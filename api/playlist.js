@@ -1,146 +1,141 @@
 export default async function handler(req, res) {
 
-const jsonUrl = "https://ipl2020-46d2f.firebaseio.com/Json.json";
+  const jsonUrl = "https://ipl2020-46d2f.firebaseio.com/Json.json";
 
-function unpack(code){
-try{
-const evalPattern=/eval\(function\(p,a,c,k,e,d\).+?\}\('(.*?)',(\d+),(\d+),'(.*?)'\.split\(\'\|'\)\)\)/;
-const m=code.match(evalPattern);
+  function unpack(code) {
+    try {
+      const evalPattern = /eval\(function\(p,a,c,k,e,d\).+?\}\('(.*?)',(\d+),(\d+),'(.*?)'\.split\(\'\|'\)\)\)/;
+      const evalContent = code.match(evalPattern);
 
-if(m){
-let p=m[1];
-let a=parseInt(m[2]);
-let c=parseInt(m[3]);
-let k=m[4].split('|');
+      if (evalContent) {
+        let [_, p, a, c, k] = evalContent;
+        a = parseInt(a);
+        c = parseInt(c);
+        k = k.split('|');
 
-while(c--){
-if(k[c]){
-p=p.replace(new RegExp('\\b'+c.toString(a)+'\\b','g'),k[c]);
-}
-}
+        while (c--) {
+          if (k[c]) {
+            p = p.replace(new RegExp('\\b' + c.toString(a) + '\\b', 'g'), k[c]);
+          }
+        }
+        return p;
+      }
+    } catch (e) {}
 
-return p;
-}
+    return code;
+  }
 
-}catch(e){}
+  async function getLiveDomain(testUrls) {
+    for (let url of testUrls) {
+      try {
+        const r = await fetch(url, { method: "HEAD", redirect: "follow" });
+        if (r.ok) return new URL(r.url).origin + "/";
+      } catch (e) {}
+    }
+    return testUrls[0];
+  }
 
-return code;
-}
+  try {
 
-async function getLiveDomain(list){
+    const r = await fetch(jsonUrl);
+    let text = await r.text();
 
-for(const url of list){
+    text = text.replace(/,[ \t\r\n]*([\]}])/g, "$1");
+    const data = JSON.parse(text);
 
-try{
+    const prmoviesDomains = [
+      "https://prmovies.tours/",
+      "https://prmovies.to/",
+      "https://prmovies.vc/"
+    ];
 
-const r=await fetch(url,{method:"HEAD",redirect:"follow"});
+    const speedoDomains = [
+      "https://speedostream1.com/",
+      "https://speedostream2.com/",
+      "https://speedostream.com/"
+    ];
 
-if(r.ok){
-return new URL(r.url).origin+"/";
-}
+    const officialSite = await getLiveDomain(prmoviesDomains);
+    const streamBase = await getLiveDomain(speedoDomains);
+    const targetHost = new URL(streamBase).host;
 
-}catch(e){}
+    let m3uContent = "#EXTM3U\n\n";
 
-}
+    const promises = data.map(async (item) => {
 
-return list[0];
+      try {
 
-}
+        const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, "");
+        const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${cleanId}.html`;
 
-try{
+        const streamResponse = await fetch(embedUrl, {
+          headers: {
+            "User-Agent": "Mozilla/5.0",
+            "Referer": officialSite,
+            "Origin": officialSite.replace(/\/$/, "")
+          }
+        });
 
-const r=await fetch(jsonUrl);
-let text=await r.text();
+        let source = await streamResponse.text();
+        const decoded = unpack(source);
 
-text=text.replace(/,[ \t\r\n]*([\]}])/g,'$1');
+        const m3u8Regex = /(https?:\/\/[^\s"'<>]+\.m3u8[^"'\s<>]*)/i;
+        const match = decoded.match(m3u8Regex) || source.match(m3u8Regex);
 
-const data=JSON.parse(text);
+        if (match) {
 
-const prmoviesDomains=[
-"https://prmovies.tours/",
-"https://prmovies.to/",
-"https://prmovies.vc/"
-];
+          const m3u8 = match[1].replace(/\\/g, "");
+          const originHost = `https://${targetHost}`;
 
-const speedoDomains=[
-"https://speedostream1.com/",
-"https://speedostream2.com/",
-"https://speedostream.com/"
-];
+          const finalUrl =
+            `${m3u8}|referer=${originHost}/&origin=${originHost}`;
 
-const officialSite=await getLiveDomain(prmoviesDomains);
-const streamBase=await getLiveDomain(speedoDomains);
+          let entry =
+            `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo}" group-title="${item.group}",${item.name}\n`;
 
-const targetHost=new URL(streamBase).host;
+          entry += `${finalUrl}\n\n`;
 
-let m3u="#EXTM3U\n\n";
+          return entry;
+        }
 
-for(const item of data){
+        return "";
 
-try{
+      } catch (e) {
+        return "";
+      }
 
-const cleanId=item.id.replace(/[^a-zA-Z0-9]/g,'');
+    });
 
-const embedUrl=`${streamBase.replace(/\/$/,"")}/embed-${cleanId}.html`;
+    const m3uEntries = await Promise.all(promises);
+    m3uContent += m3uEntries.join("");
 
-const streamRes=await fetch(embedUrl,{
-headers:{
-"User-Agent":"Mozilla/5.0",
-"Referer":officialSite,
-"Origin":officialSite.replace(/\/$/,"")
-}
-});
+    const extraM3uUrl =
+      "https://raw.githubusercontent.com/Prtstream820894/prtstreams/main/mx.m3u";
 
-let source=await streamRes.text();
+    try {
 
-const decoded=unpack(source);
+      const extraRes = await fetch(extraM3uUrl);
 
-const regex=/(https?:\/\/[^\s"'<>]+\.m3u8[^"'\s<>]*)/i;
+      if (extraRes.ok) {
 
-const match=decoded.match(regex)||source.match(regex);
+        let extraText = await extraRes.text();
+        extraText = extraText.replace(/^#EXTM3U\s*/i, "");
 
-if(match){
+        m3uContent += "\n" + extraText;
 
-const m3u8=match[1].replace(/\\/g,'');
+      }
 
-const origin=`https://${targetHost}`;
+    } catch (e) {}
 
-const finalUrl=`${m3u8}|referer=${origin}/&origin=${origin}`;
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Access-Control-Allow-Origin", "*");
 
-m3u+=`#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo}" group-title="${item.group}",${item.name}\n`;
-m3u+=`${finalUrl}\n\n`;
+    res.send(m3uContent);
 
-}
+  } catch (err) {
 
-}catch(e){}
+    res.status(500).send("Error: " + err.message);
 
-}
-
-try{
-
-const extra=await fetch("https://raw.githubusercontent.com/Prtstream820894/prtstreams/main/mx.m3u");
-
-if(extra.ok){
-
-let txt=await extra.text();
-
-txt=txt.replace(/^#EXTM3U\s*/i,'');
-
-m3u+="\n"+txt;
-
-}
-
-}catch(e){}
-
-res.setHeader("Content-Type","text/plain; charset=utf-8");
-
-res.send(m3u);
-
-}catch(err){
-
-res.status(500).send("Error: "+err.message);
+  }
 
 }
-
-}
-// update
