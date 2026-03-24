@@ -1,29 +1,36 @@
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
-  try {
-    const url = "https://ipl2020-46d2f.firebaseio.com/Webplalist.json";
+    const jsonUrl = 'https://ipl2020-46d2f.firebaseio.com/Webplalist.json';
 
-    const response = await fetch(url);
-    const text = await response.text(); // raw response
+    try {
+        const response = await fetch(jsonUrl);
+        const data = await response.json();
 
-    console.log("Firebase Raw:", text);
+        // M3U Header start
+        let m3u = '#EXTM3U\n';
 
-    const data = JSON.parse(text);
+        // JSON array par loop chalana
+        data.forEach((item) => {
+            const name = item.name || "Unknown Title";
+            const logo = item.logo || "";
+            const group = item.group || "Movies";
+            const url = item.id || ""; // Aapke JSON mein 'id' hi link hai
 
-    let m3u = "#EXTM3U\n\n";
+            if (url) {
+                // M3U Format mapping
+                m3u += `#EXTINF:-1 group-title="${group}" tvg-logo="${logo}",${name}\n`;
+                m3u += `${url}\n`;
+            }
+        });
 
-    const items = Array.isArray(data) ? data : Object.values(data || {});
+        // Response headers for M3U file
+        res.setHeader('Content-Type', 'audio/x-mpegurl');
+        res.setHeader('Content-Disposition', 'inline; filename="playlist.m3u"');
+        
+        return res.status(200).send(m3u);
 
-    items.forEach(item => {
-      if (!item.url) return;
-
-      m3u += `#EXTINF:-1 group-title="${item.group || "Other"}" tvg-logo="${item.logo || ""}",${item.name || "No Name"}\n`;
-      m3u += `${item.url}\n\n`;
-    });
-
-    res.setHeader("Content-Type", "text/plain");
-    res.status(200).send(m3u || "EMPTY PLAYLIST");
-
-  } catch (err) {
-    res.status(500).send("ERROR: " + err.message);
-  }
+    } catch (error) {
+        return res.status(500).send("Error fetching or parsing JSON: " + error.message);
+    }
 }
