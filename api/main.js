@@ -1,25 +1,52 @@
 export default async function handler(req, res) {
   try {
-    const url1 = "https://fancy-morning-a287.poonamchouhan076.workers.dev/";
-    const url2 = "https://tight-firefly-ecdd.poonamchouhan076.workers.dev/";
-    const url3 = "http://ekjhirastreaming.42web.io/zee3.php";
+    const urls = [
+      "https://fancy-morning-a287.poonamchouhan076.workers.dev/", // 1st
+      "https://tight-firefly-ecdd.poonamchouhan076.workers.dev/", // 2nd
+      "https://late-hat-1b4a.poonamchouhan076.workers.dev/"      // 3rd
+    ];
 
-    // Fetch all playlists
-    const [p1, p2, p3] = await Promise.all([
-      fetch(url1).then(r => r.text()),
-      fetch(url2).then(r => r.text()),
-      fetch(url3).then(r => r.text())
-    ]);
+    const seen = new Set();
+    let finalChannels = [];
 
-    // Clean headers (#EXTM3U remove)
-    const cleanP1 = p1.replace("#EXTM3U", "").trim();
-    const cleanP2 = p2.replace("#EXTM3U", "").trim();
-    const cleanP3 = p3.replace("#EXTM3U", "").trim();
+    for (let url of urls) {
+      const text = await fetch(url).then(r => r.text());
 
-    // Final merged playlist (Top → Bottom → Last)
-    const finalPlaylist = `#EXTM3U\n${cleanP1}\n${cleanP2}\n${cleanP3}`;
+      const lines = text.replace("#EXTM3U", "").trim().split("\n");
+
+      let tempBlock = [];
+
+      for (let line of lines) {
+        if (line.startsWith("#EXTINF")) {
+
+          if (tempBlock.length) {
+            const key = tempBlock[0];
+
+            if (!seen.has(key)) {
+              seen.add(key);
+              finalChannels.push(...tempBlock);
+            }
+
+            tempBlock = [];
+          }
+        }
+        tempBlock.push(line);
+      }
+
+      // last block
+      if (tempBlock.length) {
+        const key = tempBlock[0];
+        if (!seen.has(key)) {
+          seen.add(key);
+          finalChannels.push(...tempBlock);
+        }
+      }
+    }
+
+    const finalPlaylist = "#EXTM3U\n" + finalChannels.join("\n");
 
     res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
+    res.setHeader("Cache-Control", "s-maxage=300");
     res.status(200).send(finalPlaylist);
 
   } catch (e) {
