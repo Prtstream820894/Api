@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   try {
     const url1 = "https://fancy-morning-a287.poonamchouhan076.workers.dev/";
     const url2 = "https://tight-firefly-ecdd.poonamchouhan076.workers.dev/";
-    const url3 = "http://ekjhirastreaming.42web.io/zee3.php";
+    const url3 = "https://ekjhirastreaming.42web.io/zee3.php";
 
     // Fetch all playlists
     const [p1, p2, p3] = await Promise.all([
