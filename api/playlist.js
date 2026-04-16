@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
 
-  const workerUrl = "https://raspy-firefly-02ff.prtstream.workers.dev/";
+  const workerUrl = "https://wild-snowflake-c305.poonamchouhan076.workers.dev/";
 
   try {
 
