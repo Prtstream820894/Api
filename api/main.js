@@ -1,18 +1,20 @@
 export default async function handler(req, res) {
   try {
     const urls = [
-      "https://fancy-morning-a287.poonamchouhan076.workers.dev/", // 1st
+      "https://fancy-morning-a287.poonamchouhan076.workers.dev/", // 1st (top)
       "https://tight-firefly-ecdd.poonamchouhan076.workers.dev/", // 2nd
-      "https://late-hat-1b4a.poonamchouhan076.workers.dev/",      // 3rd
-      "https://iptv-org.github.io/iptv/index.m3u"                // 4th (new)
+      "https://late-hat-1b4a.poonamchouhan076.workers.dev/"       // 3rd
     ];
+
+    // ⚡ Parallel fetch (FAST)
+    const responses = await Promise.all(
+      urls.map(url => fetch(url).then(r => r.text()))
+    );
 
     const seen = new Set();
     let finalChannels = [];
 
-    for (let url of urls) {
-      const text = await fetch(url).then(r => r.text());
-
+    for (let text of responses) {
       const lines = text.replace("#EXTM3U", "").trim().split("\n");
 
       let tempBlock = [];
@@ -47,7 +49,10 @@ export default async function handler(req, res) {
     const finalPlaylist = "#EXTM3U\n" + finalChannels.join("\n");
 
     res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
-    res.setHeader("Cache-Control", "s-maxage=300");
+
+    // ⚡ Better caching (faster repeat loads)
+    res.setHeader("Cache-Control", "public, s-maxage=600, stale-while-revalidate=1200");
+
     res.status(200).send(finalPlaylist);
 
   } catch (e) {
