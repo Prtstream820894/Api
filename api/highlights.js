@@ -1,36 +1,40 @@
 export default async function handler(req, res) {
   try {
-    const url = "https://www.hotstar.com/in/browse/editorial/tata-ipl-2026-highlights/1271615359";
+    const pageUrl = "https://www.iplt20.com/videos/highlights";
 
-    const response = await fetch(url);
-    const html = await response.text();
-
-    // NEXT DATA extract
-    const match = html.match(/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/);
-
-    if (!match) {
-      return res.status(500).send("Data not found");
-    }
-
-    const json = JSON.parse(match[1]);
-
-    // Path thoda change ho sakta hai future me
-    const items =
-      json?.props?.pageProps?.initialState?.content?.items || [];
-
-    let m3u = "#EXTM3U\n\n";
-
-    items.forEach(item => {
-      const title = item?.title || "No Title";
-      const img = item?.images?.horizontal?.[0]?.url || "";
-      const slug = item?.slug || "";
-
-      const link = "https://www.hotstar.com" + slug;
-
-      m3u += `#EXTINF:-1 group-title="IPL Highlights" tvg-logo="${img}",${title}\n${link}\n\n`;
+    const response = await fetch(pageUrl, {
+      headers: {
+        "user-agent": "Mozilla/5.0"
+      }
     });
 
-    res.setHeader("Content-Type", "text/plain");
+    const html = await response.text();
+
+    // Find all highlight cards only from list section
+    const cardRegex = /<a[^>]+href="([^"]*highlights[^"]*)"[^>]*>[\s\S]*?<img[^>]+src="([^"]+)"[\s\S]*?<h[0-9][^>]*>(.*?)<\/h[0-9]>/gi;
+
+    let m3u = "#EXTM3U\n\n";
+    let match;
+    let count = 0;
+
+    while ((match = cardRegex.exec(html)) !== null) {
+      let url = match[1];
+      let img = match[2];
+      let title = match[3].replace(/<[^>]+>/g, "").trim();
+
+      if (!url.startsWith("http")) {
+        url = "https://www.iplt20.com" + url;
+      }
+
+      m3u += `#EXTINF:-1 group-title="IPL Highlights" tvg-logo="${img}",${title}\n${url}\n\n`;
+      count++;
+    }
+
+    if (!count) {
+      return res.status(500).send("No highlights found");
+    }
+
+    res.setHeader("content-type", "text/plain");
     res.send(m3u);
 
   } catch (e) {
