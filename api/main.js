@@ -4,7 +4,7 @@ export default async function handler(req, res) {
       "https://fancy-morning-a287.poonamchouhan076.workers.dev/", // 1st
       "https://tight-firefly-ecdd.poonamchouhan076.workers.dev/", // 2nd
       "https://late-hat-1b4a.poonamchouhan076.workers.dev/",      // 3rd
-      ""                // 4th (new)
+      "https://iptv-org.github.io/iptv/index.m3u"                // 4th (new)
     ];
 
     const seen = new Set();
