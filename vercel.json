@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    {
+      "source": "/live.mpd",
+      "destination": "/api/index"
+    }
+  ]
+}
+
