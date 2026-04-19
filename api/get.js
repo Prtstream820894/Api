@@ -1,50 +1,67 @@
+import chromium from '@sparticuz/chromium';
+import puppeteer from 'puppeteer-core';
+
 export default async function handler(req, res) {
-  const targetUrl = "https://game.denver69.fun/Jtv/";
-  
+  let browser = null;
   try {
-    // 1. Fetching the page with Browser-like Headers
-    const response = await fetch(targetUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': 'https://game.denver69.fun/',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,'
-      }
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: true,
     });
 
-    const html = await response.text();
+    const page = await browser.newPage();
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
 
-    // 2. Debugging: Agar source empty hai toh check karein
-    if (!html || html.length < 100) {
-      return res.status(500).json({ error: "Site blocked the request or empty response" });
-    }
+    // Step 1: Main Page par jana
+    await page.goto('https://game.denver69.fun/Jtv/', { waitUntil: 'networkidle2' });
 
-    // 3. Robust Regex: Ye 'jcevents' aur 'hdntl' dono ko dhoondhega
-    // Ye pattern pure line ko capture karega jisme hotstar ka link ho
-    const linkRegex = /(https:\/\/jcevents\.hotstar\.com\/bpk-tv\/.*?.m3u8\?\|.*?)(?=["'\s<>])/g;
-    const match = html.match(linkRegex);
+    // Step 2: Check for "Manage Token" or "Delete"
+    const needsDelete = await page.evaluate(() => {
+      const links = Array.from(document.querySelectorAll('a, button'));
+      // Check agar 'Manage' ya 'Delete' jaisa kuch likha hai
+      return links.some(el => el.innerText.toLowerCase().includes('manage') || el.innerText.toLowerCase().includes('delete'));
+    });
 
-    if (match && match[0]) {
-      const fullUrl = match[0];
+    if (needsDelete) {
+      // Agar Manage option hai toh uspar click karo
+      await page.evaluate(() => {
+        const links = Array.from(document.querySelectorAll('a, button'));
+        const target = links.find(el => el.innerText.toLowerCase().includes('manage') || el.innerText.toLowerCase().includes('delete'));
+        if (target) target.click();
+      });
+      await new Promise(r => setTimeout(r, 2000)); // Delete action process hone ka wait
       
-      // Cookie extract karne ke liye
-      const cookieMatch = fullUrl.match(/hdntl=exp=[^&|\s]+/);
-      const cookie = cookieMatch ? cookieMatch[0] : "Cookie not found in URL";
-
-      res.status(200).json({
-        success: true,
-        extracted_url: fullUrl,
-        cookie: cookie,
-        raw_match: match[0]
-      });
-    } else {
-      // Agar match nahi mila toh html ka ek chota hissa return karein debug ke liye
-      res.status(404).json({ 
-        error: "Token/Cookie not found in source",
-        hint: "Check if 'Generate' button needs to be clicked first",
-        preview: html.substring(0, 500).replace(/<[^>]*>?/gm, '') // Stripping tags for preview
-      });
+      // Delete karne ke baad wapas main page par aana agar auto-redirect nahi hua
+      await page.goto('https://game.denver69.fun/Jtv/', { waitUntil: 'networkidle2' });
     }
-  } catch (err) {
-    res.status(500).json({ error: "Server Error", details: err.message });
+
+    // Step 3: "Generate Game Token" par click karna
+    await page.evaluate(() => {
+      const links = Array.from(document.querySelectorAll('a, button'));
+      const genBtn = links.find(el => el.innerText.includes('Generate Game Token'));
+      if (genBtn) genBtn.click();
+    });
+
+    // Step 4: Wait for Dashboard/M3U source to appear
+    // Yahan hum 5-7 second wait karenge taaki server process karle
+    await new Promise(r => setTimeout(r, 6000)); 
+
+    // Step 5: Final Source nikalna
+    const finalSource = await page.content();
+
+    // Output for debugging
+    res.status(200).send(`
+      <div style="background:#000; color:#0f0; padding:20px; font-family:monospace;">
+        <h2>--- DASHBOARD SOURCE START ---</h2>
+        <pre>${finalSource.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+        <h2>--- DASHBOARD SOURCE END ---</h2>
+      </div>
+    `);
+
+  } catch (error) {
+    res.status(500).json({ error: "Automation Failed", message: error.message });
+  } finally {
+    if (browser !== null) await browser.close();
   }
 }
