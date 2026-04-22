@@ -1,10 +1,10 @@
 export default async function handler(req, res) {
-  try {
-    // NAYA: Secret key check - agar ?prtstream nahi hai to block
-    if (!('prtstream' in req.query)) {
-      return res.status(403).send("Access Denied: Invalid Key");
-    }
+  // Sirf ?prtstream check - nahi hai to block
+  if (!('prtstream' in req.query)) {
+    return res.status(403).send("Access Denied");
+  }
 
+  try {
     const url1 = "https://project-lc4mz.vercel.app/api/main";
     const url2 = "https://bold-bird-0854.poonamchouhan076.workers.dev/";
 
@@ -15,12 +15,8 @@ export default async function handler(req, res) {
       try {
         const response = await fetch(url + "?t=" + Date.now(), {
           signal: controller.signal,
-          headers: {
-            "Cache-Control": "no-cache",
-            "Pragma": "no-cache"
-          }
+          headers: { "Cache-Control": "no-cache", "Pragma": "no-cache" }
         });
-
         return await response.text();
       } catch (err) {
         return "";
@@ -40,16 +36,13 @@ export default async function handler(req, res) {
 
     let data2 = "";
     if (data2Raw) {
-      data2 = data2Raw
-        .replace("#EXTM3U", "")
-        .replace(/\r/g, "")
-        .trim();
+      data2 = data2Raw.replace("#EXTM3U", "").replace(/\r/g, "").trim();
     }
 
     const finalPlaylist = data1.trim() + "\n" + data2;
 
     res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
-    res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");
+    res.setHeader("Cache-Control", "no-store");
     res.status(200).send(finalPlaylist);
 
   } catch (error) {
