@@ -1,67 +1,49 @@
-import chromium from '@sparticuz/chromium';
-import puppeteer from 'puppeteer-core';
-
 export default async function handler(req, res) {
-  let browser = null;
+  const default_cookie = "hdntl=exp=1776988846~acl=%2f*~id=019eb050fa99295f1bbe0e2d61f83918~data=hdntl~hmac=11a8663ccb5a44f4c5ddb7b3ff6abb484242001f6ad009009944870ee17353d1";
+
+  const url = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
+
   try {
-    browser = await puppeteer.launch({
-      args: chromium.args,
-      executablePath: await chromium.executablePath(),
-      headless: true,
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "*/*"
+      }
     });
 
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    const text = await response.text();
+    let cookie_found = false;
 
-    // Step 1: Main Page par jana
-    await page.goto('https://game.denver69.fun/Jtv/', { waitUntil: 'networkidle2' });
+    const lines = text.split("\n");
 
-    // Step 2: Check for "Manage Token" or "Delete"
-    const needsDelete = await page.evaluate(() => {
-      const links = Array.from(document.querySelectorAll('a, button'));
-      // Check agar 'Manage' ya 'Delete' jaisa kuch likha hai
-      return links.some(el => el.innerText.toLowerCase().includes('manage') || el.innerText.toLowerCase().includes('delete'));
-    });
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].includes("JC_ColorsHD.m3u8")) {
+        const extinf = lines[i - 1] || "";
 
-    if (needsDelete) {
-      // Agar Manage option hai toh uspar click karo
-      await page.evaluate(() => {
-        const links = Array.from(document.querySelectorAll('a, button'));
-        const target = links.find(el => el.innerText.toLowerCase().includes('manage') || el.innerText.toLowerCase().includes('delete'));
-        if (target) target.click();
-      });
-      await new Promise(r => setTimeout(r, 2000)); // Delete action process hone ka wait
-      
-      // Delete karne ke baad wapas main page par aana agar auto-redirect nahi hua
-      await page.goto('https://game.denver69.fun/Jtv/', { waitUntil: 'networkidle2' });
+        const match = extinf.match(/"Cookie":"([^"]+)"/);
+
+        if (match) {
+          res.status(200).send(`
+            <h3>🍪 Live Cookie:</h3>
+            ${match[1]}
+          `);
+          cookie_found = true;
+        }
+        break;
+      }
     }
 
-    // Step 3: "Generate Game Token" par click karna
-    await page.evaluate(() => {
-      const links = Array.from(document.querySelectorAll('a, button'));
-      const genBtn = links.find(el => el.innerText.includes('Generate Game Token'));
-      if (genBtn) genBtn.click();
-    });
+    if (!cookie_found) {
+      res.status(200).send(`
+        <h3>⚠️ Default Cookie (Fallback):</h3>
+        ${default_cookie}
+      `);
+    }
 
-    // Step 4: Wait for Dashboard/M3U source to appear
-    // Yahan hum 5-7 second wait karenge taaki server process karle
-    await new Promise(r => setTimeout(r, 6000)); 
-
-    // Step 5: Final Source nikalna
-    const finalSource = await page.content();
-
-    // Output for debugging
-    res.status(200).send(`
-      <div style="background:#000; color:#0f0; padding:20px; font-family:monospace;">
-        <h2>--- DASHBOARD SOURCE START ---</h2>
-        <pre>${finalSource.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
-        <h2>--- DASHBOARD SOURCE END ---</h2>
-      </div>
+  } catch (err) {
+    res.status(500).send(`
+      <h3>❌ Error:</h3>
+      ${default_cookie}
     `);
-
-  } catch (error) {
-    res.status(500).json({ error: "Automation Failed", message: error.message });
-  } finally {
-    if (browser !== null) await browser.close();
   }
 }
