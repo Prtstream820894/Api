@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   // Sirf ?prtstream check - nahi hai to block
   if (!('prtstream' in req.query)) {
-    return res.status(403).send("Access Denied");
+    return res.status(403).send("Access Denied Yah Link Sirf Prtstream App Me Chalenga Copy Karo Link Ko Or PrtStream Me jake Paste Karo");
   }
 
   try {
