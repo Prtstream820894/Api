@@ -6,14 +6,8 @@ function unpack(code) {
         const evalContent = code.match(evalPattern);
         if (evalContent) {
             let [_, p, a, c, k] = evalContent;
-            a = parseInt(a);
-            c = parseInt(c);
-            k = k.split('|');
-            while (c--) {
-                if (k[c]) {
-                    p = p.replace(new RegExp('\\b' + c.toString(a) + '\\b', 'g'), k[c]);
-                }
-            }
+            a = parseInt(a); c = parseInt(c); k = k.split('|');
+            while (c--) { if (k[c]) p = p.replace(new RegExp('\\b' + c.toString(a) + '\\b', 'g'), k[c]); }
             return p;
         }
     } catch (e) {}
@@ -23,7 +17,7 @@ function unpack(code) {
 async function getLiveDomain(testUrls) {
     for (let url of testUrls) {
         try {
-            const res = await fetch(url, { method: 'HEAD', timeout: 3000 });
+            const res = await fetch(url, { method: 'HEAD', timeout: 2000 });
             if (res.ok) return new URL(res.url).origin + "/";
         } catch (e) {}
     }
@@ -31,49 +25,57 @@ async function getLiveDomain(testUrls) {
 }
 
 module.exports = async (req, res) => {
+    const { play } = req.query;
+    const host = `https://${req.headers.host}`;
+
     try {
-        const jsonResponse = await fetch("https://ipl2020-46d2f.firebaseio.com/Json.json");
-        const data = await jsonResponse.json();
+        // --- PLAY MODE (Jab App video request karega) ---
+        if (play) {
+            const officialSite = await getLiveDomain(["https://prmovies.pizza/", "https://prmovies.to/"]);
+            const streamBase = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
+            const targetHost = new URL(streamBase).host;
+            const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${play}.html`;
 
-        // Limit data to prevent Vercel Timeout (Pehle 50 items check karte hain)
-        const limitedData = data.slice(0, 60);
+            const streamRes = await fetch(embedUrl, {
+                headers: { "User-Agent": "Mozilla/5.0", "Referer": officialSite },
+                timeout: 5000
+            });
 
-        const officialSite = await getLiveDomain(["https://prmovies.pizza/", "https://prmovies.to/"]);
-        const streamBase = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
-        const targetHost = new URL(streamBase).host;
+            const source = await streamRes.text();
+            const decoded = unpack(source);
+            const m3u8Regex = /(https?[:\/\/\w\.\-\%\!\?\&\=\,]+?\.m3u8[^\s"']*)/i;
+            const match = decoded.match(m3u8Regex) || source.match(m3u8Regex);
 
-        const results = await Promise.all(limitedData.map(async (item) => {
-            try {
-                const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
-                const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${cleanId}.html`;
+            if (match) {
+                const directUrl = match[1].replace(/\\/g, '');
+                // Apps ke liye Referer aur Origin zaroori hain
+                const finalUrl = `${directUrl}|Referer=https://${targetHost}/&Origin=https://${targetHost}`;
+                
+                // Hum direct redirect karenge, agar player smart hai toh uthalega
+                res.redirect(302, finalUrl);
+                return;
+            }
+            return res.status(404).send("Stream Link Not Found");
+        }
 
-                const streamRes = await fetch(embedUrl, {
-                    headers: {
-                        "User-Agent": "Mozilla/5.0",
-                        "Referer": officialSite
-                    },
-                    timeout: 5000
-                });
+        // --- LIST MODE (M3U8 Playlist generate karega) ---
+        const jsonRes = await fetch("https://ipl2020-46d2f.firebaseio.com/Json.json");
+        const data = await jsonRes.json();
 
-                const source = await streamRes.text();
-                const decoded = unpack(source);
-                const m3u8Regex = /(https?[:\/\/\w\.\-\%\!\?\&\=\,]+?\.m3u8[^\s"']*)/i;
-                const match = decoded.match(m3u8Regex) || source.match(m3u8Regex);
+        let playlist = "#EXTM3U\n";
+        data.forEach(item => {
+            const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
+            // Aapka Vercel URL jo play mode ko trigger karega
+            const playLink = `${host}/api/speedo?play=${cleanId}`;
+            
+            playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo}" group-title="${item.group}",${item.name}\n${playLink}\n`;
+        });
 
-                if (match) {
-                    const m3u8 = match[1].replace(/\\/g, '');
-                    const originHost = `https://${targetHost}`;
-                    return `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo}" group-title="${item.group}",${item.name}\n${m3u8}|Referer=${originHost}&Origin=${originHost}\n`;
-                }
-            } catch (e) {}
-            return "";
-        }));
-
-        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.setHeader('Content-Type', 'application/x-mpegurl'); // Correct M3U Type
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.status(200).send("#EXTM3U\n" + results.join(""));
+        res.status(200).send(playlist);
 
     } catch (err) {
-        res.status(500).send("Server Error: " + err.message);
+        res.status(500).send("#EXTM3U\n#ERROR: " + err.message);
     }
 };
