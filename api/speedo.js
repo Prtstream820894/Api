@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
     const host = `https://${req.headers.host}`;
 
     try {
-        // --- PLAY MODE (Jab App video request karega) ---
+        // --- PLAY MODE ---
         if (play) {
             const officialSite = await getLiveDomain(["https://prmovies.pizza/", "https://prmovies.to/"]);
             const streamBase = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
@@ -48,34 +48,41 @@ module.exports = async (req, res) => {
 
             if (match) {
                 const directUrl = match[1].replace(/\\/g, '');
-                // Apps ke liye Referer aur Origin zaroori hain
                 const finalUrl = `${directUrl}|Referer=https://${targetHost}/&Origin=https://${targetHost}`;
-                
-                // Hum direct redirect karenge, agar player smart hai toh uthalega
                 res.redirect(302, finalUrl);
                 return;
             }
             return res.status(404).send("Stream Link Not Found");
         }
 
-        // --- LIST MODE (M3U8 Playlist generate karega) ---
+        // --- LIST MODE ---
         const jsonRes = await fetch("https://ipl2020-46d2f.firebaseio.com/Json.json");
-        const data = await jsonRes.json();
+        let text = await jsonRes.text();
+        
+        // JSON Clean up: Kabhi-kabhi trailing commas (,) ki wajah se crash hota hai
+        text = text.replace(/,[ \t\r\n]*([\]}])/g, '$1');
+        const data = JSON.parse(text);
 
         let playlist = "#EXTM3U\n";
-        data.forEach(item => {
-            const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
-            // Aapka Vercel URL jo play mode ko trigger karega
-            const playLink = `${host}/api/speedo?play=${cleanId}`;
-            
-            playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo}" group-title="${item.group}",${item.name}\n${playLink}\n`;
-        });
+        
+        if (Array.isArray(data)) {
+            data.forEach(item => {
+                // YAHAN FIX HAI: Check karein ki item exist karta hai aur uska ID hai
+                if (item && item.id) {
+                    const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
+                    const playLink = `${host}/api/speedo?play=${cleanId}`;
+                    
+                    playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
+                }
+            });
+        }
 
-        res.setHeader('Content-Type', 'application/x-mpegurl'); // Correct M3U Type
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.status(200).send(playlist);
 
     } catch (err) {
+        // Error ko clearly print karega taaki hum samajh sakein kya hua
         res.status(500).send("#EXTM3U\n#ERROR: " + err.message);
     }
 };
