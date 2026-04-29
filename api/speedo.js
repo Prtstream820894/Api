@@ -29,17 +29,20 @@ module.exports = async (req, res) => {
     const host = `https://${req.headers.host}`;
 
     try {
+        // --- PLAY MODE (Extracting Real M3U8) ---
         if (play) {
-            play = play.replace('.m3u8', '');
+            play = play.replace('.m3u8', ''); // Extension safai
 
             const officialSite = await getLiveDomain(["https://prmovies.pizza/", "https://prmovies.to/"]);
             const streamBase = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
-            const targetHost = new URL(streamBase).origin;
+            const targetHost = new URL(streamBase).host;
             const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${play}.html`;
 
-            // 1. Pehle page fetch karo
             const streamRes = await fetch(embedUrl, {
-                headers: { "User-Agent": "Mozilla/5.0", "Referer": officialSite },
+                headers: { 
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36", 
+                    "Referer": officialSite 
+                },
                 timeout: 5000
             });
 
@@ -50,44 +53,39 @@ module.exports = async (req, res) => {
 
             if (match) {
                 const finalM3u8 = match[1].replace(/\\/g, '');
+                // Final link with headers for the player
+                const linkWithHeaders = `${finalM3u8}|Referer=https://${targetHost}/&Origin=https://${targetHost}`;
                 
-                // 2. AB PROXY: Player ko redirect karne ke bajaye, hum link ka content mangwayenge
-                const videoRes = await fetch(finalM3u8, {
-                    headers: {
-                        "User-Agent": "Mozilla/5.0",
-                        "Referer": targetHost + "/",
-                        "Origin": targetHost
-                    }
-                });
-
-                const m3u8Content = await videoRes.text();
-
-                // 3. Sabse zaruri: .m3u8 content ke andar ke paths ko fix karna
-                // Hum content wahi bhejenge jo link ke andar hai
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
-                return res.status(200).send(m3u8Content);
+                // Redirecting to the actual streaming file
+                res.redirect(302, linkWithHeaders);
+                return;
             }
-            return res.status(404).send("Link Not Found");
+            return res.status(404).send("Streaming link not found on source");
         }
 
-        // --- LIST MODE (Playlist) ---
+        // --- LIST MODE (Generating Playlist) ---
         const jsonRes = await fetch("https://ipl2020-46d2f.firebaseio.com/Json.json");
-        let data = await jsonRes.json();
+        let text = await jsonRes.text();
+        text = text.replace(/,[ \t\r\n]*([\]}])/g, '$1');
+        const data = JSON.parse(text);
 
         let playlist = "#EXTM3U\n";
-        data.forEach(item => {
-            if (item && item.id) {
-                const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
-                const playLink = `${host}/api/speedo/${cleanId}.m3u8`;
-                playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
-            }
-        });
+        if (Array.isArray(data)) {
+            data.forEach(item => {
+                if (item && item.id) {
+                    const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
+                    // Format: /api/speedo/ID.m3u8
+                    const playLink = `${host}/api/speedo/${cleanId}.m3u8`;
+                    playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
+                }
+            });
+        }
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.setHeader('Access-Control-Allow-Origin', '*');
         res.status(200).send(playlist);
 
     } catch (err) {
-        res.status(500).send("Error: " + err.message);
+        res.status(500).send("#EXTM3U\n#ERROR: " + err.message);
     }
 };
