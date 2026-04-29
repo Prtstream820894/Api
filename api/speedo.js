@@ -25,19 +25,24 @@ async function getLiveDomain(testUrls) {
 }
 
 module.exports = async (req, res) => {
-    const { play } = req.query;
+    let { play } = req.query;
     const host = `https://${req.headers.host}`;
 
     try {
-        // --- PLAY MODE ---
+        // --- PLAY MODE (Extracting Real M3U8) ---
         if (play) {
+            play = play.replace('.m3u8', ''); // Extension safai
+
             const officialSite = await getLiveDomain(["https://prmovies.pizza/", "https://prmovies.to/"]);
             const streamBase = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
             const targetHost = new URL(streamBase).host;
             const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${play}.html`;
 
             const streamRes = await fetch(embedUrl, {
-                headers: { "User-Agent": "Mozilla/5.0", "Referer": officialSite },
+                headers: { 
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36", 
+                    "Referer": officialSite 
+                },
                 timeout: 5000
             });
 
@@ -47,31 +52,30 @@ module.exports = async (req, res) => {
             const match = decoded.match(m3u8Regex) || source.match(m3u8Regex);
 
             if (match) {
-                const directUrl = match[1].replace(/\\/g, '');
-                const finalUrl = `${directUrl}|Referer=https://${targetHost}/&Origin=https://${targetHost}`;
-                res.redirect(302, finalUrl);
+                const finalM3u8 = match[1].replace(/\\/g, '');
+                // Final link with headers for the player
+                const linkWithHeaders = `${finalM3u8}|Referer=https://${targetHost}/&Origin=https://${targetHost}`;
+                
+                // Redirecting to the actual streaming file
+                res.redirect(302, linkWithHeaders);
                 return;
             }
-            return res.status(404).send("Stream Link Not Found");
+            return res.status(404).send("Streaming link not found on source");
         }
 
-        // --- LIST MODE ---
+        // --- LIST MODE (Generating Playlist) ---
         const jsonRes = await fetch("https://ipl2020-46d2f.firebaseio.com/Json.json");
         let text = await jsonRes.text();
-        
-        // JSON Clean up: Kabhi-kabhi trailing commas (,) ki wajah se crash hota hai
         text = text.replace(/,[ \t\r\n]*([\]}])/g, '$1');
         const data = JSON.parse(text);
 
         let playlist = "#EXTM3U\n";
-        
         if (Array.isArray(data)) {
             data.forEach(item => {
-                // YAHAN FIX HAI: Check karein ki item exist karta hai aur uska ID hai
                 if (item && item.id) {
                     const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
-                    const playLink = `${host}/api/speedo?play=${cleanId}`;
-                    
+                    // Format: /api/speedo/ID.m3u8
+                    const playLink = `${host}/api/speedo/${cleanId}.m3u8`;
                     playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
                 }
             });
@@ -82,7 +86,6 @@ module.exports = async (req, res) => {
         res.status(200).send(playlist);
 
     } catch (err) {
-        // Error ko clearly print karega taaki hum samajh sakein kya hua
         res.status(500).send("#EXTM3U\n#ERROR: " + err.message);
     }
 };
