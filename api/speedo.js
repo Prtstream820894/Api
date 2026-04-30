@@ -54,7 +54,7 @@ module.exports = async (req, res) => {
             if (match) {
                 const finalM3u8 = match[1].replace(/\\/g, '');
                 // Final link with headers for the player
-                const linkWithHeaders = `${finalM3u8}|Referer=https://${targetHost}/&Origin=https://${targetHost}`;
+            
                 
                 // Redirecting to the actual streaming file
                 res.redirect(302, linkWithHeaders);
