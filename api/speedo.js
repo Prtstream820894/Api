@@ -31,11 +31,10 @@ module.exports = async (req, res) => {
     try {
         // --- PLAY MODE (Extracting Real M3U8) ---
         if (play) {
-            play = play.replace('.m3u8', ''); // Extension safai
+            play = play.replace('.m3u8', ''); // Extension clean-up
 
             const officialSite = await getLiveDomain(["https://prmovies.pizza/", "https://prmovies.to/"]);
             const streamBase = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
-            const targetHost = new URL(streamBase).host;
             const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${play}.html`;
 
             const streamRes = await fetch(embedUrl, {
@@ -52,12 +51,11 @@ module.exports = async (req, res) => {
             const match = decoded.match(m3u8Regex) || source.match(m3u8Regex);
 
             if (match) {
+                // Yahan se headers hata diye gaye hain
                 const finalM3u8 = match[1].replace(/\\/g, '');
-                // Final link with headers for the player
-            
-                    const linkWithHeaders = `${finalM3u8}|Referer=https://${targetHost}/&Origin=https://${targetHost}`;
-                // Redirecting to the actual streaming file
-                res.redirect(302, linkWithHeaders);
+                
+                // Seedha pure m3u8 link par redirect
+                res.redirect(302, finalM3u8);
                 return;
             }
             return res.status(404).send("Streaming link not found on source");
@@ -74,7 +72,6 @@ module.exports = async (req, res) => {
             data.forEach(item => {
                 if (item && item.id) {
                     const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
-                    // Format: /api/speedo/ID.m3u8
                     const playLink = `${host}/api/speedo/${cleanId}.m3u8`;
                     playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
                 }
