@@ -29,10 +29,9 @@ module.exports = async (req, res) => {
     const host = `https://${req.headers.host}`;
 
     try {
-        // --- PLAY MODE (Extracting Real M3U8) ---
+        // --- PLAY MODE ---
         if (play) {
-            play = play.replace('.m3u8', ''); // Extension clean-up
-
+            play = play.replace('.m3u8', '');
             const officialSite = await getLiveDomain(["https://prmovies.pizza/", "https://prmovies.to/"]);
             const streamBase = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
             const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${play}.html`;
@@ -51,28 +50,30 @@ module.exports = async (req, res) => {
             const match = decoded.match(m3u8Regex) || source.match(m3u8Regex);
 
             if (match) {
-                // Yahan se headers hata diye gaye hain
                 const finalM3u8 = match[1].replace(/\\/g, '');
-                
-                // Seedha pure m3u8 link par redirect
                 res.redirect(302, finalM3u8);
                 return;
             }
-            return res.status(404).send("Streaming link not found on source");
+            return res.status(404).send("Link not found");
         }
 
-        // --- LIST MODE (Generating Playlist) ---
+        // --- LIST MODE (Yahan headers add kiye gaye hain) ---
         const jsonRes = await fetch("https://ipl2020-46d2f.firebaseio.com/Json.json");
         let text = await jsonRes.text();
         text = text.replace(/,[ \t\r\n]*([\]}])/g, '$1');
         const data = JSON.parse(text);
+
+        // Header constant (aap chahein toh ise getLiveDomain se dynamic bhi bana sakte hain)
+        const headersuffix = "|Referer=https://speedostream1.com/&Origin=https://speedostream1.com";
 
         let playlist = "#EXTM3U\n";
         if (Array.isArray(data)) {
             data.forEach(item => {
                 if (item && item.id) {
                     const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
-                    const playLink = `${host}/api/speedo/${cleanId}.m3u8`;
+                    // Link ke peeche headers suffix add kar diya
+                    const playLink = `${host}/api/speedo/${cleanId}.m3u8${headersuffix}`;
+                    
                     playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
                 }
             });
