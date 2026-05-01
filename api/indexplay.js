@@ -6,7 +6,7 @@ export default async function handler(req, res) {
 
   try {
     const url1 = "https://mainplaylist.poonamchouhan076.workers.dev/";
-    const url2 = "https://bold-bird-0854.poonamchouhan076.workers.dev/";
+    const url2 = "https://allmovieslist.poonamchouhan076.workers.dev/";
 
     const fetchWithTimeout = async (url, ms = 7000) => {
       const controller = new AbortController();
