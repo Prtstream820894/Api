@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     const text = await response.text();
 
     // ===== CUT PLAYLIST =====
-    const start = text.indexOf("OTT | TP");
+    const start = text.indexOf("=== VT OTT | TP ===");
     const end = text.indexOf("-------===");
 
     const section = text.substring(start, end);
