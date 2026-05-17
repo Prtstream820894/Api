@@ -59,102 +59,103 @@ export default async function handler(req, res) {
         let mpd = "";
 
         // ===== NEXT LINES =====
-        for (let j = i + 1; j < i + 12; j++) {
+        for (let i = 0; i < lines.length; i++) {
 
-          const line = lines[j] || "";
+  if (lines[i].includes("#EXTINF")) {
 
-          // LICENSE URL
-          if (
-            line.includes(
-              "inputstream.adaptive.license_key="
-            )
-          ) {
+    const extinf = lines[i];
 
-            licenseUrl =
-              line
-                .split("license_key=")[1]
-                ?.trim() || "";
-          }
+    // PREVIOUS LINE SE LICENSE
+    let licenseLine =
+      lines[i - 2] || "";
 
-          // VLC
-          if (
-            line.includes("#EXTVLCOPT")
-          ) {
-            vlc = line;
-          }
+    let licenseUrl = "";
+    let vlc = "";
+    let http = "";
+    let mpd = "";
 
-          // HTTP
-          if (
-            line.includes("#EXTHTTP")
-          ) {
-            http = line;
-          }
+    // LICENSE URL
+    if (
+      licenseLine.includes(
+        "inputstream.adaptive.license_key="
+      )
+    ) {
 
-          // MPD
-          if (
-            line.startsWith("http") &&
-            line.includes(".mpd")
-          ) {
-            mpd = line;
-          }
-        }
+      licenseUrl =
+        licenseLine
+          .split("license_key=")[1]
+          ?.trim() || "";
+    }
 
-        // SKIP INVALID
-        if (!licenseUrl || !mpd)
-          continue;
+    // NEXT LINES
+    for (let j = i; j < i + 10; j++) {
 
-        // ===== FETCH KEY =====
-        let finalKey = "";
+      const line = lines[j] || "";
 
-        try {
+      if (
+        line.includes("#EXTVLCOPT")
+      ) {
+        vlc = line;
+      }
 
-          const keyRes =
-            await fetch(licenseUrl, {
-              headers: {
-                "user-agent":
-                  "Mozilla/5.0"
-              }
-            });
+      if (
+        line.includes("#EXTHTTP")
+      ) {
+        http = line;
+      }
 
-          const keyJson =
-            await keyRes.json();
+      if (
+        line.startsWith("http") &&
+        line.includes(".mpd")
+      ) {
+        mpd = line;
+      }
+    }
 
-          if (
-            !keyJson.keys ||
-            !keyJson.keys.length
-          ) {
-            continue;
-          }
+    // SKIP
+    if (!licenseUrl || !mpd)
+      continue;
 
-          const kid =
-            keyJson.keys[0].kid;
+    // ===== FETCH KEY =====
+    let finalKey = "";
 
-          const key =
-            keyJson.keys[0].k;
+    try {
 
-          finalKey =
-            `${kid}:${key}`;
+      const keyRes =
+        await fetch(licenseUrl);
 
-        } catch (e) {
+      const keyJson =
+        await keyRes.json();
 
-          continue;
-        }
+      const kid =
+        keyJson.keys[0].kid;
 
-        // ===== LOGO =====
-        const logo =
-          extinf.match(
-            /tvg-logo="([^"]+)"/
-          )?.[1] || "";
+      const key =
+        keyJson.keys[0].k;
 
-        // ===== CHANNEL NAME =====
-        const name =
-          extinf
-            .split(",")
-            .pop()
-            .trim();
+      finalKey =
+        `${kid}:${key}`;
 
-        // ===== FINAL OUTPUT =====
-        output +=
+    } catch (e) {
+
+      continue;
+    }
+
+    // LOGO
+    const logo =
+      extinf.match(
+        /tvg-logo="([^"]+)"/
+      )?.[1] || "";
+
+    // NAME
+    const name =
+      extinf
+        .split(",")
+        .pop()
+        .trim();
+
+    // OUTPUT
+    output +=
 `#EXTINF:-1 tvg-logo="${logo}" group-title="Sports", ${name}
 #KODIPROP:inputstream.adaptive.license_type=clearkey
 #KODIPROP:inputstream.adaptive.license_key=${finalKey}
@@ -163,8 +164,8 @@ ${http}
 ${mpd}
 
 `;
-      }
-    }
+  }
+}
 
     // ===== SAVE CACHE =====
     global.cachedPlaylist =
