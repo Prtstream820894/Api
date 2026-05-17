@@ -9,6 +9,7 @@ export default async function handler(req, res) {
 
   const now = Date.now();
 
+  // ===== RETURN CACHE =====
   if (
     global.cachedPlaylist &&
     (now - global.cacheTime) < 86400000
@@ -20,95 +21,140 @@ export default async function handler(req, res) {
 
   try {
 
+    // ===== FETCH SOURCE =====
     const response = await fetch(SOURCE);
+
     const text = await response.text();
 
-    // ===== CUT PLAYLIST =====
-    const start = text.indexOf("=== VT OTT | TP ===");
-    const end = text.indexOf("-------===");
+    // ===== START / END SECTION =====
+    const start =
+      text.indexOf(
+        "# ----------=== VT OTT | TP ===--------------"
+      );
 
-    const section = text.substring(start, end);
+    const end =
+      text.indexOf(
+        "# ----------=== Other Channels ===--------------"
+      );
 
-    const lines = section.split("\n");
+    const section =
+      text.substring(start, end);
+
+    const lines =
+      section.split("\n");
 
     let output = "#EXTM3U\n\n";
 
+    // ===== LOOP =====
     for (let i = 0; i < lines.length; i++) {
 
-      if (!lines[i].includes("#EXTINF")) continue;
+      // ONLY CHANNEL ROW
+      if (lines[i].includes("#EXTINF")) {
 
-      const extinf = lines[i];
+        const extinf = lines[i];
 
-      let licenseUrl = "";
-      let vlc = "";
-      let http = "";
-      let mpd = "";
+        let licenseUrl = "";
+        let vlc = "";
+        let http = "";
+        let mpd = "";
 
-      // ===== NEXT LINES SCAN =====
-      for (let j = i; j < i + 12; j++) {
+        // ===== NEXT LINES =====
+        for (let j = i + 1; j < i + 12; j++) {
 
-        const line = lines[j] || "";
+          const line = lines[j] || "";
 
-        if (line.includes("license_key=")) {
-          licenseUrl =
-            line.split("license_key=")[1].trim();
-        }
+          // LICENSE URL
+          if (
+            line.includes(
+              "inputstream.adaptive.license_key="
+            )
+          ) {
 
-        if (line.includes("#EXTVLCOPT")) {
-          vlc = line;
-        }
-
-        if (line.includes("#EXTHTTP")) {
-          http = line;
-        }
-
-        if (
-          line.startsWith("http") &&
-          line.includes(".mpd")
-        ) {
-          mpd = line;
-        }
-      }
-
-      if (!licenseUrl || !mpd) continue;
-
-      // ===== GET CLEARKEY =====
-      let finalKey = "";
-
-      try {
-
-        const keyRes = await fetch(licenseUrl, {
-          headers: {
-            "user-agent":
-              "Mozilla/5.0"
+            licenseUrl =
+              line
+                .split("license_key=")[1]
+                ?.trim() || "";
           }
-        });
 
-        const keyJson = await keyRes.json();
+          // VLC
+          if (
+            line.includes("#EXTVLCOPT")
+          ) {
+            vlc = line;
+          }
 
-        if (
-          !keyJson.keys ||
-          !keyJson.keys.length
-        ) continue;
+          // HTTP
+          if (
+            line.includes("#EXTHTTP")
+          ) {
+            http = line;
+          }
 
-        const kid = keyJson.keys[0].kid;
-        const key = keyJson.keys[0].k;
+          // MPD
+          if (
+            line.startsWith("http") &&
+            line.includes(".mpd")
+          ) {
+            mpd = line;
+          }
+        }
 
-        finalKey = `${kid}:${key}`;
+        // SKIP INVALID
+        if (!licenseUrl || !mpd)
+          continue;
 
-      } catch (e) {
-        continue;
-      }
+        // ===== FETCH KEY =====
+        let finalKey = "";
 
-      // ===== EXTRACT DATA =====
-      const logo =
-        extinf.match(/tvg-logo="([^"]+)"/)?.[1] || "";
+        try {
 
-      const name =
-        extinf.split(",").pop().trim();
+          const keyRes =
+            await fetch(licenseUrl, {
+              headers: {
+                "user-agent":
+                  "Mozilla/5.0"
+              }
+            });
 
-      // ===== CUSTOM FORMAT =====
-      output +=
+          const keyJson =
+            await keyRes.json();
+
+          if (
+            !keyJson.keys ||
+            !keyJson.keys.length
+          ) {
+            continue;
+          }
+
+          const kid =
+            keyJson.keys[0].kid;
+
+          const key =
+            keyJson.keys[0].k;
+
+          finalKey =
+            `${kid}:${key}`;
+
+        } catch (e) {
+
+          continue;
+        }
+
+        // ===== LOGO =====
+        const logo =
+          extinf.match(
+            /tvg-logo="([^"]+)"/
+          )?.[1] || "";
+
+        // ===== CHANNEL NAME =====
+        const name =
+          extinf
+            .split(",")
+            .pop()
+            .trim();
+
+        // ===== FINAL OUTPUT =====
+        output +=
 `#EXTINF:-1 tvg-logo="${logo}" group-title="Sports", ${name}
 #KODIPROP:inputstream.adaptive.license_type=clearkey
 #KODIPROP:inputstream.adaptive.license_key=${finalKey}
@@ -117,20 +163,29 @@ ${http}
 ${mpd}
 
 `;
+      }
     }
 
     // ===== SAVE CACHE =====
-    global.cachedPlaylist = output;
+    global.cachedPlaylist =
+      output;
+
     global.cacheTime = now;
 
-    res.setHeader("Content-Type", "text/plain");
+    // ===== RESPONSE =====
+    res.setHeader(
+      "Content-Type",
+      "text/plain"
+    );
 
-    return res.status(200).send(output);
+    return res
+      .status(200)
+      .send(output);
 
   } catch (err) {
 
-    return res.status(500).send(
-      "Playlist Error"
-    );
+    return res
+      .status(500)
+      .send("Playlist Error");
   }
 }
