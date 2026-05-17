@@ -2,7 +2,7 @@ export default {
   async fetch() {
 
     const imageUrl =
-      "https://img10.hotstar.com/image/upload/f_auto,q_90/sources/r1/cms/prod/4753/1778859124753-h";
+      "https://img10.hotstar.com/image/upload/f_auto,t_web_m_2x/sources/r1/cms/prod/8118/1778929098118-h";
 
     try {
 
