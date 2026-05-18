@@ -1,3 +1,10 @@
+// Server memory me data save rakhne ke liye cache object
+let playlistCache = {
+  data2: "",
+  data3: "",
+  lastFetched: 0 // Timestamp milliseconds me
+};
+
 export default async function handler(req, res) {
   // Sirf ?prtstream check
   if (!('prtstream' in req.query)) {
@@ -6,7 +13,7 @@ export default async function handler(req, res) {
 
   try {
     const url1 = "https://mainplaylist.poonamchouhan076.workers.dev/";
-    const url2 = "https://project-lc4mz.vercel.app/api/tp"; // 👈 Naya URL yahan add kiya hai
+    const url2 = "https://project-lc4mz.vercel.app/api/tp_";
     const url3 = "https://allmovieslist.poonamchouhan076.workers.dev/";
     const url4 = "https://new-j-tv9filr.poonamchouhan076.workers.dev/";
 
@@ -30,18 +37,6 @@ export default async function handler(req, res) {
       }
     };
 
-    // Sabhi 4 URLs ko parallel fetch kiya
-    const [data1, data2Raw, data3Raw, data4Raw] = await Promise.all([
-      fetchWithTimeout(url1),
-      fetchWithTimeout(url2),
-      fetchWithTimeout(url3),
-      fetchWithTimeout(url4)
-    ]);
-
-    if (!data1) {
-      return res.status(500).send("Main playlist failed");
-    }
-
     // Clean function (header remove + trim)
     const cleanM3U = (data) => {
       if (!data) return "";
@@ -51,11 +46,45 @@ export default async function handler(req, res) {
         .trim();
     };
 
-    const data2 = cleanM3U(data2Raw);
-    const data3 = cleanM3U(data3Raw);
+    const currentTime = Date.now();
+    const twelveHours = 12 * 60 * 60 * 1000; // 12 ghante milliseconds me
+
+    let data2 = "";
+    let data3 = "";
+
+    // Check karo kya 12 ghante ho gaye hain ya cache khali hai?
+    if (!playlistCache.data2 || !playlistCache.data3 || (currentTime - playlistCache.lastFetched > twelveHours)) {
+      
+      // Agar cache purana hai, toh sirf url2 aur url3 ko fetch karo
+      const [raw2, raw3] = await Promise.all([
+        fetchWithTimeout(url2),
+        fetchWithTimeout(url3)
+      ]);
+
+      // Agar fetch successfully data lata hai tabhi cache update karo (taaki khali data save na ho)
+      if (raw2) playlistCache.data2 = cleanM3U(raw2);
+      if (raw3) playlistCache.data3 = cleanM3U(raw3);
+      
+      playlistCache.lastFetched = currentTime; // Time reset karo
+    }
+
+    // data2 aur data3 ab memory (cache) se aayenge
+    data2 = playlistCache.data2;
+    data3 = playlistCache.data3;
+
+    // url1 aur url4 ko HAR BAAR fresh fetch karenge kyunki inme cookies update hoti hain
+    const [data1, data4Raw] = await Promise.all([
+      fetchWithTimeout(url1),
+      fetchWithTimeout(url4)
+    ]);
+
+    if (!data1) {
+      return res.status(500).send("Main playlist failed");
+    }
+
     const data4 = cleanM3U(data4Raw);
 
-    // Final merge (Nayi playlist ab data1 ke theek baad yaani 2nd number par aayegi)
+    // Final merge
     const finalPlaylist =
       data1.trim() +
       "\n" +
