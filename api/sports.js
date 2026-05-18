@@ -3,8 +3,9 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET');
   res.setHeader('Content-Type', 'application/mpegurl');
 
-  // Vercel isko 24 ghante (86400 seconds) ke liye khud save (cache) rakhega
-  res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=3600');
+  // TEMPORARY CACHE: Abhi testing ke liye 10 second rakha hai taaki purana cache bypass ho jaye.
+  // Sab perfect chalne ke baad '10' ki jagah '86400' (24 ghante) kar dena.
+  res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=5');
 
   try {
     const m3uUrl = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
@@ -21,7 +22,7 @@ export default async function handler(req, res) {
     const endIndex = rawText.indexOf(endMarker, startIndex);
 
     if (startIndex === -1 || endIndex === -1) {
-      return res.status(404).send("#EXTM3U\n#ERROR: Section not found");
+      return res.status(404).send("#EXTM3U\n#ERROR: Required playlist section not found");
     }
 
     const targetSection = rawText.substring(startIndex, endIndex);
@@ -32,16 +33,12 @@ export default async function handler(req, res) {
       const lines = ("#EXTINF:" + channelBlock).split("\n").map(l => l.trim()).filter(l => l);
 
       let extinfLine = "";
-      let licenseUrl = "";
       let extvlcoptLine = "";
       let exthttpLine = "";
       let streamUrl = "";
 
       lines.forEach(line => {
         if (line.startsWith("#EXTINF:")) extinfLine = line;
-        else if (line.startsWith("#KODIPROP:inputstream.adaptive.license_key=")) {
-          licenseUrl = line.replace("#KODIPROP:inputstream.adaptive.license_key=", "").trim();
-        }
         else if (line.startsWith("#EXTVLCOPT:")) extvlcoptLine = line;
         else if (line.startsWith("#EXTHTTP:")) exthttpLine = line;
         else if (line.startsWith("http")) streamUrl = line;
@@ -52,14 +49,23 @@ export default async function handler(req, res) {
       let channelName = extinfLine.split(",").pop() || "Unknown Channel";
       channelName = channelName.trim();
 
-      // License fetch aur Clearkey format (kid:k) banana
+      // Channel ID nikalna (e.g., Channel_209 -> 209 ya /555.mpd -> 555)
       let clearkeyPair = "";
-      if (licenseUrl && licenseUrl.startsWith("http")) {
+      let channelIdMatch = streamUrl.match(/Channel_(\d+)/);
+      
+      if (!channelIdMatch) {
+        channelIdMatch = streamUrl.match(/\/(\d+)\.mpd/);
+      }
+
+      if (channelIdMatch && channelIdMatch[1]) {
+        const channelId = channelIdMatch[1];
+        const generatedLicenseUrl = `https://tplay.virey40690.workers.dev/key/${channelId}`;
+
         try {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
 
-          const licenseRes = await fetch(licenseUrl, {
+          const licenseRes = await fetch(generatedLicenseUrl, {
             signal: controller.signal,
             headers: {
               "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -75,11 +81,11 @@ export default async function handler(req, res) {
             }
           }
         } catch (e) {
-          console.error("License fetch failed for: " + channelName);
+          console.error(`License fetch failed for ${channelName} (ID: ${channelId})`);
         }
       }
 
-      // Aapka bataya naya clean format
+      // Aapka bataya naya clean format jodna
       let outputChunk = `#EXTINF:-1 tvg-logo="https://project-lc4mz.vercel.app/api/img" group-title="Sports", ${channelName}\n`;
       outputChunk += `#KODIPROP:inputstream.adaptive.license_type=clearkey\n`;
       if (clearkeyPair) {
