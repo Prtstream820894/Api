@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Yeh file ClearKey format bna kar player ko degi
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Content-Type', 'text/plain');
 
@@ -7,7 +6,7 @@ export default async function handler(req, res) {
   if (!id) return res.status(400).send("Missing Channel ID");
 
   try {
-    const targetLicenseUrl = `[https://tplay.virey40690.workers.dev/key/$](https://tplay.virey40690.workers.dev/key/$){id}`;
+    const targetLicenseUrl = `https://tplay.virey40690.workers.dev/key/${id}`;
     
     const response = await fetch(targetLicenseUrl, {
       headers: {
@@ -21,7 +20,7 @@ export default async function handler(req, res) {
       if (json.keys && json.keys[0]) {
         const kid = json.keys[0].kid;
         const k = json.keys[0].k;
-        // Pura string return karein jo player ko chahiye
+        // Seedha 'kid:k' format return hoga jo player ko chahiye
         return res.status(200).send(`${kid}:${k}`);
       }
     }
