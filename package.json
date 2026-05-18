@@ -1,8 +1,12 @@
 {
   "name": "json-to-m3u-converter",
   "version": "1.0.0",
+  "description": "Tata Play M3U Converter with License Support",
   "main": "api/speedo.js",
   "dependencies": {
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.7"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
