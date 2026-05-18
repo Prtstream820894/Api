@@ -1,31 +1,21 @@
 export default async function handler(req, res) {
+  // Isse player ko JSON mil jayega
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Content-Type', 'text/plain');
+  res.setHeader('Content-Type', 'application/json');
 
   const { id } = req.query;
-  if (!id) return res.status(400).send("Missing Channel ID");
+  if (!id) return res.status(400).json({ error: "No ID" });
 
   try {
-    const targetLicenseUrl = `https://tplay.virey40690.workers.dev/key/${id}`;
+    // Asli license server jahan se JSON mil raha hai
+    const targetUrl = `https://tplay.virey40690.workers.dev/key/${id}`;
     
-    const response = await fetch(targetLicenseUrl, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Accept": "application/json"
-      }
-    });
+    const response = await fetch(targetUrl);
+    const data = await response.json();
 
-    if (response.ok) {
-      const json = await response.json();
-      if (json.keys && json.keys[0]) {
-        const kid = json.keys[0].kid;
-        const k = json.keys[0].k;
-        // Seedha 'kid:k' format return hoga jo player ko chahiye
-        return res.status(200).send(`${kid}:${k}`);
-      }
-    }
-    return res.status(500).send("Failed to extract keys from JSON");
+    // Same to same wahi JSON return kar rahe hain jo asli server ka hai
+    return res.status(200).json(data);
   } catch (error) {
-    return res.status(500).send("Error: " + error.message);
+    return res.status(500).json({ error: "License Fetch Failed" });
   }
 }
