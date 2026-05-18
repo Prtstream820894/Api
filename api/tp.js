@@ -10,49 +10,83 @@ export default async function handler(req, res) {
 
     const startMarker = "OTT | TP";
     const endMarker = "-------===";
-    const section = rawText.substring(rawText.indexOf(startMarker), rawText.indexOf(endMarker));
+    const startIdx = rawText.indexOf(startMarker);
+    const endIdx = rawText.indexOf(endMarker, startIdx);
     
+    // Target section uthana
+    const section = rawText.substring(startIdx, endIdx);
+    
+    // Chunking logic - har channel ko group karna
     const blocks = section.split("#EXTINF:").slice(1);
     
-    // 1. Pehle saare License Keys ko ek array mein nikal lo
-    let allLicenses = [];
-    blocks.forEach(block => {
-      const lines = block.split("\n");
-      const keyLine = lines.find(l => l.includes("license_key="));
-      if (keyLine) allLicenses.push(keyLine.trim());
-    });
+    // Temp array taaki hum license ko aage shift kar sakein
+    let channelsList = [];
 
-    let m3u = "#EXTM3U\n\n";
-
-    // 2. Loop chalao aur har channel ko usse "Agla" (i + 1) license do
-    for (let i = 0; i < blocks.length; i++) {
-      const lines = ("#EXTINF:" + blocks[i]).split("\n").map(l => l.trim()).filter(l => l !== "");
+    for (const block of blocks) {
+      const lines = ("#EXTINF:" + block).split("\n").map(l => l.trim()).filter(l => l !== "");
       
       const infoLine = lines.find(l => l.startsWith("#EXTINF:"));
       const streamUrl = lines.find(l => l.startsWith("http"));
+      const licenseKey = lines.find(l => l.includes("license_key="));
       const licenseType = lines.find(l => l.includes("license_type="));
 
-      // Jaisa tune bola: Jo license ek aage chala gaya hai, use i+1 se uthao
-      const shiftedLicense = allLicenses[i + 1]; 
+      if (!streamUrl || !infoLine) continue;
 
-      // Agar agla license nahi hai (last channel), toh use skip kar do ya remove kar do
-      if (!streamUrl || !shiftedLicense) continue;
-
-      const logo = infoLine.match(/tvg-logo="([^"]+)"/)?.[1] || "";
-      const group = infoLine.match(/group-title="([^"]+)"/)?.[1] || "";
+      const logoMatch = infoLine.match(/tvg-logo="([^"]+)"/);
+      const groupMatch = infoLine.match(/group-title="([^"]+)"/);
+      const logo = logoMatch ? logoMatch[1] : "";
+      const group = groupMatch ? groupMatch[1] : "";
       const name = infoLine.split(",").pop().trim();
 
-      m3u += `#EXTINF:-1 tvg-logo="${logo}" group-title="${group}", ${name}\n`;
-      if (licenseType) m3u += `${licenseType}\n`;
-      m3u += `${shiftedLicense}\n`; // Ye raha shifted license
-
+      // Baki saare extra headers/options
+      let extraHeaders = [];
       lines.forEach(l => {
         if (l.startsWith("#EXTVLCOPT:") || l.startsWith("#EXTHTTP:")) {
-          m3u += `${l}\n`;
+          extraHeaders.push(l);
         }
       });
 
-      m3u += `${streamUrl}\n\n`;
+      // Sabhi details ko pehle object me save kar rahe hain
+      channelsList.push({
+        logo,
+        group,
+        name,
+        streamUrl,
+        extraHeaders,
+        // License ko abhi save kar rahe hain taaki shift kar sakein
+        originalLicenseType: licenseType || null,
+        originalLicenseKey: licenseKey || null,
+        finalLicenseType: null,
+        finalLicenseKey: null
+      });
+    }
+
+    // --- LICENSE SHIFTING LOGIC ---
+    // Har channel ka license uske AAGE VAALE (i + 1) channel me daal rahe hain
+    for (let i = 0; i < channelsList.length - 1; i++) {
+      channelsList[i + 1].finalLicenseType = channelsList[i].originalLicenseType;
+      channelsList[i + 1].finalLicenseKey = channelsList[i].originalLicenseKey;
+    }
+
+    // Pehle channel ko remove karna (kyunki shift hone ke baad iske paas koi license nahi bacha)
+    channelsList.shift();
+
+    // Final M3U Playlist build karna
+    let m3u = "#EXTM3U\n\n";
+
+    for (const ch of channelsList) {
+      m3u += `#EXTINF:-1 tvg-logo="${ch.logo}" group-title="${ch.group}", ${ch.name}\n`;
+      
+      // Agar shifted license mila hai toh hi add karein
+      if (ch.finalLicenseType) m3u += `${ch.finalLicenseType}\n`;
+      if (ch.finalLicenseKey) m3u += `${ch.finalLicenseKey}\n`;
+
+      // Headers add karna
+      ch.extraHeaders.forEach(h => {
+        m3u += `${h}\n`;
+      });
+
+      m3u += `${ch.streamUrl}\n\n`;
     }
 
     res.status(200).send(m3u);
