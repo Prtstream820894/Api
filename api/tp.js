@@ -53,7 +53,6 @@ export default async function handler(req, res) {
         name,
         streamUrl,
         extraHeaders,
-        // License ko abhi save kar rahe hain taaki shift kar sakein
         originalLicenseType: licenseType || null,
         originalLicenseKey: licenseKey || null,
         finalLicenseType: null,
@@ -71,13 +70,55 @@ export default async function handler(req, res) {
     // Pehle channel ko remove karna (kyunki shift hone ke baad iske paas koi license nahi bacha)
     channelsList.shift();
 
+    // --- NEW LOGIC: FETCH JSON & EXTRACT KID:K ---
+    // Sabhi channels ke licenses ko parallelly fetch aur convert karne ke liye `Promise.all` use kar rahe hain
+    await Promise.all(
+      channelsList.map(async (ch) => {
+        // Agar license key line exist karti hai aur usme URL hai
+        if (ch.finalLicenseKey && ch.finalLicenseKey.includes("http")) {
+          try {
+            // URL nikalna (e.g., #EXT-X-KEY:URI="http://..." se sirf http://... nikalna)
+            const urlMatch = ch.finalLicenseKey.match(/https?:\/\/[^\s"]+/);
+            if (urlMatch) {
+              const licenseUrl = urlMatch[0];
+              
+              // License URL ko fetch karna
+              const jsonRes = await fetch(licenseUrl);
+              const jsonData = await jsonRes.json();
+              
+              // JSON se kid aur k extract karna
+              if (jsonData.keys && jsonData.keys.length > 0) {
+                const kid = jsonData.keys[0].kid;
+                const k = jsonData.keys[0].k;
+                
+                // Naya format banana: kid:k
+                const clearKey = `${kid}:${k}`;
+                
+                // Purani URL vaali line ko naye clearKey string se replace kar dena
+                // Agar pehle line `#EXT-X-KEY:URI="http://..."` thi, toh ab wo `#EXT-X-KEY:URI="kid:k"` ho jayegi
+                ch.finalLicenseKey = ch.finalLicenseKey.replace(licenseUrl, clearKey);
+                
+                // Agar license_type player ke liye 'clearkey' karna ho toh yahan change kar sakte hain
+                if (ch.finalLicenseType && ch.finalLicenseType.includes("license_type=")) {
+                  ch.finalLicenseType = '#EXTVLCOPT:license_type=clearkey'; // ClearKey type set kiya
+                }
+              }
+            }
+          } catch (err) {
+            console.error(`Failed to fetch license for ${ch.name}:`, err.message);
+            // Agar kisi ka fetch fail ho jaye, toh purana URL hi rehne dega taaki crash na ho
+          }
+        }
+      })
+    );
+
     // Final M3U Playlist build karna
     let m3u = "#EXTM3U\n\n";
 
     for (const ch of channelsList) {
       m3u += `#EXTINF:-1 tvg-logo="${ch.logo}" group-title="${ch.group}", ${ch.name}\n`;
       
-      // Agar shifted license mila hai toh hi add karein
+      // Shifted aur Converted license add karna
       if (ch.finalLicenseType) m3u += `${ch.finalLicenseType}\n`;
       if (ch.finalLicenseKey) m3u += `${ch.finalLicenseKey}\n`;
 
