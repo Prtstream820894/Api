@@ -10,7 +10,7 @@
       "destination": "/api/speedo?play=$1"
     },
     {
-      "source": "/tata.m3u",
+      "source": "/tp.m3u",
       "destination": "/api/tp.js"
     },
     {
