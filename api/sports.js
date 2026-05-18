@@ -3,12 +3,11 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET');
   res.setHeader('Content-Type', 'application/mpegurl');
 
-  // TEMPORARY CACHE: Abhi testing ke liye 10 second rakha hai taaki purana cache bypass ho jaye.
-  // Sab perfect chalne ke baad '10' ki jagah '86400' (24 ghante) kar dena.
-  res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=5');
+  // Yeh static list hai toh isko full 24 ghante (86400s) ke liye cache kar sakte hain
+  res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=3600');
 
   try {
-    const m3uUrl = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
+    const m3uUrl = "[https://server.vodep39240327.workers.dev/channel/raw?=m3u](https://server.vodep39240327.workers.dev/channel/raw?=m3u)";
     const m3uResponse = await fetch(m3uUrl, {
       headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" }
     });
@@ -22,14 +21,18 @@ export default async function handler(req, res) {
     const endIndex = rawText.indexOf(endMarker, startIndex);
 
     if (startIndex === -1 || endIndex === -1) {
-      return res.status(404).send("#EXTM3U\n#ERROR: Required playlist section not found");
+      return res.status(404).send("#EXTM3U\n#ERROR: Section not found");
     }
 
     const targetSection = rawText.substring(startIndex, endIndex);
     const rawChannels = targetSection.split("#EXTINF:");
     let finalPlaylist = "#EXTM3U\n\n";
 
-    const channelPromises = rawChannels.slice(1).map(async (channelBlock) => {
+    // Vercel ka host domain dynamic nikalna taaki link auto-adjust ho jaye
+    const host = req.headers.host || "project-lc4mz.vercel.app";
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+
+    rawChannels.slice(1).forEach((channelBlock) => {
       const lines = ("#EXTINF:" + channelBlock).split("\n").map(l => l.trim()).filter(l => l);
 
       let extinfLine = "";
@@ -44,62 +47,32 @@ export default async function handler(req, res) {
         else if (line.startsWith("http")) streamUrl = line;
       });
 
-      if (!streamUrl) return null;
+      if (!streamUrl) return;
 
       let channelName = extinfLine.split(",").pop() || "Unknown Channel";
       channelName = channelName.trim();
 
-      // Channel ID nikalna (e.g., Channel_209 -> 209 ya /555.mpd -> 555)
-      let clearkeyPair = "";
+      // Stream URL se ID nikalna
       let channelIdMatch = streamUrl.match(/Channel_(\d+)/);
-      
       if (!channelIdMatch) {
         channelIdMatch = streamUrl.match(/\/(\d+)\.mpd/);
       }
 
+      let outputChunk = `#EXTINF:-1 tvg-logo="[https://project-lc4mz.vercel.app/api/img](https://project-lc4mz.vercel.app/api/img)" group-title="Sports", ${channelName}\n`;
+      outputChunk += `#KODIPROP:inputstream.adaptive.license_type=clearkey\n`;
+      
       if (channelIdMatch && channelIdMatch[1]) {
         const channelId = channelIdMatch[1];
-        const generatedLicenseUrl = `https://tplay.virey40690.workers.dev/key/${channelId}`;
-
-        try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
-
-          const licenseRes = await fetch(generatedLicenseUrl, {
-            signal: controller.signal,
-            headers: {
-              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-              "Accept": "application/json"
-            }
-          });
-          clearTimeout(timeoutId);
-
-          if (licenseRes.ok) {
-            const json = await licenseRes.json();
-            if (json.keys && json.keys[0]) {
-              clearkeyPair = `${json.keys[0].kid}:${json.keys[0].k}`;
-            }
-          }
-        } catch (e) {
-          console.error(`License fetch failed for ${channelName} (ID: ${channelId})`);
-        }
+        // ON-CLICK JUGAD: Hum direct player ko hamare naye license server ka link de rahe hain
+        outputChunk += `#KODIPROP:inputstream.adaptive.license_key=${protocol}://${host}/api/license?id=${channelId}\n`;
       }
-
-      // Aapka bataya naya clean format jodna
-      let outputChunk = `#EXTINF:-1 tvg-logo="https://project-lc4mz.vercel.app/api/img" group-title="Sports", ${channelName}\n`;
-      outputChunk += `#KODIPROP:inputstream.adaptive.license_type=clearkey\n`;
-      if (clearkeyPair) {
-        outputChunk += `#KODIPROP:inputstream.adaptive.license_key=${clearkeyPair}\n`;
-      }
+      
       if (extvlcoptLine) outputChunk += `${extvlcoptLine}\n`;
       if (exthttpLine) outputChunk += `${exthttpLine}\n`;
       outputChunk += `${streamUrl}\n\n`;
 
-      return outputChunk;
+      finalPlaylist += outputChunk;
     });
-
-    const processedChunks = await Promise.all(channelPromises);
-    finalPlaylist += processedChunks.filter(Boolean).join("");
 
     return res.status(200).send(finalPlaylist);
   } catch (error) {
