@@ -23,23 +23,22 @@ export default async function handler(req, res) {
       
       const infoLine = lines[0];
       const streamUrl = lines.find(l => l.startsWith("http"));
-      
-      // Har channel ka apna asli license line dhoondna
-      const originalLicenseLine = lines.find(l => l.includes("license_key="));
-      const licenseTypeLine = lines.find(l => l.includes("license_type="));
-
       if (!streamUrl) return;
 
-      // Sahi Logo, Group aur Name original line se nikalna
+      // 1. Sabse important: Asli License Key aur Type ki poori line uthana
+      const originalLicenseKey = lines.find(l => l.includes("license_key="));
+      const originalLicenseType = lines.find(l => l.includes("license_type="));
+
+      // 2. Logo, Group aur Name nikalna
       const logo = infoLine.match(/tvg-logo="([^"]+)"/)?.[1] || "";
       const group = infoLine.match(/group-title="([^"]+)"/)?.[1] || "";
       const name = infoLine.split(",").pop().trim();
 
+      // 3. Playlist structure (Ditto copy of tags)
       m3u += `#EXTINF:-1 tvg-logo="${logo}" group-title="${group}", ${name}\n`;
       
-      // Bina kisi badlav ke asli license links chipkana
-      if (licenseTypeLine) m3u += `${licenseTypeLine}\n`;
-      if (originalLicenseLine) m3u += `${originalLicenseLine}\n`;
+      if (originalLicenseType) m3u += `${originalLicenseType}\n`;
+      if (originalLicenseKey) m3u += `${originalLicenseKey}\n`;
 
       // Baaki VLCOPT aur HTTP headers (Cookies wagera)
       lines.forEach(l => {
