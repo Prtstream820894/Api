@@ -10,8 +10,8 @@
       "destination": "/api/speedo?play=$1"
     },
     {
-      "source": "/tata-sports.m3u",
-      "destination": "/api/sports"
+      "source": "/tata.m3u",
+      "destination": "/api/tata"
     },
     {
       "source": "/api/license",
