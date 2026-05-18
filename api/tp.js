@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   const currentTime = Date.now();
   const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 Hours in milliseconds
 
-  // 1. Check karo agar cache me valid playlist padi hai
+  // Check karo agar cache me valid playlist padi hai
   if (global.playlistCache.data && currentTime < global.playlistCache.expiry) {
     console.log("Serving Playlist from Cache!");
     return res.status(200).send(global.playlistCache.data);
@@ -49,7 +49,19 @@ export default async function handler(req, res) {
       const logoMatch = infoLine.match(/tvg-logo="([^"]+)"/);
       const groupMatch = infoLine.match(/group-title="([^"]+)"/);
       const logo = logoMatch ? logoMatch[1] : "";
-      const group = groupMatch ? groupMatch[1] : "";
+      
+      // --- NEW GROUP CLEANING LOGIC ---
+      let group = groupMatch ? groupMatch[1] : "";
+      
+      // 1. "TATA PLAY ▶ | " ko remove karna
+      group = group.replace("TATA PLAY ▶ | ", "").trim();
+      
+      // 2. Agar group ka naam "Spor" bacha ho, toh use "Sports" karna
+      if (group === "Spor") {
+        group = "Sports";
+      }
+      // --------------------------------
+
       const name = infoLine.split(",").pop().trim();
 
       let extraHeaders = [];
@@ -110,7 +122,7 @@ export default async function handler(req, res) {
       m3u += `${ch.streamUrl}\n\n`;
     }
 
-    // 2. Response dene se pehle data ko cache me daal do aur 12 ghante ki expiry set karo
+    // Data ko cache me daal do aur 12 ghante ki expiry set karo
     global.playlistCache.data = m3u;
     global.playlistCache.expiry = currentTime + CACHE_DURATION;
 
