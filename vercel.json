@@ -1,4 +1,5 @@
 {
+  "version": 2,
   "rewrites": [
     {
       "source": "/live.mpd",
@@ -7,6 +8,10 @@
     {
       "source": "/api/speedo/(.*).m3u8",
       "destination": "/api/speedo?play=$1"
+    },
+    {
+      "source": "/tata-sports.m3u",
+      "destination": "/api/sports"
     }
   ]
 }
