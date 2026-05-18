@@ -1,9 +1,27 @@
+// Global cache object jo server restart hone tak memory me rehta hai
+if (!global.playlistCache) {
+  global.playlistCache = {
+    data: null,
+    expiry: 0
+  };
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Content-Type', 'application/mpegurl');
   res.setHeader('Cache-Control', 'no-store'); 
 
+  const currentTime = Date.now();
+  const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 Hours in milliseconds
+
+  // 1. Check karo agar cache me valid playlist padi hai
+  if (global.playlistCache.data && currentTime < global.playlistCache.expiry) {
+    console.log("Serving Playlist from Cache!");
+    return res.status(200).send(global.playlistCache.data);
+  }
+
   try {
+    console.log("Cache expired or empty. Fetching fresh playlist from source...");
     const m3uUrl = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
     const response = await fetch(m3uUrl);
     const rawText = await response.text();
@@ -62,7 +80,6 @@ export default async function handler(req, res) {
 
     channelsList.shift();
 
-    // Domain aur Base URL handle karna
     const host = req.headers.host;
     const protocol = req.headers['x-forwarded-proto'] || 'http';
     const serverUrl = `${protocol}://${host}`;
@@ -76,7 +93,6 @@ export default async function handler(req, res) {
         const urlMatch = ch.finalLicenseKey.match(/https?:\/\/[^\s"]+/);
         if (urlMatch) {
           const originalUrl = urlMatch[0];
-          // Yeh call seedha hamare dusre file (license.js) par redirect karega jab channel chalega
           const proxyLicenseUrl = `${serverUrl}/api/license?url=${encodeURIComponent(originalUrl)}`;
           
           m3u += `#EXTVLCOPT:license_type=clearkey\n`;
@@ -93,6 +109,10 @@ export default async function handler(req, res) {
 
       m3u += `${ch.streamUrl}\n\n`;
     }
+
+    // 2. Response dene se pehle data ko cache me daal do aur 12 ghante ki expiry set karo
+    global.playlistCache.data = m3u;
+    global.playlistCache.expiry = currentTime + CACHE_DURATION;
 
     res.status(200).send(m3u);
   } catch (e) {
