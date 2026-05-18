@@ -6,8 +6,9 @@ export default async function handler(req, res) {
 
   try {
     const url1 = "https://mainplaylist.poonamchouhan076.workers.dev/";
-    const url2 = "https://allmovieslist.poonamchouhan076.workers.dev/";
-    const url3 = "https://new-j-tv9filr.poonamchouhan076.workers.dev/";
+    const url2 = "https://project-lc4mz.vercel.app/api/tp_"; // 👈 Naya URL yahan add kiya hai
+    const url3 = "https://allmovieslist.poonamchouhan076.workers.dev/";
+    const url4 = "https://new-j-tv9filr.poonamchouhan076.workers.dev/";
 
     const fetchWithTimeout = async (url, ms = 7000) => {
       const controller = new AbortController();
@@ -29,10 +30,12 @@ export default async function handler(req, res) {
       }
     };
 
-    const [data1, data2Raw, data3Raw] = await Promise.all([
+    // Sabhi 4 URLs ko parallel fetch kiya
+    const [data1, data2Raw, data3Raw, data4Raw] = await Promise.all([
       fetchWithTimeout(url1),
       fetchWithTimeout(url2),
-      fetchWithTimeout(url3)
+      fetchWithTimeout(url3),
+      fetchWithTimeout(url4)
     ]);
 
     if (!data1) {
@@ -50,14 +53,17 @@ export default async function handler(req, res) {
 
     const data2 = cleanM3U(data2Raw);
     const data3 = cleanM3U(data3Raw);
+    const data4 = cleanM3U(data4Raw);
 
-    // Final merge
+    // Final merge (Nayi playlist ab data1 ke theek baad yaani 2nd number par aayegi)
     const finalPlaylist =
       data1.trim() +
       "\n" +
       data2 +
       "\n" +
-      data3;
+      data3 +
+      "\n" +
+      data4;
 
     res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
     res.setHeader("Cache-Control", "no-store");
