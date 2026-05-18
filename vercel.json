@@ -11,11 +11,11 @@
     },
     {
       "source": "/tata.m3u",
-      "destination": "/api/tata"
+      "destination": "/api/tata.js"
     },
     {
       "source": "/api/license",
-      "destination": "/api/license"
+      "destination": "/api/license.js"
     }
   ]
 }
