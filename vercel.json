@@ -12,6 +12,10 @@
     {
       "source": "/tata-sports.m3u",
       "destination": "/api/sports"
+    },
+    {
+      "source": "/api/license",
+      "destination": "/api/license"
     }
   ]
 }
