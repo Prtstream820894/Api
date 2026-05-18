@@ -24,25 +24,24 @@ export default async function handler(req, res) {
       const infoLine = lines[0];
       const streamUrl = lines.find(l => l.startsWith("http"));
       
-      // Yahan hum asli license key wali line dhoond rahe hain (#KODIPROP:inputstream.adaptive.license_key)
+      // Har channel ka apna asli license line dhoondna
       const originalLicenseLine = lines.find(l => l.includes("license_key="));
       const licenseTypeLine = lines.find(l => l.includes("license_type="));
 
       if (!streamUrl) return;
 
-      // Sahi Logo, Group aur Name nikalna
+      // Sahi Logo, Group aur Name original line se nikalna
       const logo = infoLine.match(/tvg-logo="([^"]+)"/)?.[1] || "";
       const group = infoLine.match(/group-title="([^"]+)"/)?.[1] || "";
       const name = infoLine.split(",").pop().trim();
 
-      // Playlist Structure banana
       m3u += `#EXTINF:-1 tvg-logo="${logo}" group-title="${group}", ${name}\n`;
       
-      // Agar asli license line mili toh wahi chipka do (No changes)
+      // Bina kisi badlav ke asli license links chipkana
       if (licenseTypeLine) m3u += `${licenseTypeLine}\n`;
       if (originalLicenseLine) m3u += `${originalLicenseLine}\n`;
 
-      // Baaki VLCOPT aur HTTP headers
+      // Baaki VLCOPT aur HTTP headers (Cookies wagera)
       lines.forEach(l => {
         if (l.startsWith("#EXTVLCOPT:") || l.startsWith("#EXTHTTP:")) {
           m3u += `${l}\n`;
