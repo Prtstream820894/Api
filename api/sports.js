@@ -3,11 +3,11 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET');
   res.setHeader('Content-Type', 'application/mpegurl');
 
-  // Yeh static list hai toh isko full 24 ghante (86400s) ke liye cache kar sakte hain
-  res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=3600');
+  // CACHE FORCE DISABLE: Is line se Vercel ka saara purana cache khatam ho jayega
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
 
   try {
-    const m3uUrl = "[https://server.vodep39240327.workers.dev/channel/raw?=m3u](https://server.vodep39240327.workers.dev/channel/raw?=m3u)";
+    const m3uUrl = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
     const m3uResponse = await fetch(m3uUrl, {
       headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" }
     });
@@ -21,14 +21,13 @@ export default async function handler(req, res) {
     const endIndex = rawText.indexOf(endMarker, startIndex);
 
     if (startIndex === -1 || endIndex === -1) {
-      return res.status(404).send("#EXTM3U\n#ERROR: Section not found");
+      return res.status(404).send("#EXTM3U\n#ERROR: Required playlist section not found");
     }
 
     const targetSection = rawText.substring(startIndex, endIndex);
     const rawChannels = targetSection.split("#EXTINF:");
     let finalPlaylist = "#EXTM3U\n\n";
 
-    // Vercel ka host domain dynamic nikalna taaki link auto-adjust ho jaye
     const host = req.headers.host || "project-lc4mz.vercel.app";
     const protocol = req.headers['x-forwarded-proto'] || 'https';
 
@@ -52,18 +51,17 @@ export default async function handler(req, res) {
       let channelName = extinfLine.split(",").pop() || "Unknown Channel";
       channelName = channelName.trim();
 
-      // Stream URL se ID nikalna
       let channelIdMatch = streamUrl.match(/Channel_(\d+)/);
       if (!channelIdMatch) {
         channelIdMatch = streamUrl.match(/\/(\d+)\.mpd/);
       }
 
-      let outputChunk = `#EXTINF:-1 tvg-logo="[https://project-lc4mz.vercel.app/api/img](https://project-lc4mz.vercel.app/api/img)" group-title="Sports", ${channelName}\n`;
+      let outputChunk = `#EXTINF:-1 tvg-logo="https://project-lc4mz.vercel.app/api/img" group-title="Sports", ${channelName}\n`;
       outputChunk += `#KODIPROP:inputstream.adaptive.license_type=clearkey\n`;
       
       if (channelIdMatch && channelIdMatch[1]) {
         const channelId = channelIdMatch[1];
-        // ON-CLICK JUGAD: Hum direct player ko hamare naye license server ka link de rahe hain
+        // Yeh line naya dynamic license URL banaegi aapke host ke sath
         outputChunk += `#KODIPROP:inputstream.adaptive.license_key=${protocol}://${host}/api/license?id=${channelId}\n`;
       }
       
