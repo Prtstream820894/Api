@@ -1,78 +1,56 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
   res.setHeader('Content-Type', 'application/mpegurl');
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate'); // No cache as requested
+  res.setHeader('Cache-Control', 'no-store'); 
 
   try {
     const m3uUrl = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
-    const m3uResponse = await fetch(m3uUrl, {
-      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" }
-    });
+    const response = await fetch(m3uUrl);
+    const rawText = await response.text();
 
-    if (!m3uResponse.ok) throw new Error("Source M3U fetch failed");
-    const rawText = await m3uResponse.text();
-
+    // Section nikalna
     const startMarker = "OTT | TP";
     const endMarker = "-------===";
-    const startIndex = rawText.indexOf(startMarker);
-    const endIndex = rawText.indexOf(endMarker, startIndex);
+    const section = rawText.substring(rawText.indexOf(startMarker), rawText.indexOf(endMarker));
+    
+    const chunks = section.split("#EXTINF:").slice(1);
+    let m3u = "#EXTM3U\n\n";
 
-    if (startIndex === -1 || endIndex === -1) {
-      return res.status(404).send("#EXTM3U\n#ERROR: Section not found");
-    }
+    const host = req.headers.host;
 
-    const targetSection = rawText.substring(startIndex, endIndex);
-    const rawChannels = targetSection.split("#EXTINF:");
-    let finalPlaylist = "#EXTM3U\n\n";
-
-    const host = req.headers.host || "project-lc4mz.vercel.app";
-    const protocol = req.headers['x-forwarded-proto'] || 'https';
-
-    rawChannels.slice(1).forEach((channelBlock) => {
-      const lines = ("#EXTINF:" + channelBlock).split("\n").map(l => l.trim()).filter(l => l);
-
-      let extinfLine = "";
-      let extvlcoptLine = "";
-      let exthttpLine = "";
-      let streamUrl = "";
-
-      lines.forEach(line => {
-        if (line.startsWith("#EXTINF:")) extinfLine = line;
-        else if (line.startsWith("#EXTVLCOPT:")) extvlcoptLine = line;
-        else if (line.startsWith("#EXTHTTP:")) exthttpLine = line;
-        else if (line.startsWith("http")) streamUrl = line;
-      });
+    chunks.forEach(chunk => {
+      const lines = ("#EXTINF:" + chunk).split("\n").map(l => l.trim());
+      const infoLine = lines[0];
+      const streamUrl = lines.find(l => l.startsWith("http"));
 
       if (!streamUrl) return;
 
-      // Original Logo nikalne ka jugaad
-      let logoMatch = extinfLine.match(/tvg-logo="([^"]+)"/);
-      let originalLogo = logoMatch ? logoMatch[1] : "https://project-lc4mz.vercel.app/api/img";
+      // 1. Sahi Logo aur Group nikalna
+      const logo = infoLine.match(/tvg-logo="([^"]+)"/)?.[1] || "";
+      const group = infoLine.match(/group-title="([^"]+)"/)?.[1] || "Entertainment";
+      const name = infoLine.split(",").pop();
 
-      let channelName = extinfLine.split(",").pop() || "Unknown Channel";
-      channelName = channelName.trim();
+      // 2. Channel ID nikalna license ke liye
+      const channelId = streamUrl.match(/Channel_(\d+)/)?.[1] || streamUrl.match(/\/(\d+)\.mpd/)?.[1];
 
-      let channelIdMatch = streamUrl.match(/Channel_(\d+)/) || streamUrl.match(/\/(\d+)\.mpd/);
-
-      // Naya format with Original Logo
-      let outputChunk = `#EXTINF:-1 tvg-logo="${originalLogo}" group-title="Sports", ${channelName}\n`;
-      outputChunk += `#KODIPROP:inputstream.adaptive.license_type=clearkey\n`;
-      
-      if (channelIdMatch && channelIdMatch[1]) {
-        const channelId = channelIdMatch[1];
-        outputChunk += `#KODIPROP:inputstream.adaptive.license_key=${protocol}://${host}/api/license?id=${channelId}\n`;
+      m3u += `#EXTINF:-1 tvg-logo="${logo}" group-title="${group}", ${name}\n`;
+      m3u += `#KODIPROP:inputstream.adaptive.license_type=clearkey\n`;
+      if (channelId) {
+        // Tumhara license URL jo niche wali file ko hit karega
+        m3u += `#KODIPROP:inputstream.adaptive.license_key=https://${host}/api/license?id=${channelId}\n`;
       }
       
-      if (extvlcoptLine) outputChunk += `${extvlcoptLine}\n`;
-      if (exthttpLine) outputChunk += `${exthttpLine}\n`;
-      outputChunk += `${streamUrl}\n\n`;
-
-      finalPlaylist += outputChunk;
+      // Baaki headers (User-Agent/Cookie) jo source mein hain unhe dhoond kar add karna
+      const vlcOpt = lines.find(l => l.startsWith("#EXTVLCOPT:"));
+      const httpOpt = lines.find(l => l.startsWith("#EXTHTTP:"));
+      if (vlcOpt) m3u += `${vlcOpt}\n`;
+      if (httpOpt) m3u += `${httpOpt}\n`;
+      
+      m3u += `${streamUrl}\n\n`;
     });
 
-    return res.status(200).send(finalPlaylist);
-  } catch (error) {
-    return res.status(500).send(`#EXTM3U\n#ERROR: ${error.message}`);
+    res.status(200).send(m3u);
+  } catch (e) {
+    res.status(500).send("Error: " + e.message);
   }
 }
