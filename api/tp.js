@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
   res.setHeader('Content-Type', 'application/mpegurl');
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate'); // No cache as requested
 
   try {
     const m3uUrl = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     const endIndex = rawText.indexOf(endMarker, startIndex);
 
     if (startIndex === -1 || endIndex === -1) {
-      return res.status(404).send("#EXTM3U\n#ERROR: Required playlist section not found");
+      return res.status(404).send("#EXTM3U\n#ERROR: Section not found");
     }
 
     const targetSection = rawText.substring(startIndex, endIndex);
@@ -46,20 +46,21 @@ export default async function handler(req, res) {
 
       if (!streamUrl) return;
 
+      // Original Logo nikalne ka jugaad
+      let logoMatch = extinfLine.match(/tvg-logo="([^"]+)"/);
+      let originalLogo = logoMatch ? logoMatch[1] : "https://project-lc4mz.vercel.app/api/img";
+
       let channelName = extinfLine.split(",").pop() || "Unknown Channel";
       channelName = channelName.trim();
 
-      let channelIdMatch = streamUrl.match(/Channel_(\d+)/);
-      if (!channelIdMatch) {
-        channelIdMatch = streamUrl.match(/\/(\d+)\.mpd/);
-      }
+      let channelIdMatch = streamUrl.match(/Channel_(\d+)/) || streamUrl.match(/\/(\d+)\.mpd/);
 
-      let outputChunk = `#EXTINF:-1 tvg-logo="https://project-lc4mz.vercel.app/api/img" group-title="Sports", ${channelName}\n`;
+      // Naya format with Original Logo
+      let outputChunk = `#EXTINF:-1 tvg-logo="${originalLogo}" group-title="Sports", ${channelName}\n`;
       outputChunk += `#KODIPROP:inputstream.adaptive.license_type=clearkey\n`;
       
       if (channelIdMatch && channelIdMatch[1]) {
         const channelId = channelIdMatch[1];
-        // Player jab channel pe click karega toh is URL pe jaakar key uthayega
         outputChunk += `#KODIPROP:inputstream.adaptive.license_key=${protocol}://${host}/api/license?id=${channelId}\n`;
       }
       
