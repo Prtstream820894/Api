@@ -33,23 +33,31 @@ export default async function handler(req, res) {
     
     const rawText = await response.text();
 
-    // Agar Cloudflare ka error page mil raha hai to treat it as error
-    if (rawText.includes("error code:") || rawText.includes("1027")) {
-      throw new Error("Cloudflare Rate Limit Error (1027) detected from source.");
+    // 2. Safety Check: Agar response khali hai ya koi error page hai
+    if (!rawText || rawText.trim() === "") {
+      throw new Error("Received empty response from source server.");
     }
 
+    if (rawText.includes("error code:") || rawText.includes("1027") || rawText.includes("Cloudflare")) {
+      throw new Error("Cloudflare Rate Limit Error or Blocking page detected.");
+    }
+
+    // 3. Robust Marker Check: Agar markers badal gaye hain ya nahi hain, toh backup filter lagao
     const startMarker = "OTT | TP";
     const endMarker = "-------===";
     const startIdx = rawText.indexOf(startMarker);
     const endIdx = rawText.indexOf(endMarker, startIdx);
     
-    if (startIdx === -1 || endIdx === -1) {
-      throw new Error("Markers not found in source text. Structure might have changed.");
+    let section = rawText;
+    
+    // Agar markers milte hain toh theek, nahi toh poora rawText use karo agar usme #EXTINF maujood ho
+    if (startIdx !== -1 && endIdx !== -1) {
+      section = rawText.substring(startIdx, endIdx);
+    } else if (!rawText.includes("#EXTINF:")) {
+      throw new Error("Valid M3U structure or Markers not found in source text.");
     }
 
-    const section = rawText.substring(startIdx, endIdx);
     const blocks = section.split("#EXTINF:").slice(1);
-    
     let channelsList = [];
 
     for (const block of blocks) {
@@ -96,15 +104,16 @@ export default async function handler(req, res) {
     }
 
     // --- LICENSE SHIFTING LOGIC ---
-    for (let i = 0; i < channelsList.length - 1; i++) {
-      channelsList[i + 1].finalLicenseType = channelsList[i].originalLicenseType;
-      channelsList[i + 1].finalLicenseKey = channelsList[i].originalLicenseKey;
+    if (channelsList.length > 1) {
+      for (let i = 0; i < channelsList.length - 1; i++) {
+        channelsList[i + 1].finalLicenseType = channelsList[i].originalLicenseType;
+        channelsList[i + 1].finalLicenseKey = channelsList[i].originalLicenseKey;
+      }
+      channelsList.shift();
     }
 
-    channelsList.shift();
-
     if (channelsList.length === 0) {
-      throw new Error("No channels successfully parsed.");
+      throw new Error("No channels successfully parsed from the text.");
     }
 
     const host = req.headers.host;
@@ -142,7 +151,7 @@ export default async function handler(req, res) {
     global.playlistCache.expiry = currentTime + CACHE_DURATION;
 
     console.log("Cache refreshed successfully!");
-    res.status(200).send(m3u);
+    return res.status(200).send(m3u);
 
   } catch (e) {
     console.error("Error fetching fresh data:", e.message);
@@ -151,14 +160,11 @@ export default async function handler(req, res) {
     // Agar source API block hai ya error de rahi hai, par hamare paas PURANA cache pada hai
     if (global.playlistCache.data) {
       console.log("Source failed! Serving expired cache as fallback to keep app alive.");
-      
-      // Temporary cache lifetime badha dete hain (e.g., 5-10 mins) taaki har request pe source hit na ho jab wo down ho
       global.playlistCache.expiry = Date.now() + (5 * 60 * 1000); 
-      
       return res.status(200).send(global.playlistCache.data);
     }
 
-    // Agar cache me bilkul kuch nahi hai (first time server load) tabhi error do
-    res.status(500).send("Error: " + e.message);
+    // Agar cache me bilkul kuch nahi hai aur pehli baar hi error aa gaya
+    return res.status(500).send("Server Error: " + e.message);
   }
 }
