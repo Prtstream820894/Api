@@ -12,19 +12,29 @@ export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store'); 
 
   const currentTime = Date.now();
-  const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 Hours in milliseconds
+  const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 Hours
 
-  // 1. Check karo agar cache me strictly valid (unexpired) playlist padi hai
+  // URL query check to force clear cache (e.g., /api/playlist?clear=true)
+  const { clear } = req.query;
+  if (clear === 'true') {
+    console.log("Force clearing cache via URL param!");
+    global.playlistCache.data = null;
+    global.playlistCache.expiry = 0;
+  }
+
+  // 1. Check karo agar strictly valid cache padi hai
   if (global.playlistCache.data && currentTime < global.playlistCache.expiry) {
-    console.log("Serving Playlist from Fresh Cache!");
-    return res.status(200).send(global.playlistCache.data);
+    // Ek aur check: m3u data sahi hona chahiye, koi chota error text cache nahi hona chahiye
+    if (global.playlistCache.data.includes("#EXTM3U") && global.playlistCache.data.length > 500) {
+      console.log("Serving Playlist from Fresh Cache!");
+      return res.status(200).send(global.playlistCache.data);
+    }
   }
 
   try {
-    console.log("Cache expired or empty. Fetching fresh playlist from source...");
+    console.log("Fetching fresh playlist from source...");
     const m3uUrl = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
     
-    // Fetch with a timeout so it doesn't hang forever
     const response = await fetch(m3uUrl, { signal: AbortSignal.timeout(8000) });
     
     if (!response.ok) {
@@ -33,7 +43,6 @@ export default async function handler(req, res) {
     
     const rawText = await response.text();
 
-    // 2. Safety Check: Agar response khali hai ya koi error page hai
     if (!rawText || rawText.trim() === "") {
       throw new Error("Received empty response from source server.");
     }
@@ -42,19 +51,26 @@ export default async function handler(req, res) {
       throw new Error("Cloudflare Rate Limit Error or Blocking page detected.");
     }
 
-    // 3. Robust Marker Check: Agar markers badal gaye hain ya nahi hain, toh backup filter lagao
+    // 2. NEW ROBUST MARKER LOGIC (Naye markers ke hisab se)
     const startMarker = "OTT | TP";
-    const endMarker = "-------===";
     const startIdx = rawText.indexOf(startMarker);
-    const endIdx = rawText.indexOf(endMarker, startIdx);
     
     let section = rawText;
     
-    // Agar markers milte hain toh theek, nahi toh poora rawText use karo agar usme #EXTINF maujood ho
-    if (startIdx !== -1 && endIdx !== -1) {
-      section = rawText.substring(startIdx, endIdx);
+    if (startIdx !== -1) {
+      // Hum naye aur purane dono end markers ko check kar rahe hain safety ke liye
+      let endIdx = rawText.indexOf("=== Other Channels", startIdx);
+      if (endIdx === -1) endIdx = rawText.indexOf("-------===", startIdx);
+      if (endIdx === -1) endIdx = rawText.indexOf("===", startIdx + startMarker.length); // Fallback to just ===
+
+      if (endIdx !== -1) {
+        section = rawText.substring(startIdx, endIdx);
+      } else {
+        // Agar koi bhi end marker na mile toh startMarker se lekar poori file ke end tak le lo
+        section = rawText.substring(startIdx);
+      }
     } else if (!rawText.includes("#EXTINF:")) {
-      throw new Error("Valid M3U structure or Markers not found in source text.");
+      throw new Error("Valid M3U structure or Start Marker not found in source text.");
     }
 
     const blocks = section.split("#EXTINF:").slice(1);
@@ -91,15 +107,10 @@ export default async function handler(req, res) {
       });
 
       channelsList.push({
-        logo,
-        group,
-        name,
-        streamUrl,
-        extraHeaders,
+        logo, group, name, streamUrl, extraHeaders,
         originalLicenseType: licenseType || null,
         originalLicenseKey: licenseKey || null,
-        finalLicenseType: null,
-        finalLicenseKey: null
+        finalLicenseType: null, finalLicenseKey: null
       });
     }
 
@@ -146,7 +157,7 @@ export default async function handler(req, res) {
       m3u += `${ch.streamUrl}\n\n`;
     }
 
-    // Successfully fetch hone par new data aur expiry save karo
+    // Sahi data ko hi cache me daalein
     global.playlistCache.data = m3u;
     global.playlistCache.expiry = currentTime + CACHE_DURATION;
 
@@ -156,15 +167,19 @@ export default async function handler(req, res) {
   } catch (e) {
     console.error("Error fetching fresh data:", e.message);
 
-    // --- SMART FALLBACK LOGIC ---
-    // Agar source API block hai ya error de rahi hai, par hamare paas PURANA cache pada hai
+    // Agar kharab data cache hua tha, toh use clear kar do taaki agli request fresh try kare
+    if (global.playlistCache.data && (!global.playlistCache.data.includes("#EXTM3U") || global.playlistCache.data.length < 500)) {
+      global.playlistCache.data = null;
+      global.playlistCache.expiry = 0;
+    }
+
+    // Smart Fallback
     if (global.playlistCache.data) {
-      console.log("Source failed! Serving expired cache as fallback to keep app alive.");
+      console.log("Serving expired cache as fallback.");
       global.playlistCache.expiry = Date.now() + (5 * 60 * 1000); 
       return res.status(200).send(global.playlistCache.data);
     }
 
-    // Agar cache me bilkul kuch nahi hai aur pehli baar hi error aa gaya
     return res.status(500).send("Server Error: " + e.message);
   }
 }
