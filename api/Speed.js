@@ -24,8 +24,8 @@ export default async function handler(req, res) {
 
     // 🌐 Domains
     const prmoviesDomains = [
+      "https://prmovies.health/",
       "https://prmovies.pizza/",
-      "https://prmovies.to/",
       "https://prmovies.vc/"
     ];
 
