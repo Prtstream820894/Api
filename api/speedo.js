@@ -17,7 +17,8 @@ function unpack(code) {
 async function getLiveDomain(testUrls) {
     for (let url of testUrls) {
         try {
-            const res = await fetch(url, { method: 'HEAD', timeout: 2000 });
+            // node-fetch mein timeout handle karne ke liye AbortSignal ka use karein ya bina timeout ke test karein
+            const res = await fetch(url, { method: 'HEAD' });
             if (res.ok) return new URL(res.url).origin + "/";
         } catch (e) {}
     }
@@ -25,6 +26,10 @@ async function getLiveDomain(testUrls) {
 }
 
 module.exports = async (req, res) => {
+    // CORS headers basic allow-all
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    
     let { play } = req.query;
     const host = `https://${req.headers.host}`;
 
@@ -40,8 +45,7 @@ module.exports = async (req, res) => {
                 headers: { 
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36", 
                     "Referer": officialSite 
-                },
-                timeout: 5000
+                }
             });
 
             const source = await streamRes.text();
@@ -51,39 +55,59 @@ module.exports = async (req, res) => {
 
             if (match) {
                 const finalM3u8 = match[1].replace(/\\/g, '');
-                res.redirect(302, finalM3u8);
-                return;
+                return res.redirect(302, finalM3u8);
             }
             return res.status(404).send("Link not found");
         }
 
-        // --- LIST MODE (Yahan headers add kiye gaye hain) ---
+        // --- LIST MODE ---
         const jsonRes = await fetch("https://ipl2020-46d2f.firebaseio.com/Json.json");
+        if (!jsonRes.ok) {
+            throw new Error(`Firebase returned status ${jsonRes.status}`);
+        }
+        
         let text = await jsonRes.text();
-        text = text.replace(/,[ \t\r\n]*([\]}])/g, '$1');
-        const data = JSON.parse(text);
+        
+        // Trailing commas remove karne ke liye safe cleaner
+        try {
+            text = text.replace(/,[ \t\r\n]*([\]}])/g, '$1');
+        } catch(err) {}
 
-        // Header constant (aap chahein toh ise getLiveDomain se dynamic bhi bana sakte hain)
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (parseErr) {
+            return res.status(500).send("#EXTM3U\n#ERROR: JSON Parsing Failed. Check database response.");
+        }
+
         const headersuffix = "|Referer=https://speedostream1.com/&Origin=https://speedostream1.com";
-
         let playlist = "#EXTM3U\n";
+
         if (Array.isArray(data)) {
             data.forEach(item => {
                 if (item && item.id) {
                     const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
-                    // Link ke peeche headers suffix add kar diya
                     const playLink = `${host}/api/speedo/${cleanId}.m3u8${headersuffix}`;
-                    
+                    playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
+                }
+            });
+        } else if (data && typeof data === 'object') {
+            // Agar Firebase ka data object roop mein aa raha hai toh:
+            Object.keys(data).forEach(key => {
+                const item = data[key];
+                if (item && item.id) {
+                    const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
+                    const playLink = `${host}/api/speedo/${cleanId}.m3u8${headersuffix}`;
                     playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
                 }
             });
         }
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.status(200).send(playlist);
+        return res.status(200).send(playlist);
 
     } catch (err) {
-        res.status(500).send("#EXTM3U\n#ERROR: " + err.message);
+        // Taaki crash hone par error message M3U ke andhar saaf dikhe
+        return res.status(200).send("#EXTM3U\n#ERROR: " + err.message);
     }
 };
