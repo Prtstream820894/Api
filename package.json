@@ -1,21 +1,13 @@
 {
   "name": "json-to-m3u-converter",
   "version": "1.0.0",
-  "description": "Tata Play M3U Converter with License Support",
+  "description": "Tata Play M3U Converter with License Support and Proxy",
+  "type": "module",
   "main": "api/speedo.js",
   "dependencies": {
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^3.3.2"
   },
   "engines": {
-    "node": "24.x"
-  }
-
-{
-  "name": "vercel-m3u-proxy",
-  "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "node-fetch": "^3.3.2"
+    "node": "20.x"
   }
 }
-
