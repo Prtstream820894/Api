@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
         // --- PLAY MODE ---
         if (play) {
             play = play.replace('.m3u8', '');
-            const officialSite = await getLiveDomain(["https://prmovies.giving/", "https://prmovies.to/"]);
+            const officialSite = await getLiveDomain(["https://prmovies.health/", "https://prmovies.to/"]);
             const streamBase = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
             const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${play}.html`;
 
