@@ -1,10 +1,3 @@
-// Serverless me ye sirf kuch der hi memory me rahega
-let playlistCache = {
-  data2: "",
-  data3: "",
-  lastFetched: 0
-};
-
 export default async function handler(req, res) {
   if (!('prtstream' in req.query)) {
     return res.status(403).send("❌ Access Denied ! Yah Link Sirf Prtstream App Me Chalenga Copy Karo Link Ko Or PrtStream Me jake Paste Karo");
@@ -16,7 +9,7 @@ export default async function handler(req, res) {
     const url3 = "https://allmovieslist.poonamchouhan076.workers.dev/";
     const url4 = "https://new-j-tv9filr.poonamchouhan076.workers.dev/";
 
-    const fetchWithTimeout = async (url, ms = 8000) => { // Timeout badhakar 8 second kiya
+    const fetchWithTimeout = async (url, ms = 8000) => {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), ms);
 
@@ -42,63 +35,42 @@ export default async function handler(req, res) {
       return data.replace("#EXTM3U", "").replace(/\r/g, "").trim();
     };
 
-    const currentTime = Date.now();
-    const twelveHours = 12 * 60 * 60 * 1000;
-
-    // Fail-Safe Cache Logic: Agar memory me data hai aur 12 ghante nahi hue, toh fetch skip karo
-    let data2 = playlistCache.data2;
-    let data3 = playlistCache.data3;
-
-    if (!data2 || !data3 || (currentTime - playlistCache.lastFetched > twelveHours)) {
-      // Background ya regular fetch
-      const [raw2, raw3] = await Promise.all([
-        fetchWithTimeout(url2),
-        fetchWithTimeout(url3)
-      ]);
-
-      // SAFE CHECK: Agar upar wala server data dene me fail ho gaya, toh purana saved data hi chalne do (khali mat karo)
-      if (raw2) {
-        playlistCache.data2 = cleanM3U(raw2);
-        data2 = playlistCache.data2;
-      }
-      if (raw3) {
-        playlistCache.data3 = cleanM3U(raw3);
-        data3 = playlistCache.data3;
-      }
-      
-      if (raw2 || raw3) {
-        playlistCache.lastFetched = currentTime;
-      }
-    }
-
-    // URL 1 aur URL 4 hamesha fresh call honge (Cookies ke liye)
-    const [data1, data4Raw] = await Promise.all([
+    // Sabhi 4 URLs ko ek saath live fetch kar rahe hain (No Cache, No Save)
+    const [raw1, raw2, raw3, raw4] = await Promise.all([
       fetchWithTimeout(url1),
+      fetchWithTimeout(url2),
+      fetchWithTimeout(url3),
       fetchWithTimeout(url4)
     ]);
 
-    if (!data1) {
+    // URL 1 Main Playlist hai, iska hona zaroori hai
+    if (!raw1) {
       return res.status(500).send("Main playlist failed");
     }
 
-    const data4 = cleanM3U(data4Raw);
+    // Baaki playlists ko clean kar rahe hain
+    const data1 = raw1.trim();
+    const data2 = cleanM3U(raw2);
+    const data3 = cleanM3U(raw3);
+    const data4 = cleanM3U(raw4);
 
-    // Final merge
+    // Final merge: Agar koi beech me fail bhi ho jaye toh baaki ka data jud jayega
     const finalPlaylist =
-      data1.trim() +
+      data1 +
       "\n" +
-      (data2 ? data2 + "\n" : "") + // Agar data2 khali ho toh error na aaye
-      (data3 ? data3 + "\n" : "") + // Agar data3 khali ho toh error na aaye
+      (data2 ? data2 + "\n" : "") +
+      (data3 ? data3 + "\n" : "") +
       data4;
 
+    // Response Headers
     res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
-    res.setHeader("Cache-Control", "no-store");
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    
     res.status(200).send(finalPlaylist);
 
   } catch (error) {
     res.status(500).send("Server Error");
   }
 }
-
-
-//Isme bhi vhi kardo
