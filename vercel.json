@@ -3,11 +3,11 @@
   "rewrites": [
     {
       "source": "/live.mpd",
-      "destination": "/api/index"
+      "destination": "/api/index.js"
     },
     {
       "source": "/api/speedo/(.*).m3u8",
-      "destination": "/api/speedo?play=$1"
+      "destination": "/api/speedo.js?play=$1"
     },
     {
       "source": "/tp.m3u",
