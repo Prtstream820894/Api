@@ -5,8 +5,8 @@ export default async function handler(req, res) {
 
   try {
     const url1 = "https://mainplaylist.poonamchouhan076.workers.dev/";
-    const url2 = "https://tata-playlist.poonamchouhan76.workers.dev/";
-    const url3 = "https://allmovieslist.poonamchouhan76.workers.dev/";
+    const url2 = "https://tata-playlist.poonamchouhan076.workers.dev/";
+    const url3 = "https://allmovieslist.poonamchouhan076.workers.dev/";
     const url4 = "https://new-j-tv9filr.poonamchouhan076.workers.dev/";
 
     const fetchWithTimeout = async (url, ms = 8000) => {
