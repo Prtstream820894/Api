@@ -15,8 +15,7 @@ export default async function handler(req, res) {
 
     const response = await fetch(target, {
       headers: {
-        "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "referer": base,
         "origin": base,
       },
@@ -24,54 +23,58 @@ export default async function handler(req, res) {
 
     const contentType = response.headers.get("content-type") || "";
 
+    // 🔥 HTML handling
     if (contentType.includes("text/html")) {
       let html = await response.text();
 
-      // Base tag
+      // Base tag add takis relative URLs correct base se load hon
       html = html.replace(/<head>/i, `<head><base href="${base}/">`);
 
-      const rewrite = (attr) => {
-        const regex = new RegExp(`${attr}="(.*?)"`, "gi");
-        html = html.replace(regex, (match, p1) => {
-          try {
-            const newUrl = new URL(p1, target).href;
-            return `${attr}="/api/proxy?url=${encodeURIComponent(newUrl)}"`;
-          } catch {
-            return match;
-          }
-        });
-      };
-
-      // 🔥 All important attributes
-      rewrite("href");
-      rewrite("src");
-      rewrite("data-src");
-      rewrite("poster");
-
-      // srcset fix
-      html = html.replace(/srcset="(.*?)"/gi, (match, p1) => {
+      // 1. Rewrite ALL href attributes (Single & Double quotes)
+      html = html.replace(/href=["'](.*?)["']/gi, (match, p1) => {
+        if (p1.startsWith('#') || p1.startsWith('javascript:')) return match;
         try {
-          const parts = p1.split(",");
-          const newParts = parts.map(part => {
-            let [url, size] = part.trim().split(" ");
-            const newUrl = new URL(url, target).href;
-            return `/api/proxy?url=${encodeURIComponent(newUrl)} ${size || ""}`;
-          });
-          return `srcset="${newParts.join(", ")}"`;
-        } catch {
-          return match;
-        }
+          const newUrl = new URL(p1, target).href;
+          return `href="/api/proxy?url=${encodeURIComponent(newUrl)}"`;
+        } catch { return match; }
+      });
+
+      // 2. Rewrite ALL src attributes (Single & Double quotes) - Fixes standard Images/Scripts
+      html = html.replace(/src=["'](.*?)["']/gi, (match, p1) => {
+        try {
+          const newUrl = new URL(p1, target).href;
+          return `src="/api/proxy?url=${encodeURIComponent(newUrl)}"`;
+        } catch { return match; }
+      });
+
+      // 3. Rewrite data-src & srcset (Modern lazy-loaded images fix)
+      html = html.replace(/(data-src|srcset)=["'](.*?)["']/gi, (match, attr, p1) => {
+        try {
+          // Agar srcset me multiple images hain comma-separated
+          if (attr === 'srcset') {
+            const parts = p1.split(',').map(part => {
+              const [url, size] = part.trim().split(/\s+/);
+              const newUrl = new URL(url, target).href;
+              return `/api/proxy?url=${encodeURIComponent(newUrl)} ${size || ''}`.trim();
+            });
+            return `srcset="${parts.join(', ')}"`;
+          }
+          const newUrl = new URL(p1, target).href;
+          return `${attr}="/api/proxy?url=${encodeURIComponent(newUrl)}"`;
+        } catch { return match; }
       });
 
       res.setHeader("Content-Type", "text/html");
-      return res.send(html);
+      return res.status(200).send(html);
     }
 
-    // 🔥 Binary files (images, css, js)
+    // 🔥 Other files (css/js/images)
     const buffer = await response.arrayBuffer();
-
     res.setHeader("Content-Type", contentType);
-    return res.send(Buffer.from(buffer));
+    // Cache standard assets for speed improvement
+    res.setHeader("Cache-Control", "public, max-age=86400"); 
+
+    return res.status(200).send(Buffer.from(buffer));
 
   } catch (err) {
     return res.status(500).send("Proxy Error: " + err.toString());
