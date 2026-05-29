@@ -3,53 +3,82 @@ export default async function handler(req, res) {
     let target = req.query.url;
 
     if (!target) {
-      return res.status(400).send("URL missing");
+      return res.status(400).send("Missing URL");
     }
 
-    // अगर http नहीं है तो add कर देंगे
     if (!target.startsWith("http")) {
       target = "https://" + target;
     }
 
-    const base = new URL(target).origin;
+    const urlObj = new URL(target);
+    const base = urlObj.origin;
 
     const response = await fetch(target, {
       headers: {
-        "User-Agent":
+        "user-agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36",
+        "referer": base,
+        "origin": base,
       },
     });
 
-    let contentType = response.headers.get("content-type");
+    const contentType = response.headers.get("content-type") || "";
 
-    // अगर HTML है तभी rewrite करेंगे
-    if (contentType && contentType.includes("text/html")) {
+    // 🔥 HTML handling
+    if (contentType.includes("text/html")) {
       let html = await response.text();
 
-      // 🔥 सभी links proxy से गुजरेंगे
-      html = html.replace(/href="(.*?)"/g, (match, p1) => {
-        if (p1.startsWith("http")) {
-          return `href="/api/proxy?url=${encodeURIComponent(p1)}"`;
-        }
-        return `href="/api/proxy?url=${encodeURIComponent(base + p1)}"`;
-      });
+      // Base tag add
+      html = html.replace(
+        /<head>/i,
+        `<head><base href="${base}/">`
+      );
 
-      html = html.replace(/src="(.*?)"/g, (match, p1) => {
-        if (p1.startsWith("http")) {
-          return `src="/api/proxy?url=${encodeURIComponent(p1)}"`;
+      // href rewrite
+      html = html.replace(
+        /href="(.*?)"/gi,
+        (match, p1) => {
+          try {
+            const newUrl = new URL(p1, target).href;
+            return `href="/api/proxy?url=${encodeURIComponent(newUrl)}"`;
+          } catch {
+            return match;
+          }
         }
-        return `src="/api/proxy?url=${encodeURIComponent(base + p1)}"`;
-      });
+      );
+
+      // src rewrite
+      html = html.replace(
+        /src="(.*?)"/gi,
+        (match, p1) => {
+          try {
+            const newUrl = new URL(p1, target).href;
+            return `src="/api/proxy?url=${encodeURIComponent(newUrl)}"`;
+          } catch {
+            return match;
+          }
+        }
+      );
 
       res.setHeader("Content-Type", "text/html");
-      return res.send(html);
-    } else {
-      // CSS / JS / Image direct pass
-      const buffer = await response.arrayBuffer();
-      res.setHeader("Content-Type", contentType || "application/octet-stream");
-      return res.send(Buffer.from(buffer));
+      return res.status(200).send(html);
     }
+
+    // 🔥 Other files (css/js/images)
+    const buffer = await response.arrayBuffer();
+
+    res.setHeader(
+      "Content-Type",
+      contentType
+    );
+
+    return res
+      .status(200)
+      .send(Buffer.from(buffer));
+
   } catch (err) {
-    res.status(500).send("Error: " + err.toString());
+    return res
+      .status(500)
+      .send("Proxy Error: " + err.toString());
   }
 }
