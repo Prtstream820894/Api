@@ -24,61 +24,56 @@ export default async function handler(req, res) {
 
     const contentType = response.headers.get("content-type") || "";
 
-    // 🔥 HTML handling
     if (contentType.includes("text/html")) {
       let html = await response.text();
 
-      // Base tag add
-      html = html.replace(
-        /<head>/i,
-        `<head><base href="${base}/">`
-      );
+      // Base tag
+      html = html.replace(/<head>/i, `<head><base href="${base}/">`);
 
-      // href rewrite
-      html = html.replace(
-        /href="(.*?)"/gi,
-        (match, p1) => {
+      const rewrite = (attr) => {
+        const regex = new RegExp(`${attr}="(.*?)"`, "gi");
+        html = html.replace(regex, (match, p1) => {
           try {
             const newUrl = new URL(p1, target).href;
-            return `href="/api/proxy?url=${encodeURIComponent(newUrl)}"`;
+            return `${attr}="/api/proxy?url=${encodeURIComponent(newUrl)}"`;
           } catch {
             return match;
           }
-        }
-      );
+        });
+      };
 
-      // src rewrite
-      html = html.replace(
-        /src="(.*?)"/gi,
-        (match, p1) => {
-          try {
-            const newUrl = new URL(p1, target).href;
-            return `src="/api/proxy?url=${encodeURIComponent(newUrl)}"`;
-          } catch {
-            return match;
-          }
+      // 🔥 All important attributes
+      rewrite("href");
+      rewrite("src");
+      rewrite("data-src");
+      rewrite("poster");
+
+      // srcset fix
+      html = html.replace(/srcset="(.*?)"/gi, (match, p1) => {
+        try {
+          const parts = p1.split(",");
+          const newParts = parts.map(part => {
+            let [url, size] = part.trim().split(" ");
+            const newUrl = new URL(url, target).href;
+            return `/api/proxy?url=${encodeURIComponent(newUrl)} ${size || ""}`;
+          });
+          return `srcset="${newParts.join(", ")}"`;
+        } catch {
+          return match;
         }
-      );
+      });
 
       res.setHeader("Content-Type", "text/html");
-      return res.status(200).send(html);
+      return res.send(html);
     }
 
-    // 🔥 Other files (css/js/images)
+    // 🔥 Binary files (images, css, js)
     const buffer = await response.arrayBuffer();
 
-    res.setHeader(
-      "Content-Type",
-      contentType
-    );
-
-    return res
-      .status(200)
-      .send(Buffer.from(buffer));
+    res.setHeader("Content-Type", contentType);
+    return res.send(Buffer.from(buffer));
 
   } catch (err) {
-    return res
-      .status(500)
-      .send("Proxy Error: " + err.toString());
+    return res.status(500).send("Proxy Error: " + err.toString());
   }
 }
