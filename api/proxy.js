@@ -1,3 +1,5 @@
+import { Readable } from 'stream';
+
 export default async function handler(req, res) {
   try {
     let target = req.query.url;
@@ -15,68 +17,72 @@ export default async function handler(req, res) {
 
     const response = await fetch(target, {
       headers: {
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36",
         "referer": base,
         "origin": base,
       },
     });
 
     const contentType = response.headers.get("content-type") || "";
+    res.setHeader("Content-Type", contentType);
 
-    // 🔥 HTML handling
+    // ⚡ अगर HTML पेज है तो URL बदलें
     if (contentType.includes("text/html")) {
       let html = await response.text();
 
-      // Base tag add takis relative URLs correct base se load hon
+      // Base tag जोड़ें ताकि अधूरे URL अपने आप बेस URL से लोड हों
       html = html.replace(/<head>/i, `<head><base href="${base}/">`);
 
-      // 1. Rewrite ALL href attributes (Single & Double quotes)
-      html = html.replace(/href=["'](.*?)["']/gi, (match, p1) => {
-        if (p1.startsWith('#') || p1.startsWith('javascript:')) return match;
-        try {
-          const newUrl = new URL(p1, target).href;
-          return `href="/api/proxy?url=${encodeURIComponent(newUrl)}"`;
-        } catch { return match; }
-      });
-
-      // 2. Rewrite ALL src attributes (Single & Double quotes) - Fixes standard Images/Scripts
-      html = html.replace(/src=["'](.*?)["']/gi, (match, p1) => {
-        try {
-          const newUrl = new URL(p1, target).href;
-          return `src="/api/proxy?url=${encodeURIComponent(newUrl)}"`;
-        } catch { return match; }
-      });
-
-      // 3. Rewrite data-src & srcset (Modern lazy-loaded images fix)
-      html = html.replace(/(data-src|srcset)=["'](.*?)["']/gi, (match, attr, p1) => {
-        try {
-          // Agar srcset me multiple images hain comma-separated
-          if (attr === 'srcset') {
-            const parts = p1.split(',').map(part => {
-              const [url, size] = part.trim().split(/\s+/);
-              const newUrl = new URL(url, target).href;
-              return `/api/proxy?url=${encodeURIComponent(newUrl)} ${size || ''}`.trim();
-            });
-            return `srcset="${parts.join(', ')}"`;
+      const rewrite = (attr) => {
+        const regex = new RegExp(`${attr}="(.*?)"`, "gi");
+        html = html.replace(regex, (match, p1) => {
+          try {
+            // अगर URL पहले से ही प्रॉक्सी का है या डेटा URI है तो न बदलें
+            if (p1.startsWith("data:") || p1.includes("/api/proxy")) return match;
+            const newUrl = new URL(p1, target).href;
+            return `${attr}="/api/proxy?url=${encodeURIComponent(newUrl)}"`;
+          } catch {
+            return match;
           }
-          const newUrl = new URL(p1, target).href;
-          return `${attr}="/api/proxy?url=${encodeURIComponent(newUrl)}"`;
-        } catch { return match; }
+        });
+      };
+
+      // महत्वपूर्ण एट्रिब्यूट्स बदलें
+      rewrite("href");
+      rewrite("src");
+      rewrite("data-src");
+      rewrite("poster");
+
+      // srcset फिक्स
+      html = html.replace(/srcset="(.*?)"/gi, (match, p1) => {
+        try {
+          const parts = p1.split(",");
+          const newParts = parts.map(part => {
+            let [url, size] = part.trim().split(/\s+/);
+            if (!url) return part;
+            const newUrl = new URL(url, target).href;
+            return `/api/proxy?url=${encodeURIComponent(newUrl)} ${size || ""}`;
+          });
+          return `srcset="${newParts.join(", ")}"`;
+        } catch {
+          return match;
+        }
       });
 
-      res.setHeader("Content-Type", "text/html");
-      return res.status(200).send(html);
+      return res.send(html);
     }
 
-    // 🔥 Other files (css/js/images)
-    const buffer = await response.arrayBuffer();
-    res.setHeader("Content-Type", contentType);
-    // Cache standard assets for speed improvement
-    res.setHeader("Cache-Control", "public, max-age=86400"); 
-
-    return res.status(200).send(Buffer.from(buffer));
+    // ⚡ फ़ास्ट लोडिंग के लिए (इमेज/CSS/JS) को सीधे स्ट्रीम करें (ArrayBuffer की जरूरत नहीं)
+    if (response.body) {
+      const nodeStream = Readable.fromWeb(response.body);
+      nodeStream.pipe(res);
+    } else {
+      const buffer = await response.arrayBuffer();
+      return res.send(Buffer.from(buffer));
+    }
 
   } catch (err) {
+    console.error(err);
     return res.status(500).send("Proxy Error: " + err.toString());
   }
 }
