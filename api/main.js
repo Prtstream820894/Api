@@ -1,9 +1,9 @@
 export default async function handler(req, res) {
   try {
     const urls = [
-      "https://fancy-morning-a287.poonamchouhan076.workers.dev/", // 1st (top)
-      "https://tight-firefly-ecdd.poonamchouhan076.workers.dev/", // 2nd
-      "https://zeehdk.poonamchouhan076.workers.dev/"       // 3rd
+      "https://zeehdk.poonamchouhan076.workers.dev/", // 1st (top)
+      "https://fancy-morning-a287.poonamchouhan076.workers.dev/", // 2nd
+      "https://tight-firefly-ecdd.poonamchouhan076.workers.dev/"       // 3rd
     ];
 
     // ⚡ Parallel fetch (FAST)
