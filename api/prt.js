@@ -55,7 +55,7 @@ export default {
 
       // 3. Naya Group Order Setup (Case-insensitive matching ke liye lowercase kiya hai)
       const groupOrder = [
-        "✨✦ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍ✦✨",      // 1
+        "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",      // 1
         "highlights",        // 2
         "sports",            // 3
         "south",             // 4
@@ -82,19 +82,19 @@ export default {
         let originalGroup = ch.groupTitle.trim();
         let groupLower = originalGroup.toLowerCase();
 
-        // RULE 1: SonyLiv aur FanCode ke saare channels ✨✦ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍ✦✨ me daalo
+        // RULE 1: SonyLiv aur FanCode ke saare channels ✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨ me daalo
         if (groupLower.includes("sonyliv") || groupLower.includes("fancode")) {
-          ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍ✦✨"');
-          ch.groupTitle = "✨✦ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍ✦✨";
-          groupedChannels["✨✦ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍ✦✨"].push(ch);
+          ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"');
+          ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
+          groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
         }
         // BADLAV 1: Agar group exactly "sports" hai
         else if (groupLower === "sports") {
           if (sportsCount < 5) {
-            // Shuruati 5 channels direct ✨✦ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍ✦✨ me jayenge (Sports me nahi rahenge)
-            ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍ✦✨"');
-            ch.groupTitle = "✨✦ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍ✦✨";
-            groupedChannels["✨✦ʟɪᴠᴇ ꜱᴛʀᴇᴀᴍ✦✨"].push(ch);
+            // Shuruati 5 channels direct ✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨ me jayenge (Sports me nahi rahenge)
+            ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"');
+            ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
+            groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
             sportsCount++;
           } else {
             // 5 ke baad waale bache huye channels original Sports me hi rahenge
