@@ -86,7 +86,7 @@ export default {
 if (
     groupLower.includes("sonyliv") ||
     groupLower.includes("fancode") ||
-    groupLower.includes("fifa wc 2026")
+    groupLower.includes("FIFA WC 2026")
 ) {
     ch.extinf = ch.extinf.replace(
         /group-title="[^"]+"/,
