@@ -1,6 +1,7 @@
 export default {
   async fetch(request, env, ctx) {
     const playlistUrl = "https://project-lc4mz.vercel.app/api/indexplay?prtstream";
+    const fifaPlaylistUrl = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
 
     try {
       // 1. Original playlist fetch karo
@@ -14,6 +15,14 @@ export default {
       }
 
       const text = await response.text();
+      const fifaResponse = await fetch(fifaPlaylistUrl, {
+  headers: {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+  },
+});
+
+const fifaText = fifaResponse.ok ? await fifaResponse.text() : "";
+
       const lines = text.split("\n");
       let headerLines = [];
       let channels = [];
@@ -52,6 +61,53 @@ export default {
         }
       }
       if (currentChannel) channels.push(currentChannel);
+      // FIFA playlist parse
+if (fifaText) {
+  const fifaLines = fifaText.split("\n");
+  let fifaChannel = null;
+
+  for (const rawLine of fifaLines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    if (line.startsWith("#EXTINF:")) {
+
+    if (fifaChannel) {
+        channels.push(fifaChannel);
+    }
+
+    const match = line.match(/group-title="([^"]+)"/i);
+    const group = match ? match[1].toLowerCase() : "";
+
+    // Sirf FIFA WC 2026 group import hoga
+    if (!group.includes("fifa wc 2026")) {
+        fifaChannel = null;
+        continue;
+    }
+
+    fifaChannel = {
+        extinf: line.replace(
+            /group-title="[^"]+"/,
+            'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"'
+        ),
+        groupTitle: "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
+        extraMetadata: [],
+        url: ""
+    };
+} else if (fifaChannel) {
+      if (line.startsWith("#")) {
+        fifaChannel.extraMetadata.push(line);
+      } else {
+        fifaChannel.url = line;
+        channels.push(fifaChannel);
+        fifaChannel = null;
+      }
+    }
+  }
+if (fifaChannel) {
+      channels.push(fifaChannel);
+  }
+}
 
       // 3. Naya Group Order Setup (Case-insensitive matching ke liye lowercase kiya hai)
       const groupOrder = [
@@ -85,8 +141,7 @@ export default {
         // RULE 1: SonyLiv, FanCode aur FIFA WC 2026 ke saare channels ✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨ me daalo
 if (
     groupLower.includes("sonyliv") ||
-    groupLower.includes("fancode") ||
-    groupLower.includes("FIFA WC 2026")
+    groupLower.includes("fancode")
 ) {
     ch.extinf = ch.extinf.replace(
         /group-title="[^"]+"/,
