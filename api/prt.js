@@ -82,12 +82,19 @@ export default {
         let originalGroup = ch.groupTitle.trim();
         let groupLower = originalGroup.toLowerCase();
 
-        // RULE 1: SonyLiv aur FanCode ke saare channels ✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨ me daalo
-        if (groupLower.includes("sonyliv") || groupLower.includes("fancode")) {
-          ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"');
-          ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
-          groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
-        }
+        // RULE 1: SonyLiv, FanCode aur FIFA WC 2026 ke saare channels ✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨ me daalo
+if (
+    groupLower.includes("sonyliv") ||
+    groupLower.includes("fancode") ||
+    groupLower.includes("fifa wc 2026")
+) {
+    ch.extinf = ch.extinf.replace(
+        /group-title="[^"]+"/,
+        'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"'
+    );
+    ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
+    groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
+}
         // BADLAV 1: Agar group exactly "sports" hai
         else if (groupLower === "sports") {
           if (sportsCount < 5) {
