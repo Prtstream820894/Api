@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   try {
     const url1 = "https://mainplaylist.poonamchouhan076.workers.dev/";
     const url2 = "https://allmovieslist.poonamchouhan076.workers.dev/";
-    const url3 = "https://shiny-hat-32f8.poonamchouhan076.workers.dev/";
+    const url3 = "https://raw.githubusercontent.com/poonamchouhan54/love-/refs/heads/main/Jtv.m3u";
     const url4 = "https://new-j-tv9filr.poonamchouhan076.workers.dev/";
     
     // Naye FanCode aur SonyLIV Workers ke URLs yahan add kar diye
