@@ -8,13 +8,16 @@ export default async function handler(req, res) {
     const url2 = "https://allmovieslist.poonamchouhan076.workers.dev/";
     const url3 = "https://shiny-hat-32f8.poonamchouhan076.workers.dev/";
     const url4 = "https://new-j-tv9filr.poonamchouhan076.workers.dev/";
+    
+    // Naye FanCode aur SonyLIV Workers ke URLs yahan add kar diye
+    const url5 = "https://fancode-art-c9de.poonamchouhan076.workers.dev/";
+    const url6 = "https://sonyliv-event-5e05.poonamchouhan076.workers.dev/";
 
     const fetchWithTimeout = async (url, ms = 8000) => {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), ms);
 
       try {
-        // url3 ke liye extra strong cache buster
         const isUrl3 = url === url3;
         const cacheBuster = isUrl3 
           ? `?nocache=${Date.now()}&r=${Math.random()}` 
@@ -26,7 +29,6 @@ export default async function handler(req, res) {
             "Cache-Control": "no-cache, no-store, max-age=0", 
             "Pragma": "no-cache" 
           },
-          // Sirf url3 ke liye Cloudflare cache bypass
           ...(isUrl3 && { cf: { cacheTtl: 0, cacheEverything: false } })
         });
         
@@ -44,41 +46,46 @@ export default async function handler(req, res) {
       return data.replace("#EXTM3U", "").replace(/\r/g, "").trim();
     };
 
-    // Sabhi 4 URLs ko ek saath live fetch kar rahe hain
-    const [raw1, raw2, raw3, raw4] = await Promise.all([
+    // Sabhi 6 URLs ko ek saath live fetch kar rahe hain Promise.all se (Fastest speed ke liye)
+    const [raw1, raw2, raw3, raw4, raw5, raw6] = await Promise.all([
       fetchWithTimeout(url1, 8000),
       fetchWithTimeout(url2, 8000),
-      fetchWithTimeout(url3, 15000), // url3 ko extra time diya
-      fetchWithTimeout(url4, 8000)
+      fetchWithTimeout(url3, 15000), // url3 ko extra time
+      fetchWithTimeout(url4, 8000),
+      fetchWithTimeout(url5, 8000),  // FanCode
+      fetchWithTimeout(url6, 8000)   // SonyLIV
     ]);
 
-    // URL 1 Main Playlist hai, iska hona zaroori hai
     if (!raw1) {
       return res.status(500).send("Main playlist failed");
     }
 
-    // Baaki playlists ko clean kar rahe hain
     const data1 = raw1.trim();
     const data2 = cleanM3U(raw2);
     const data3 = cleanM3U(raw3);
     const data4 = cleanM3U(raw4);
+    const data5 = cleanM3U(raw5); // FanCode clean data
+    const data6 = cleanM3U(raw6); // SonyLIV clean data
 
-    // Final merge: Agar koi beech me fail bhi ho jaye toh baaki ka data jud jayega
+    // Final merge: Agar live match nahi chal raha hoga aur wo worker empty response dega, 
+    // toh ye automatic use skip karke baki playlist bana dega, koi error nahi aayega.
     const finalPlaylist =
       data1 +
       "\n" +
       (data2 ? data2 + "\n" : "") +
       (data3 ? data3 + "\n" : "") +
-      data4;
+      (data4 ? data4 + "\n" : "") +
+      (data5 ? data5 + "\n" : "") +
+      (data6 ? data6 + "\n" : "");
 
     // Response Headers
     res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
     res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-    res.setHeader("Cloudflare-CDN-Cache-Control", "no-store"); // Ye line add ki
+    res.setHeader("Cloudflare-CDN-Cache-Control", "no-store");
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
     
-    res.status(200).send(finalPlaylist);
+    res.status(200).send(finalPlaylist.trim());
 
   } catch (error) {
     res.status(500).send("Server Error");
