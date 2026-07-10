@@ -16,19 +16,19 @@ export default {
 
       const text = await response.text();
       const fifaResponse = await fetch(fifaPlaylistUrl, {
-  headers: {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-  },
-});
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        },
+      });
 
-const fifaText = fifaResponse.ok ? await fifaResponse.text() : "";
+      const fifaText = fifaResponse.ok ? await fifaResponse.text() : "";
 
       const lines = text.split("\n");
       let headerLines = [];
       let channels = [];
       let currentChannel = null;
 
-      // 2. Playlist parsing suru karo
+      // 2. Playlist parsing shuru karo
       for (let i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
         if (!line) continue;
@@ -61,55 +61,55 @@ const fifaText = fifaResponse.ok ? await fifaResponse.text() : "";
         }
       }
       if (currentChannel) channels.push(currentChannel);
+
       // FIFA playlist parse
-if (fifaText) {
-  const fifaLines = fifaText.split("\n");
-  let fifaChannel = null;
+      if (fifaText) {
+        const fifaLines = fifaText.split("\n");
+        let fifaChannel = null;
 
-  for (const rawLine of fifaLines) {
-    const line = rawLine.trim();
-    if (!line) continue;
+        for (const rawLine of fifaLines) {
+          const line = rawLine.trim();
+          if (!line) continue;
 
-    if (line.startsWith("#EXTINF:")) {
+          if (line.startsWith("#EXTINF:")) {
+            if (fifaChannel) {
+              channels.push(fifaChannel);
+            }
 
-    if (fifaChannel) {
-        channels.push(fifaChannel);
-    }
+            const match = line.match(/group-title="([^"]+)"/i);
+            const group = match ? match[1].toLowerCase() : "";
 
-    const match = line.match(/group-title="([^"]+)"/i);
-    const group = match ? match[1].toLowerCase() : "";
+            // Sirf FIFA WC 2026 group import hoga
+            if (!group.includes("fifa wc 2026")) {
+              fifaChannel = null;
+              continue;
+            }
 
-    // Sirf FIFA WC 2026 group import hoga
-    if (!group.includes("fifa wc 2026")) {
-        fifaChannel = null;
-        continue;
-    }
-
-    fifaChannel = {
-        extinf: line.replace(
-            /group-title="[^"]+"/,
-            'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"'
-        ),
-        groupTitle: "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
-        extraMetadata: [],
-        url: ""
-    };
-} else if (fifaChannel) {
-      if (line.startsWith("#")) {
-        fifaChannel.extraMetadata.push(line);
-      } else {
-        fifaChannel.url = line;
-        channels.push(fifaChannel);
-        fifaChannel = null;
+            fifaChannel = {
+              extinf: line.replace(
+                /group-title="[^"]+"/,
+                'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"'
+              ),
+              groupTitle: "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
+              extraMetadata: [],
+              url: ""
+            };
+          } else if (fifaChannel) {
+            if (line.startsWith("#")) {
+              fifaChannel.extraMetadata.push(line);
+            } else {
+              fifaChannel.url = line;
+              channels.push(fifaChannel);
+              fifaChannel = null;
+            }
+          }
+        }
+        if (fifaChannel) {
+          channels.push(fifaChannel);
+        }
       }
-    }
-  }
-if (fifaChannel) {
-      channels.push(fifaChannel);
-  }
-}
 
-      // 3. Naya Group Order Setup (Case-insensitive matching ke liye lowercase kiya hai)
+      // 3. Naya Group Order Setup
       const groupOrder = [
         "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",      // 1
         "highlights",        // 2
@@ -132,67 +132,95 @@ if (fifaChannel) {
       let otherChannels = []; // Baki bache huye groups ke liye
 
       let sportsCount = 0;
+      
+      // De-duplication check ke liye unique sets (Live Events group ke liye)
+      let uniqueUrls = new Set();
+      let uniqueTitles = new Set();
+      let uniqueLogos = new Set();
+
+      // Helper function title aur logo extract karne ke liye
+      const getMetadata = (extinf) => {
+        let titleMatch = extinf.match(/,(.+)$/);
+        let logoMatch = extinf.match(/tvg-logo="([^"]+)"/i);
+        return {
+          title: titleMatch ? titleMatch[1].trim().toLowerCase() : "",
+          logo: logoMatch ? logoMatch[1].trim().toLowerCase() : ""
+        };
+      };
 
       // 4. Processing channels based on your new rules
       for (let ch of channels) {
         let originalGroup = ch.groupTitle.trim();
         let groupLower = originalGroup.toLowerCase();
+        let streamUrl = ch.url.trim().toLowerCase();
+        let meta = getMetadata(ch.extinf);
 
-        // RULE 1: SonyLiv, FanCode aur FIFA WC 2026 ke saare channels ✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨ me daalo
-if (
-    groupLower.includes("sonyliv") ||
-    groupLower.includes("fancode")
-) {
-    ch.extinf = ch.extinf.replace(
-        /group-title="[^"]+"/,
-        'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"'
-    );
-    ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
-    groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
-}
-        // BADLAV 1: Agar group exactly "sports" hai
+        // RULE 1: SonyLiv, FanCode aur FIFA WC 2026 ke saare channels ✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨ me daalo (With Duplicate Check)
+        if (groupLower.includes("sonyliv") || groupLower.includes("fancode") || groupLower === "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨") {
+          
+          // Agar same URL, same Title ya same Image pehle se Live Events me hai, toh skip kar do
+          if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
+            continue; // Duplicate found, skip this channel
+          }
+
+          // Unique arrays me store karo taaki agli baar check ho sake
+          uniqueUrls.add(streamUrl);
+          uniqueTitles.add(meta.title);
+          if (meta.logo) uniqueLogos.add(meta.logo);
+
+          ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"');
+          ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
+          groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
+        }
+        // BADLAV 1: Agar group exactly "sports" hai toh ab sirf 2 hi channel jayenge live event me
         else if (groupLower === "sports") {
-          if (sportsCount < 5) {
-            // Shuruati 5 channels direct ✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨ me jayenge (Sports me nahi rahenge)
+          if (sportsCount < 2) { // 5 se badal kar 2 kar diya
+            
+            // Sports wale ko bhi live event me bhejte waqt duplicate check kar lete hain
+            if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
+              continue;
+            }
+            uniqueUrls.add(streamUrl);
+            uniqueTitles.add(meta.title);
+            if (meta.logo) uniqueLogos.add(meta.logo);
+
             ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"');
             ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
             groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
             sportsCount++;
           } else {
-            // 5 ke baad waale bache huye channels original Sports me hi rahenge
+            // 2 ke baad waale bache huye channels original Sports me hi rahenge
             groupedChannels["sports"].push(ch);
           }
         }
         // Baaki saare normal channels ki sorting
         else {
-  if (groupLower.includes("highlights")) {
-    groupedChannels["highlights"].push(ch);
-  } else if (groupLower === "sports") {
-    groupedChannels["sports"].push(ch);
-  } else if (groupLower.includes("south")) {
-    groupedChannels["south"].push(ch);
-  } else if (groupLower.includes("bollywood")) {
-    groupedChannels["bollywood movies"].push(ch);
-  } else if (groupLower.includes("hollywood")) {
-    groupedChannels["hollywood movies"].push(ch);
-  } else if (groupLower.includes("web series")) {
-    groupedChannels["web series"].push(ch);
-  } else if (groupLower.includes("tv show") || groupLower.includes("tv shows")) {
-    groupedChannels["tv show"].push(ch);
-  } else if (groupLower.includes("entertainment")) {
-    groupedChannels["entertainment"].push(ch);
-  } else if (groupLower === "movies" || groupLower.includes("movies")) {
-    groupedChannels["movies"].push(ch);
-  } else if (groupLower.includes("music")) {
-    groupedChannels["music"].push(ch);
-  } else if (groupLower.includes("news")) {
-    groupedChannels["news"].push(ch);
-  } else if (groupLower.includes("kids")) {
-    groupedChannels["kids"].push(ch);
-  } else {
-    otherChannels.push(ch);
-  }
-}
+          if (groupLower.includes("highlights")) {
+            groupedChannels["highlights"].push(ch);
+          } else if (groupLower.includes("south")) {
+            groupedChannels["south"].push(ch);
+          } else if (groupLower.includes("bollywood")) {
+            groupedChannels["bollywood movies"].push(ch);
+          } else if (groupLower.includes("hollywood")) {
+            groupedChannels["hollywood movies"].push(ch);
+          } else if (groupLower.includes("web series")) {
+            groupedChannels["web series"].push(ch);
+          } else if (groupLower.includes("tv show") || groupLower.includes("tv shows")) {
+            groupedChannels["tv show"].push(ch);
+          } else if (groupLower.includes("entertainment")) {
+            groupedChannels["entertainment"].push(ch);
+          } else if (groupLower === "movies" || groupLower.includes("movies")) {
+            groupedChannels["movies"].push(ch);
+          } else if (groupLower.includes("music")) {
+            groupedChannels["music"].push(ch);
+          } else if (groupLower.includes("news")) {
+            groupedChannels["news"].push(ch);
+          } else if (groupLower.includes("kids")) {
+            groupedChannels["kids"].push(ch);
+          } else {
+            otherChannels.push(ch);
+          }
+        }
       }
 
       // 5. Nayi playlist string construct karo (Sahi Order Me)
@@ -203,7 +231,7 @@ if (
         output.push("#EXTM3U");
       }
 
-      // BADLAV 2: Ek-ek karke defined 1 se 13 groups ko joddo
+      // defined 1 se 13 groups ko joddo
       for (let groupKey of groupOrder) {
         let chList = groupedChannels[groupKey];
         for (let ch of chList) {
