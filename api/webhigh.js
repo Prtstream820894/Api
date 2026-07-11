@@ -1,41 +1,35 @@
+// /api/playlist.js
+
 export default async function handler(req, res) {
-  const firebaseURL = "https://ipl2020-46d2f.firebaseio.com/Webplalist.json";
+  // Aapka Cloudflare Worker URL
+  const WORKER_URL = "https://webplaylst-dawn-b30b.poonamchouhan076.workers.dev/";
 
   try {
-    const response = await fetch(firebaseURL);
-    const data = await response.json();
-
-    if (!data || !Array.isArray(data)) {
-      return res.status(404).send("Data invalid or empty");
-    }
-
-    let m3u8 = "#EXTM3U\n";
-
-    data.forEach((item) => {
-      // Check kar rahe hain ki item null na ho aur usme id/name ho
-      if (item && item.id && item.name) {
-        const name = item.name;
-        const logo = item.logo || "";
-        
-        // JSON ke "group" key se data le rahe hain
-        // Agar group khali hai toh "General" dikhayega
-        const groupName = item.group || "General"; 
-        
-        const url = item.id;
-
-        m3u8 += `#EXTINF:-1 tvg-logo="${logo}" group-title="${groupName}",${name}\n`;
-        m3u8 += `${url}\n`;
+    // Fresh data ke liye caching ko destroy (bypass) karein
+    const response = await fetch(WORKER_URL, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       }
     });
 
-    // Performance aur Fast Loading ke liye headers
-    res.setHeader('Content-Type', 'application/x-mpegurl');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=59');
+    if (!response.ok) {
+      return res.status(500).send("Worker se data fetch nahi ho paya.");
+    }
 
-    return res.status(200).send(m3u8);
+    const m3uPlaylist = await response.text();
+
+    // Sahi M3U aur CORS headers lagayein taaki player me live chale aur cache na ho
+    res.setHeader('Content-Type', 'application/x-mpegurl');
+    res.setHeader('Content-Disposition', 'attachment; filename="playlist.m3u"');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+
+    // Same to same playlist output bina badle return karein
+    return res.status(200).send(m3uPlaylist);
 
   } catch (error) {
-    return res.status(500).send("Error fetching data: " + error.message);
+    return res.status(500).json({ error: error.message });
   }
 }
