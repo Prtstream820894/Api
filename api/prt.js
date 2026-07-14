@@ -2,6 +2,7 @@ export default {
   async fetch(request, env, ctx) {
     const playlistUrl = "https://project-lc4mz.vercel.app/api/indexplay?prtstream";
     const fifaPlaylistUrl = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
+    const jtvPlaylistUrl = "https://raw.githubusercontent.com/poonamchouhan54/love-/refs/heads/main/Jtv.m3u";
 
     try {
       // 1. Original playlist fetch karo
@@ -13,22 +14,30 @@ export default {
       if (!response.ok) {
         return new Response("Failed to fetch original playlist", { status: response.status });
       }
-
       const text = await response.text();
+
+      // 2. FIFA playlist fetch karo
       const fifaResponse = await fetch(fifaPlaylistUrl, {
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
         },
       });
-
       const fifaText = fifaResponse.ok ? await fifaResponse.text() : "";
+
+      // 3. Nayi Jtv playlist fetch karo
+      const jtvResponse = await fetch(jtvPlaylistUrl, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        },
+      });
+      const jtvText = jtvResponse.ok ? await jtvResponse.text() : "";
 
       const lines = text.split("\n");
       let headerLines = [];
       let channels = [];
       let currentChannel = null;
 
-      // 2. Playlist parsing shuru karo
+      // Playlist parsing shuru karo (Main Playlist)
       for (let i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
         if (!line) continue;
@@ -109,36 +118,70 @@ export default {
         }
       }
 
-      // 3. Strict Group Order Setup
+      // Jtv playlist parse (Teesri playlist ka data bina kisi check ke pure channels add honge)
+      if (jtvText) {
+        const jtvLines = jtvText.split("\n");
+        let jtvChannel = null;
+
+        for (const rawLine of jtvLines) {
+          const line = rawLine.trim();
+          if (!line) continue;
+
+          // Skip head tag if present in loop
+          if (line.startsWith("#EXTM3U")) continue;
+
+          if (line.startsWith("#EXTINF:")) {
+            if (jtvChannel) {
+              channels.push(jtvChannel);
+            }
+            let groupMatch = line.match(/group-title="([^"]+)"/i);
+            let groupTitle = groupMatch ? groupMatch[1] : "";
+            jtvChannel = { extinf: line, groupTitle: groupTitle, extraMetadata: [], url: "" };
+          } else if (jtvChannel) {
+            if (line.startsWith("#")) {
+              jtvChannel.extraMetadata.push(line);
+            } else {
+              jtvChannel.url = line;
+              channels.push(jtvChannel);
+              jtvChannel = null;
+            }
+          }
+        }
+        if (jtvChannel) {
+          channels.push(jtvChannel);
+        }
+      }
+
+      // 4. Group Order Setup
       const groupOrder = [
         "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨", 
-        "✨✦⚽ FIFA WC✦✨",     // 1
-        "highlights",        // 2
-        "sports",            // 3
-        "south",             // 4
-        "bollywood movies",  // 5
-        "hollywood movies",  // 6
-        "web series",        // 7
-        "tv show",           // 8
-        "entertainment",     // 9
-        "movies",            // 10
-        "music",             // 11
-        "news",              // 12
-        "kids"               // 13
+        "✨✦⚽ FIFA WC✦✨",     
+        "highlights",        
+        "sports",            
+        "south",             
+        "bollywood movies",  
+        "hollywood movies",  
+        "web series",        
+        "tv show",           
+        "entertainment",     
+        "movies",            
+        "music",             
+        "news",              
+        "kids"               
       ];
 
       let groupedChannels = {};
       groupOrder.forEach(g => groupedChannels[g] = []);
-      let otherChannels = []; // Backup bucket takki koi channel drop na ho
+      let otherChannels = []; 
 
       let sportsCount = 0;
 
-      // 4. Processing channels based on your rules (NO SKIPPING/CONTINUE)
+      // 5. Processing all channels (NO SKIPPING/FILTERING AT ALL)
       for (let ch of channels) {
         let originalGroup = ch.groupTitle.trim();
         let groupLower = originalGroup.toLowerCase();
 
-        // RULE 1: SonyLiv, FanCode aur Live Events ke saare channels Live Events group me jayenge
+        // RULE 1: SonyLiv, FanCode aur Live Events ke saare channels
         if (groupLower.includes("sonyliv") || groupLower.includes("fancode") || groupLower === "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨") {
           ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"');
           ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
@@ -148,9 +191,9 @@ export default {
         else if (groupLower === "✨✦⚽ fifa wc✦✨") {
           groupedChannels["✨✦⚽ FIFA WC✦✨"].push(ch);
         }
-        // Sports check: Pehle do live me jayenge, baki sports me rahenge
+        // Sports check: Pehle 2 channels live events me jayenge
         else if (groupLower === "sports") {
-          if (sportsCount < 1) { // Pehle 2 channels
+          if (sportsCount < 1) { 
             ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"');
             ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
             groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
@@ -184,13 +227,13 @@ export default {
           } else if (groupLower.includes("kids")) {
             groupedChannels["kids"].push(ch);
           } else {
-            // FIX: Jo channel kisi specific group me nahi fit hua, wo yahan safe save hoga (Chhootega nahi)
+            // Jtv ya PRTstream ke baaki saare channels jo upar match nahi huye, wo yahan safely aa jayenge
             otherChannels.push(ch);
           }
         }
       }
 
-      // 5. Nayi playlist string construct karo (Sahi Order Me)
+      // 6. Nayi playlist string construct karo (Sahi Order Me)
       let output = [];
       if (headerLines.length > 0) {
         output.push(headerLines.join("\n"));
@@ -198,7 +241,7 @@ export default {
         output.push("#EXTM3U");
       }
 
-      // Ordered groups ko output me add karo
+      // Priority Groups ko add karo
       for (let groupKey of groupOrder) {
         let chList = groupedChannels[groupKey];
         for (let ch of chList) {
@@ -208,7 +251,7 @@ export default {
         }
       }
 
-      // Baki bache huye backup channels ko playlist ke sabse niche append karo
+      // Extra normal channels ko sabse niche append karo
       for (let ch of otherChannels) {
         output.push(ch.extinf);
         if (ch.extraMetadata.length > 0) output.push(ch.extraMetadata.join("\n"));
