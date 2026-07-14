@@ -109,7 +109,7 @@ export default {
         }
       }
 
-      // 3. Naya Group Order Setup
+      // 3. Strict Group Order Setup
       const groupOrder = [
         "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨", 
         "✨✦⚽ FIFA WC✦✨",     // 1
@@ -129,16 +129,16 @@ export default {
 
       let groupedChannels = {};
       groupOrder.forEach(g => groupedChannels[g] = []);
-      let otherChannels = []; 
+      let otherChannels = []; // Backup bucket takki koi channel drop na ho
 
       let sportsCount = 0;
 
-      // 4. Processing channels based on your rules (NO DUPLICATE CHECKS)
+      // 4. Processing channels based on your rules (NO SKIPPING/CONTINUE)
       for (let ch of channels) {
         let originalGroup = ch.groupTitle.trim();
         let groupLower = originalGroup.toLowerCase();
 
-        // RULE 1: SonyLiv, FanCode aur Live Events ke saare channels
+        // RULE 1: SonyLiv, FanCode aur Live Events ke saare channels Live Events group me jayenge
         if (groupLower.includes("sonyliv") || groupLower.includes("fancode") || groupLower === "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨") {
           ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"');
           ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
@@ -148,15 +148,14 @@ export default {
         else if (groupLower === "✨✦⚽ fifa wc✦✨") {
           groupedChannels["✨✦⚽ FIFA WC✦✨"].push(ch);
         }
-        // Agar group exactly "sports" hai
+        // Sports check: Pehle do live me jayenge, baki sports me rahenge
         else if (groupLower === "sports") {
-          if (sportsCount < 1) { // Pehle 2 channels ko Live Events me bhejenge
+          if (sportsCount < 1) { // Pehle 2 channels
             ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"');
             ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
             groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
             sportsCount++;
           } else {
-            // Baaki ke saare sports channels bina filter ke safe yahan aayenge
             groupedChannels["sports"].push(ch);
           }
         }
@@ -185,6 +184,7 @@ export default {
           } else if (groupLower.includes("kids")) {
             groupedChannels["kids"].push(ch);
           } else {
+            // FIX: Jo channel kisi specific group me nahi fit hua, wo yahan safe save hoga (Chhootega nahi)
             otherChannels.push(ch);
           }
         }
@@ -198,6 +198,7 @@ export default {
         output.push("#EXTM3U");
       }
 
+      // Ordered groups ko output me add karo
       for (let groupKey of groupOrder) {
         let chList = groupedChannels[groupKey];
         for (let ch of chList) {
@@ -207,6 +208,7 @@ export default {
         }
       }
 
+      // Baki bache huye backup channels ko playlist ke sabse niche append karo
       for (let ch of otherChannels) {
         output.push(ch.extinf);
         if (ch.extraMetadata.length > 0) output.push(ch.extraMetadata.join("\n"));
