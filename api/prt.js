@@ -85,7 +85,7 @@ export default {
               continue;
             }
 
-            // CHNAGE 1: Ise '✨✦⚽ FIFA WC✦✨' group title diya taaki sahi array me store ho sake
+            // FIFA group title sahi kiya taaki properly index ho sake
             fifaChannel = {
               extinf: line.replace(
                 /group-title="[^"]+"/,
@@ -113,19 +113,19 @@ export default {
       // 3. Naya Group Order Setup
       const groupOrder = [
         "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨", 
-        "✨✦⚽ FIFA WC✦✨",     // 1
-        "highlights",        // 2
-        "sports",            // 3
-        "south",             // 4
-        "bollywood movies",  // 5
-        "hollywood movies",  // 6
-        "web series",        // 7
-        "tv show",           // 8
-        "entertainment",     // 9
-        "movies",            // 10
-        "music",             // 11
-        "news",              // 12
-        "kids"               // 13
+        "✨✦⚽ FIFA WC✦✨",     
+        "highlights",        
+        "sports",            
+        "south",             
+        "bollywood movies",  
+        "hollywood movies",  
+        "web series",        
+        "tv show",           
+        "entertainment",     
+        "movies",            
+        "music",             
+        "news",              
+        "kids"               
       ];
 
       // Sabhi groups ke channels ko hold karne ke liye ek object map
@@ -157,9 +157,10 @@ export default {
         let streamUrl = ch.url.trim().toLowerCase();
         let meta = getMetadata(ch.extinf);
 
-        // RULE 1: SonyLiv, FanCode aur FIFA WC 2026 ke saare channels ✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨ me daalo (With Duplicate Check)
+        // RULE 1: SonyLiv, FanCode aur Live Events ke channels
         if (groupLower.includes("sonyliv") || groupLower.includes("fancode") || groupLower === "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨") {
           
+          // Duplicate check sirf is block ke andar secure rakha hai
           if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
             continue; 
           }
@@ -172,15 +173,17 @@ export default {
           ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
           groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
         }
-        // CHANGE 2: FIFA channels ko unke exact bucket me dalne ka condition joda
+        // FIFA WC check
         else if (groupLower === "✨✦⚽ fifa wc✦✨") {
           groupedChannels["✨✦⚽ FIFA WC✦✨"].push(ch);
         }
-        // BADLAV 1: Agar group exactly "sports" hai toh ab sirf 2 hi channel jayenge live event me
+        // Sports check
         else if (groupLower === "sports") {
           if (sportsCount < 1) { 
-            
+            // Live me jaate waqt hi sirf duplicate check hoga
             if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
+              // Agar duplicate hai toh skip nahi karenge, direct baaki bache sports me daal denge!
+              groupedChannels["sports"].push(ch);
               continue;
             }
             uniqueUrls.add(streamUrl);
@@ -192,6 +195,7 @@ export default {
             groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
             sportsCount++;
           } else {
+            // FIX: Purane pure channels bina chhore sports bucket me aayenge
             groupedChannels["sports"].push(ch);
           }
         }
@@ -211,7 +215,7 @@ export default {
             groupedChannels["tv show"].push(ch);
           } else if (groupLower.includes("entertainment")) {
             groupedChannels["entertainment"].push(ch);
-          } else if (groupLower === "movies" || groupLower.includes("movies")) {
+          } else if (groupLower.includes("movies")) {
             groupedChannels["movies"].push(ch);
           } else if (groupLower.includes("music")) {
             groupedChannels["music"].push(ch);
@@ -243,7 +247,7 @@ export default {
         }
       }
 
-      // Baki jo bache huye groups hain unhe sabse niche joddo
+      // Baki jo bache huye extra groups hain unhe sabse niche joddo
       for (let ch of otherChannels) {
         output.push(ch.extinf);
         if (ch.extraMetadata.length > 0) output.push(ch.extraMetadata.join("\n"));
@@ -262,4 +266,3 @@ export default {
     }
   }
 };
-
