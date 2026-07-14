@@ -7,6 +7,7 @@ export default async function handler(req, res) {
 
     const timestamp = Date.now();
 
+    // ⚡ Dono link se sidha raw text format me playlist fetch karenge
     const responses = await Promise.all(
       urls.map(url => {
         const freshUrl = url.includes('?') ? `${url}&_t=${timestamp}` : `${url}?_t=${timestamp}`;
@@ -20,46 +21,20 @@ export default async function handler(req, res) {
             'Expires': '0'
           }
         })
-          .then(r => {
-            if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
-            return r.text();
-          })
-          .catch(err => {
-            console.error(`Failed to fetch ${url}:`, err);
-            return ""; 
-          });
+          .then(r => (r.ok ? r.text() : ""))
+          .catch(() => ""); // Agar koi ek down ho toh khali string return karega
       })
     );
 
-    const seen = new Set();
-    let finalChannels = [];
+    // 🎯 Har playlist se #EXTM3U tag ko saaf karenge taaki beech me repeat na ho
+    const cleanPlaylists = responses.map(text => {
+      return text.replace("#EXTM3U", "").trim();
+    });
 
-    for (let text of responses) {
-      if (!text) continue; 
-      
-      const lines = text.replace("#EXTM3U", "").trim().split("\n");
-      let tempBlock = [];
+    // 🔗 Sabko ek sath jodenge aur main #EXTM3U tag sirf ek baar sabse upar lagayenge
+    const finalPlaylist = "#EXTM3U\n" + cleanPlaylists.filter(Boolean).join("\n");
 
-      for (let line of lines) {
-        if (line.startsWith("#EXTINF")) {
-          if (tempBlock.length) {
-            processAndAddBlock(tempBlock, seen, finalChannels);
-            tempBlock = [];
-          }
-        }
-        if (line.trim() !== "") {
-          tempBlock.push(line);
-        }
-      }
-
-      if (tempBlock.length) {
-        processAndAddBlock(tempBlock, seen, finalChannels);
-      }
-    }
-
-    const finalPlaylist = "#EXTM3U\n" + finalChannels.join("\n");
-
-    // 🎯 Vercel Server aur Player ke liye Hard Cache Destroy Headers
+    // 🚀 Strong Cache Bypass Headers taaki instantly naya channel dikhe
     res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0");
     res.setHeader("CDN-Cache-Control", "no-store, no-cache, must-revalidate");
     res.setHeader("Pragma", "no-cache");
@@ -70,22 +45,5 @@ export default async function handler(req, res) {
 
   } catch (e) {
     res.status(500).json({ error: e.message });
-  }
-}
-
-function processAndAddBlock(block, seen, finalChannels) {
-  const extinfLine = block[0];
-  const urlLine = block.find(line => line && !line.startsWith("#")); 
-
-  const blockString = block.join(" ").toLowerCase();
-  if (blockString.includes("zeehd") || blockString.includes("zee hd")) {
-    return; 
-  }
-
-  const key = urlLine ? urlLine.trim() : extinfLine;
-  
-  if (key && !seen.has(key)) {
-    seen.add(key);
-    finalChannels.push(...block);
   }
 }
