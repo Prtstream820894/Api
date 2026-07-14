@@ -85,7 +85,7 @@ export default {
               continue;
             }
 
-            // FIX 1: Isko sahi FIFA group title diya taaki sahi bucket me jaye
+            // CHNAGE 1: Ise '✨✦⚽ FIFA WC✦✨' group title diya taaki sahi array me store ho sake
             fifaChannel = {
               extinf: line.replace(
                 /group-title="[^"]+"/,
@@ -172,11 +172,11 @@ export default {
           ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
           groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
         }
-        // FIX 2: FIFA channels ko unki sahi jagah par bhejo
-        else if (groupLower === "✨✦⚽ fifa wc✦✨" || groupLower.includes("fifa wc")) {
+        // CHANGE 2: FIFA channels ko unke exact bucket me dalne ka condition joda
+        else if (groupLower === "✨✦⚽ fifa wc✦✨") {
           groupedChannels["✨✦⚽ FIFA WC✦✨"].push(ch);
         }
-        // BADLAV 1: Agar group exactly "sports" hai
+        // BADLAV 1: Agar group exactly "sports" hai toh ab sirf 2 hi channel jayenge live event me
         else if (groupLower === "sports") {
           if (sportsCount < 1) { 
             
@@ -262,3 +262,4 @@ export default {
     }
   }
 };
+
