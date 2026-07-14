@@ -88,9 +88,9 @@ export default {
             fifaChannel = {
               extinf: line.replace(
                 /group-title="[^"]+"/,
-                'group-title="✨✦⚽ FIFA WC✦✨"'
+                'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"'
               ),
-              groupTitle: "✨✦⚽ FIFA WC✦✨",
+              groupTitle: "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
               extraMetadata: [],
               url: ""
             };
@@ -127,16 +127,19 @@ export default {
         "kids"               // 13
       ];
 
+      // Sabhi groups ke channels ko hold karne ke liye ek object map
       let groupedChannels = {};
       groupOrder.forEach(g => groupedChannels[g] = []);
-      let otherChannels = []; 
+      let otherChannels = []; // Baki bache huye groups ke liye
 
       let sportsCount = 0;
       
+      // De-duplication check ke liye unique sets (Live Events group ke liye)
       let uniqueUrls = new Set();
       let uniqueTitles = new Set();
       let uniqueLogos = new Set();
 
+      // Helper function title aur logo extract karne ke liye
       const getMetadata = (extinf) => {
         let titleMatch = extinf.match(/,(.+)$/);
         let logoMatch = extinf.match(/tvg-logo="([^"]+)"/i);
@@ -146,26 +149,22 @@ export default {
         };
       };
 
-      // 4. Processing channels based on your rules
+      // 4. Processing channels based on your new rules
       for (let ch of channels) {
         let originalGroup = ch.groupTitle.trim();
         let groupLower = originalGroup.toLowerCase();
         let streamUrl = ch.url.trim().toLowerCase();
         let meta = getMetadata(ch.extinf);
 
-        // RULE 1: SonyLiv, FanCode aur Live Events ke saare channels
+        // RULE 1: SonyLiv, FanCode aur FIFA WC 2026 ke saare channels ✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨ me daalo (With Duplicate Check)
         if (groupLower.includes("sonyliv") || groupLower.includes("fancode") || groupLower === "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨") {
           
-          // FIX 1: Agar duplicate milta hai, toh use playlist se poora drop karne ki jagah "sports" ya "other" group me safely bhej denge!
+          // Agar same URL, same Title ya same Image pehle se Live Events me hai, toh skip kar do
           if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
-            if (groupLower.includes("sonyliv") || groupLower.includes("fancode")) {
-              groupedChannels["sports"].push(ch); // Sports group me safe rakha
-            } else {
-              otherChannels.push(ch); // Safe backup stack me daal diya
-            }
-            continue; 
+            continue; // Duplicate found, skip this channel
           }
 
+          // Unique arrays me store karo taaki agli baar check ho sake
           uniqueUrls.add(streamUrl);
           uniqueTitles.add(meta.title);
           if (meta.logo) uniqueLogos.add(meta.logo);
@@ -174,17 +173,12 @@ export default {
           ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
           groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
         }
-        // FIFA WC check
-        else if (groupLower === "✨✦⚽ fifa wc✦✨") {
-          groupedChannels["✨✦⚽ FIFA WC✦✨"].push(ch);
-        }
-        // Agar group exactly "sports" hai
+        // BADLAV 1: Agar group exactly "sports" hai toh ab sirf 2 hi channel jayenge live event me
         else if (groupLower === "sports") {
-          if (sportsCount < 1) { // Pehle 2 channels ke liye filter check
+          if (sportsCount < 1) { // 5 se badal kar 2 kar diya
             
-            // FIX 2: Agar ye pehle do sports channel duplicate check me faste hain, toh direct regular sports me push kar do (drop mat karo!)
+            // Sports wale ko bhi live event me bhejte waqt duplicate check kar lete hain
             if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
-              groupedChannels["sports"].push(ch);
               continue;
             }
             uniqueUrls.add(streamUrl);
@@ -196,7 +190,7 @@ export default {
             groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
             sportsCount++;
           } else {
-            // Baaki ke normal sports channels chupchap sports group me chale jayenge
+            // 2 ke baad waale bache huye channels original Sports me hi rahenge
             groupedChannels["sports"].push(ch);
           }
         }
@@ -238,8 +232,9 @@ export default {
         output.push("#EXTM3U");
       }
 
+      // defined 1 se 13 groups ko joddo
       for (let groupKey of groupOrder) {
-        let chList = groupChannels[groupKey] || groupedChannels[groupKey];
+        let chList = groupedChannels[groupKey];
         for (let ch of chList) {
           output.push(ch.extinf);
           if (ch.extraMetadata.length > 0) output.push(ch.extraMetadata.join("\n"));
@@ -247,12 +242,14 @@ export default {
         }
       }
 
+      // Baki jo bache huye groups hain unhe sabse niche joddo
       for (let ch of otherChannels) {
         output.push(ch.extinf);
         if (ch.extraMetadata.length > 0) output.push(ch.extraMetadata.join("\n"));
         output.push(ch.url);
       }
 
+      // Final response send karo
       return new Response(output.join("\n"), {
         headers: {
           "Content-Type": "application/x-mpegurl",
