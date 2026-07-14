@@ -2,7 +2,6 @@ export default {
   async fetch(request, env, ctx) {
     const playlistUrl = "https://project-lc4mz.vercel.app/api/indexplay?prtstream";
     const fifaPlaylistUrl = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
-    const jtvPlaylistUrl = "https://raw.githubusercontent.com/poonamchouhan54/love-/refs/heads/main/Jtv.m3u";
 
     try {
       // 1. Original playlist fetch karo
@@ -14,30 +13,22 @@ export default {
       if (!response.ok) {
         return new Response("Failed to fetch original playlist", { status: response.status });
       }
-      const text = await response.text();
 
-      // 2. FIFA playlist fetch karo
+      const text = await response.text();
       const fifaResponse = await fetch(fifaPlaylistUrl, {
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
         },
       });
-      const fifaText = fifaResponse.ok ? await fifaResponse.text() : "";
 
-      // 3. Nayi Jtv playlist fetch karo
-      const jtvResponse = await fetch(jtvPlaylistUrl, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-        },
-      });
-      const jtvText = jtvResponse.ok ? await jtvResponse.text() : "";
+      const fifaText = fifaResponse.ok ? await fifaResponse.text() : "";
 
       const lines = text.split("\n");
       let headerLines = [];
       let channels = [];
       let currentChannel = null;
 
-      // Playlist parsing shuru karo (Main Playlist)
+      // 2. Playlist parsing shuru karo
       for (let i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
         if (!line) continue;
@@ -97,9 +88,9 @@ export default {
             fifaChannel = {
               extinf: line.replace(
                 /group-title="[^"]+"/,
-                'group-title="✨✦⚽ FIFA WC✦✨"'
+                'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"'
               ),
-              groupTitle: "✨✦⚽ FIFA WC✦✨",
+              groupTitle: "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
               extraMetadata: [],
               url: ""
             };
@@ -118,87 +109,87 @@ export default {
         }
       }
 
-      // Jtv playlist parse (Teesri playlist ka data bina kisi check ke pure channels add honge)
-      if (jtvText) {
-        const jtvLines = jtvText.split("\n");
-        let jtvChannel = null;
-
-        for (const rawLine of jtvLines) {
-          const line = rawLine.trim();
-          if (!line) continue;
-
-          // Skip head tag if present in loop
-          if (line.startsWith("#EXTM3U")) continue;
-
-          if (line.startsWith("#EXTINF:")) {
-            if (jtvChannel) {
-              channels.push(jtvChannel);
-            }
-            let groupMatch = line.match(/group-title="([^"]+)"/i);
-            let groupTitle = groupMatch ? groupMatch[1] : "";
-            jtvChannel = { extinf: line, groupTitle: groupTitle, extraMetadata: [], url: "" };
-          } else if (jtvChannel) {
-            if (line.startsWith("#")) {
-              jtvChannel.extraMetadata.push(line);
-            } else {
-              jtvChannel.url = line;
-              channels.push(jtvChannel);
-              jtvChannel = null;
-            }
-          }
-        }
-        if (jtvChannel) {
-          channels.push(jtvChannel);
-        }
-      }
-
-      // 4. Group Order Setup
+      // 3. Naya Group Order Setup
       const groupOrder = [
-        "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨", 
-        "✨✦⚽ FIFA WC✦✨",     
-        "highlights",        
-        "sports",            
-        "south",             
-        "bollywood movies",  
-        "hollywood movies",  
-        "web series",        
-        "tv show",           
-        "entertainment",     
-        "movies",            
-        "music",             
-        "news",              
-        "kids"               
+        "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",  // 1
+        "highlights",        // 2
+        "sports",            // 3
+        "south",             // 4
+        "bollywood movies",  // 5
+        "hollywood movies",  // 6
+        "web series",        // 7
+        "tv show",           // 8
+        "entertainment",     // 9
+        "movies",            // 10
+        "music",             // 11
+        "news",              // 12
+        "kids"               // 13
       ];
 
+      // Sabhi groups ke channels ko hold karne ke liye ek object map
       let groupedChannels = {};
       groupOrder.forEach(g => groupedChannels[g] = []);
-      let otherChannels = []; 
+      let otherChannels = []; // Baki bache huye groups ke liye
 
       let sportsCount = 0;
+      
+      // De-duplication check ke liye unique sets (Live Events group ke liye)
+      let uniqueUrls = new Set();
+      let uniqueTitles = new Set();
+      let uniqueLogos = new Set();
 
-      // 5. Processing all channels (NO SKIPPING/FILTERING AT ALL)
+      // Helper function title aur logo extract karne ke liye
+      const getMetadata = (extinf) => {
+        let titleMatch = extinf.match(/,(.+)$/);
+        let logoMatch = extinf.match(/tvg-logo="([^"]+)"/i);
+        return {
+          title: titleMatch ? titleMatch[1].trim().toLowerCase() : "",
+          logo: logoMatch ? logoMatch[1].trim().toLowerCase() : ""
+        };
+      };
+
+      // 4. Processing channels based on your new rules
       for (let ch of channels) {
         let originalGroup = ch.groupTitle.trim();
         let groupLower = originalGroup.toLowerCase();
+        let streamUrl = ch.url.trim().toLowerCase();
+        let meta = getMetadata(ch.extinf);
 
-        // RULE 1: SonyLiv, FanCode aur Live Events ke saare channels
+        // RULE 1: SonyLiv, FanCode aur FIFA WC 2026 ke saare channels ✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨ me daalo (With Duplicate Check)
         if (groupLower.includes("sonyliv") || groupLower.includes("fancode") || groupLower === "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨") {
+          
+          // Agar same URL, same Title ya same Image pehle se Live Events me hai, toh skip kar do
+          if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
+            continue; // Duplicate found, skip this channel
+          }
+
+          // Unique arrays me store karo taaki agli baar check ho sake
+          uniqueUrls.add(streamUrl);
+          uniqueTitles.add(meta.title);
+          if (meta.logo) uniqueLogos.add(meta.logo);
+
           ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"');
           ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
           groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
         }
-        // FIFA WC check
-        else if (groupLower === "✨✦⚽ fifa wc✦✨") {
-          groupedChannels["✨✦⚽ FIFA WC✦✨"].push(ch);
-        }
-        // Sports check: Pehle 2 channels live events me jayenge
+        // BADLAV 1: Agar group exactly "sports" hai toh ab sirf 2 hi channel jayenge live event me
         else if (groupLower === "sports") {
-          if (sportsCount < 1) { 
+          if (sportsCount < 2) { // 5 se badal kar 2 kar diya
+            
+            // Sports wale ko bhi live event me bhejte waqt duplicate check kar lete hain
+            if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
+              continue;
+            }
+            uniqueUrls.add(streamUrl);
+            uniqueTitles.add(meta.title);
+            if (meta.logo) uniqueLogos.add(meta.logo);
+
             ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"');
             ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
             groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
             sportsCount++;
           } else {
+            // 2 ke baad waale bache huye channels original Sports me hi rahenge
             groupedChannels["sports"].push(ch);
           }
         }
@@ -227,13 +218,12 @@ export default {
           } else if (groupLower.includes("kids")) {
             groupedChannels["kids"].push(ch);
           } else {
-            // Jtv ya PRTstream ke baaki saare channels jo upar match nahi huye, wo yahan safely aa jayenge
             otherChannels.push(ch);
           }
         }
       }
 
-      // 6. Nayi playlist string construct karo (Sahi Order Me)
+      // 5. Nayi playlist string construct karo (Sahi Order Me)
       let output = [];
       if (headerLines.length > 0) {
         output.push(headerLines.join("\n"));
@@ -241,7 +231,7 @@ export default {
         output.push("#EXTM3U");
       }
 
-      // Priority Groups ko add karo
+      // defined 1 se 13 groups ko joddo
       for (let groupKey of groupOrder) {
         let chList = groupedChannels[groupKey];
         for (let ch of chList) {
@@ -251,13 +241,14 @@ export default {
         }
       }
 
-      // Extra normal channels ko sabse niche append karo
+      // Baki jo bache huye groups hain unhe sabse niche joddo
       for (let ch of otherChannels) {
         output.push(ch.extinf);
         if (ch.extraMetadata.length > 0) output.push(ch.extraMetadata.join("\n"));
         output.push(ch.url);
       }
 
+      // Final response send karo
       return new Response(output.join("\n"), {
         headers: {
           "Content-Type": "application/x-mpegurl",
