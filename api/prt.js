@@ -85,12 +85,13 @@ export default {
               continue;
             }
 
+            // FIX 1: Isko sahi FIFA group title diya taaki sahi bucket me jaye
             fifaChannel = {
               extinf: line.replace(
                 /group-title="[^"]+"/,
-                'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"'
+                'group-title="✨✦⚽ FIFA WC✦✨"'
               ),
-              groupTitle: "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
+              groupTitle: "✨✦⚽ FIFA WC✦✨",
               extraMetadata: [],
               url: ""
             };
@@ -159,12 +160,10 @@ export default {
         // RULE 1: SonyLiv, FanCode aur FIFA WC 2026 ke saare channels ✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨ me daalo (With Duplicate Check)
         if (groupLower.includes("sonyliv") || groupLower.includes("fancode") || groupLower === "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨") {
           
-          // Agar same URL, same Title ya same Image pehle se Live Events me hai, toh skip kar do
           if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
-            continue; // Duplicate found, skip this channel
+            continue; 
           }
 
-          // Unique arrays me store karo taaki agli baar check ho sake
           uniqueUrls.add(streamUrl);
           uniqueTitles.add(meta.title);
           if (meta.logo) uniqueLogos.add(meta.logo);
@@ -173,11 +172,14 @@ export default {
           ch.groupTitle = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
           groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
         }
-        // BADLAV 1: Agar group exactly "sports" hai toh ab sirf 2 hi channel jayenge live event me
+        // FIX 2: FIFA channels ko unki sahi jagah par bhejo
+        else if (groupLower === "✨✦⚽ fifa wc✦✨" || groupLower.includes("fifa wc")) {
+          groupedChannels["✨✦⚽ FIFA WC✦✨"].push(ch);
+        }
+        // BADLAV 1: Agar group exactly "sports" hai
         else if (groupLower === "sports") {
-          if (sportsCount < 1) { // 5 se badal kar 2 kar diya
+          if (sportsCount < 1) { 
             
-            // Sports wale ko bhi live event me bhejte waqt duplicate check kar lete hain
             if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
               continue;
             }
@@ -190,7 +192,6 @@ export default {
             groupedChannels["✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"].push(ch);
             sportsCount++;
           } else {
-            // 2 ke baad waale bache huye channels original Sports me hi rahenge
             groupedChannels["sports"].push(ch);
           }
         }
