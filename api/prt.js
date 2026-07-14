@@ -111,7 +111,8 @@ export default {
 
       // 3. Naya Group Order Setup
       const groupOrder = [
-        "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",      // 1
+        "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨", 
+        "✨✦⚽ FIFA WC✦✨",     // 1
         "highlights",        // 2
         "sports",            // 3
         "south",             // 4
@@ -174,7 +175,7 @@ export default {
         }
         // BADLAV 1: Agar group exactly "sports" hai toh ab sirf 2 hi channel jayenge live event me
         else if (groupLower === "sports") {
-          if (sportsCount < 2) { // 5 se badal kar 2 kar diya
+          if (sportsCount < 1) { // 5 se badal kar 2 kar diya
             
             // Sports wale ko bhi live event me bhejte waqt duplicate check kar lete hain
             if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
