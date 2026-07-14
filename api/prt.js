@@ -111,8 +111,7 @@ export default {
 
       // 3. Naya Group Order Setup
       const groupOrder = [
-        "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨", 
-        "✨✦⚽ FIFA WC✦✨",     // 1
+        "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",  // 1
         "highlights",        // 2
         "sports",            // 3
         "south",             // 4
