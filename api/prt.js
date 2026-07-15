@@ -81,7 +81,7 @@ export default {
 
             // Fixed: Direct regex replacement optimization
             fifaChannel = {
-              extinf: line.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛส์✦✨"'),
+              extinf: line.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"'),
               groupTitle: "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
               extraMetadata: [],
               url: ""
@@ -101,13 +101,13 @@ export default {
 
       // 3. Setup Exact Order Config (Keys perfectly matched now)
       const groupOrder = [
-        "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛa✦✨", "highlights", "sports", "south", 
+        "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨", "highlights", "sports", "south", 
         "bollywood movies", "hollywood movies", "web series", 
         "tv show", "entertainment", "movies", "music", "news", "kids"
       ];
 
       // Fixed: Dynamic key binding mismatch resolved completely
-      const targetLiveKey = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛa✦✨";
+      const targetLiveKey = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
 
       let groupedChannels = {};
       for (let j = 0; j < groupOrder.length; j++) {
