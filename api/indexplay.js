@@ -8,12 +8,11 @@ export default async function handler(req, res) {
     const url2 = "https://allmovieslist.poonamchouhan076.workers.dev/";
     const url3 = "https://wandering-morning-5534.poonamchouhan076.workers.dev/";
     const url4 = "";
-    
-    // Naye FanCode aur SonyLIV Workers ke URLs yahan add kar diye
     const url5 = "https://fancode-art-c9de.poonamchouhan076.workers.dev/";
     const url6 = "https://sonyliv-event-5e05.poonamchouhan076.workers.dev/";
 
     const fetchWithTimeout = async (url, ms = 8000) => {
+      if (!url) return "";
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), ms);
 
@@ -27,7 +26,8 @@ export default async function handler(req, res) {
           signal: controller.signal,
           headers: { 
             "Cache-Control": "no-cache, no-store, max-age=0", 
-            "Pragma": "no-cache" 
+            "Pragma": "no-cache",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
           },
           ...(isUrl3 && { cf: { cacheTtl: 0, cacheEverything: false } })
         });
@@ -41,44 +41,36 @@ export default async function handler(req, res) {
       }
     };
 
-    const cleanM3U = (data) => {
-      if (!data) return "";
-      return data.replace("#EXTM3U", "").replace(/\r/g, "").trim();
-    };
-
-    // Sabhi 6 URLs ko ek saath live fetch kar rahe hain Promise.all se (Fastest speed ke liye)
-    const [raw1, raw2, raw3, raw4, raw5, raw6] = await Promise.all([
+    // Sabhi 6 URLs ko ek saath live fetch kar rahe hain parallelly
+    const responses = await Promise.all([
       fetchWithTimeout(url1, 8000),
       fetchWithTimeout(url2, 8000),
-      fetchWithTimeout(url3, 15000), // url3 ko extra time
+      fetchWithTimeout(url3, 15000),
       fetchWithTimeout(url4, 8000),
-      fetchWithTimeout(url5, 8000),  // FanCode
-      fetchWithTimeout(url6, 8000)   // SonyLIV
+      fetchWithTimeout(url5, 8000),
+      fetchWithTimeout(url6, 8000)
     ]);
 
-    if (!raw1) {
+    if (!responses[0]) {
       return res.status(500).send("Main playlist failed");
     }
 
-    const data1 = raw1.trim();
-    const data2 = cleanM3U(raw2);
-    const data3 = cleanM3U(raw3);
-    const data4 = cleanM3U(raw4);
-    const data5 = cleanM3U(raw5); // FanCode clean data
-    const data6 = cleanM3U(raw6); // SonyLIV clean data
+    // Pehle block ka logic fast processing ke liye optimized string array me setup kiya
+    let finalPlaylist = responses[0].trim();
 
-    // Final merge: Agar live match nahi chal raha hoga aur wo worker empty response dega, 
-    // toh ye automatic use skip karke baki playlist bana dega, koi error nahi aayega.
-    const finalPlaylist =
-      data1 +
-      "\n" +
-      (data2 ? data2 + "\n" : "") +
-      (data3 ? data3 + "\n" : "") +
-      (data4 ? data4 + "\n" : "") +
-      (data5 ? data5 + "\n" : "") +
-      (data6 ? data6 + "\n" : "");
+    // Loop directly run karega bina cleanM3U dynamic overhead function ke
+    for (let i = 1; i < responses.length; i++) {
+      const rawData = responses[i];
+      if (rawData) {
+        // Bina function invoke kiye yahan fast direct replace kiya hai
+        const cleaned = rawData.replace("#EXTM3U", "").replace(/\r/g, "").trim();
+        if (cleaned) {
+          finalPlaylist += "\n" + cleaned;
+        }
+      }
+    }
 
-    // Response Headers
+    // Response Headers setup jo laggy applications me video buffer rokti hai
     res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
     res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
     res.setHeader("Cloudflare-CDN-Cache-Control", "no-store");
