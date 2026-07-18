@@ -99,14 +99,25 @@ export default {
         if (fifaChannel) channels.push(fifaChannel);
       }
 
-      // 3. Setup Exact Order Config (Keys perfectly matched now)
+      // 3. Setup Exact Order Config (✨Upcoming Events✨ live event ke just niche add kar diya)
       const groupOrder = [
-        "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨", "highlights", "sports", "south", 
-        "bollywood movies", "hollywood movies", "web series", 
-        "tv show", "entertainment", "movies", "music", "news", "kids"
+        "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨", 
+        "✨Upcoming Events✨", // Live Events ke thik niche sequence lock kar diya
+        "highlights", 
+        "sports", 
+        "south", 
+        "bollywood movies", 
+        "hollywood movies", 
+        "web series", 
+        "tv show", 
+        "entertainment", 
+        "movies", 
+        "music", 
+        "news", 
+        "kids"
       ];
 
-      // Fixed: Dynamic key binding mismatch resolved completely
+      // Dynamic key binding distribution
       const targetLiveKey = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
 
       let groupedChannels = {};
@@ -120,7 +131,7 @@ export default {
       let uniqueTitles = new Set();
       let uniqueLogos = new Set();
 
-      // String slice algorithm for metadata extraction (Fastest possible in JS)
+      // String slice algorithm for metadata extraction
       const getMetadata = (extinf) => {
         const commaIdx = extinf.lastIndexOf(",");
         const title = commaIdx !== -1 ? extinf.substring(commaIdx + 1).trim().toLowerCase() : "";
@@ -131,7 +142,7 @@ export default {
         };
       };
 
-      // 4. Processing Channel distribution with explicit key checks
+      // 4. Processing Channel distribution
       for (let i = 0; i < channels.length; i++) {
         const ch = channels[i];
         const originalGroup = ch.groupTitle.trim();
@@ -139,7 +150,7 @@ export default {
         const streamUrl = ch.url.trim().toLowerCase();
         const meta = getMetadata(ch.extinf);
 
-        // Rule 1: Live events processing (SonyLiv, Fancode, FIFA)
+        // Rule 1: Live events processing
         if (groupLower.includes("sonyliv") || groupLower.includes("fancode") || originalGroup === targetLiveKey || groupLower.includes("live event")) {
           if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
             continue; 
@@ -152,7 +163,13 @@ export default {
           ch.groupTitle = targetLiveKey;
           groupedChannels[targetLiveKey].push(ch);
         } 
-        // Rule 2: Sports dynamic limitation (Strictly 1 channel directly pushes to live)
+        // Upcoming Events group mapping condition (Agar main data source me direct name match kare)
+        else if (originalGroup === "✨Upcoming Events✨" || groupLower.includes("upcoming event")) {
+          ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨Upcoming Events✨"');
+          ch.groupTitle = "✨Upcoming Events✨";
+          groupedChannels["✨Upcoming Events✨"].push(ch);
+        }
+        // Rule 2: Sports dynamic limitation
         else if (groupLower === "sports") {
           if (sportsCount < 1) { 
             if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
@@ -211,7 +228,7 @@ export default {
         headers: {
           "Content-Type": "application/x-mpegurl",
           "Access-Control-Allow-Origin": "*",
-          "Cache-Control": "public, max-age=120" // Cache ko badha kar 2 mins kar diya seamless processing ke liye
+          "Cache-Control": "public, max-age=120"
         },
       });
     } catch (error) {
