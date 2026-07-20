@@ -171,7 +171,7 @@ export default {
         }
         // Rule 2: Sports dynamic limitation
         else if (groupLower === "sports") {
-          if (sportsCount < 1) { 
+          if (sportsCount < 0) { 
             if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {
               continue;
             }
