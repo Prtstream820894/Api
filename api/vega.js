@@ -17,23 +17,28 @@ export default async function handler(req, res) {
     const movieId = req.query.id || req.query.play;
 
     if (movieId) {
-        let movieUrl;
+        let movieUrl = "";
 
         if (/^\d+$/.test(movieId)) {
-            // Target website se main page fetch karke us ID wala full URL dhoondho
+            // 1. Pehle main page se check karo
             const mainHtml = await viewSourceFetch("https://vega-bio.com/");
             if (mainHtml) {
-                // Regex ko thoda broad kiya hai taaki /614790- ya aisi kisi bhi pattern ki link match ho jaye
-                const regex = new RegExp(`href="([^"]*\\/${movieId}-[^"]*)"`, 'i');
+                const regex = new RegExp(`href="([^"]*\\/${movieId}[^"]*)"`, 'i');
                 const matchUrl = mainHtml.match(regex);
                 if (matchUrl) {
                     movieUrl = matchUrl[1];
                 }
             }
 
-            // Agar main page par direct link nahi mili, toh standard pattern bana lo
+            // 2. Agar main page par nahi mila, toh search page se fetch karo (Ye ensure karega ki purane IDs bhi fail na ho)
             if (!movieUrl) {
-                movieUrl = `https://vega-bio.com/${movieId}-disclosure-day-2026-hindi-dual-audio-web-dl-720p-480p-1080p.html`;
+                const searchHtml = await viewSourceFetch(`https://vega-bio.com/?s=${movieId}`);
+                if (searchHtml) {
+                    const searchMatch = searchHtml.match(new RegExp(`href="([^"]*\\/${movieId}[^"]*)"`, 'i'));
+                    if (searchMatch) {
+                        movieUrl = searchMatch[1];
+                    }
+                }
             }
         } else {
             try {
@@ -43,6 +48,11 @@ export default async function handler(req, res) {
                 res.status(400).send("Invalid Target ID/URL String.");
                 return;
             }
+        }
+
+        if (!movieUrl) {
+            res.status(404).send("Movie URL could not be resolved from ID.");
+            return;
         }
 
         const singlePageSource = await viewSourceFetch(movieUrl);
