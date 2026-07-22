@@ -15,19 +15,37 @@ export default async function handler(req, res) {
         }
     }
 
-    const playParam = req.query.play;
+    const movieId = req.query.id || req.query.play; // Supports both 'id' and legacy 'play' parameter
 
     // =========================================================================
-    // KHEL STEP 1: Agar User/Player ne kisi Movie Link par click kiya hai
+    // KHEL STEP 1: Agar User/Player ne clean ID ke sath request bheji hai
     // =========================================================================
-    if (playParam) {
+    if (movieId) {
         let movieUrl;
-        try {
-            movieUrl = Buffer.from(decodeURIComponent(playParam), 'base64').toString('utf8');
-            new URL(movieUrl); // Validate URL format
-        } catch (e) {
-            res.status(400).send("Invalid Target URL String.");
-            return;
+
+        // Check if input is a raw ID (e.g., 614790) or an old Base64 string
+        if (/^\d+$/.test(movieId)) {
+            // If it's just numbers, we dynamically search or construct the target URL pattern
+            // Alternatively, we scrape the main page or use a direct search pattern. 
+            // Let's map it back by finding the URL matching this ID from the source site:
+            const mainHtml = await viewSourceFetch("https://vega-bio.com/");
+            const matchUrl = mainHtml ? mainHtml.match(new RegExp(`href="([^"]*${movieId}[^"]*)"`)) : null;
+            
+            if (matchUrl) {
+                movieUrl = matchUrl[1];
+            } else {
+                res.status(404).send("Movie ID not found.");
+                return;
+            }
+        } else {
+            // Fallback for old base64 links if any exist
+            try {
+                movieUrl = Buffer.from(decodeURIComponent(movieId), 'base64').toString('utf8');
+                new URL(movieUrl);
+            } catch (e) {
+                res.status(400).send("Invalid Target ID/URL String.");
+                return;
+            }
         }
 
         const singlePageSource = await viewSourceFetch(movieUrl);
@@ -35,7 +53,7 @@ export default async function handler(req, res) {
         let dynamicDomain = "https://gemma416okl.com"; // Fallback Domain
 
         if (singlePageSource) {
-            // A. Asli IMDb ID extract karo (src: 'tt...')
+            // A. Asli IMDb ID extract karo
             const idMatch = singlePageSource.match(/src:\s*'([^']+)'/);
             if (idMatch) {
                 imdbId = idMatch[1];
@@ -57,7 +75,7 @@ export default async function handler(req, res) {
             }
         }
 
-        // Direct Video Player Server par redirect patak do!
+        // Direct Video Player Server par redirect
         const finalRedirectUrl = `${dynamicDomain}/play/${imdbId}`;
         res.setHeader('Location', finalRedirectUrl);
         res.status(302).end();
@@ -65,7 +83,7 @@ export default async function handler(req, res) {
     }
 
     // =========================================================================
-    // KHEL STEP 2: Normal execution me (Instant M3U Generation)
+    // KHEL STEP 2: Instant M3U Generation with Clean IDs
     // =========================================================================
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
@@ -107,13 +125,15 @@ export default async function handler(req, res) {
         const titleMatch = part.match(/post-title">\s*<a[^>]+href="([^"]+)"[^>]*>(.*?)<\/a>/s);
         if (titleMatch) {
             movieUrl = titleMatch[1];
-            // Strip tags and trim whitespace equivalent to PHP
             titleText = titleMatch[2].replace(/<\/?[^>]+(>|$)/g, "").trim();
         }
 
         if (titleText && imgUrl && movieUrl) {
-            const encodedUrl = encodeURIComponent(Buffer.from(movieUrl).toString('base64'));
-            const finalPlayUrl = `${localBaseUrl}?play=${encodedUrl}`;
+            // Extract numeric ID from the movie URL (e.g., /614790-disclosure-... -> 614790)
+            const idMatch = movieUrl.match(/\/(\d+)-/);
+            const shortId = idMatch ? idMatch[1] : Buffer.from(movieUrl).toString('base64').substring(0, 8);
+            
+            const finalPlayUrl = `${localBaseUrl}?id=${shortId}`;
 
             m3uOutput += `#EXTINF:-1 tvg-logo="${imgUrl}" group-title="Latest Movies",${titleText}\n`;
             m3uOutput += `${finalPlayUrl}\n`;
