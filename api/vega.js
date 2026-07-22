@@ -90,8 +90,9 @@ export default async function handler(req, res) {
     const protocol = req.headers['x-forwarded-proto'] || 'https';
     const host = req.headers.host;
     
-    // Yaha path ko fix kiya gaya hai taaki baseURL me /api hi aaye (agar file ka naam index.js ya api folder ka structure hai)
-    const baseUrl = `${protocol}://${host}${req.url.split('?')[0]}`;
+    // Yahan ensure kiya hai ki sirf /api tak ka base path rahe (jaise https://project-lc4mz.vercel.app/api)
+    const cleanPath = req.url.split('?')[0].replace(/\/[^\/]+$/, '');
+    const baseUrl = `${protocol}://${host}${cleanPath}`;
 
     for (let i = 1; i < articleParts.length; i++) {
         const part = articleParts[i];
@@ -116,7 +117,7 @@ export default async function handler(req, res) {
             const idMatch = movieUrl.match(/\/(\d+)-/);
             const shortId = idMatch ? idMatch[1] : Buffer.from(movieUrl).toString('base64').substring(0, 8);
             
-            // Ab link bilkul waisa hi banega jaisa aapne maanga hai: /api?id=12345
+            // Ab ye exact aesa banayega: https://project-lc4mz.vercel.app/api?id=12345
             const finalPlayUrl = `${baseUrl}?id=${shortId}`;
 
             m3uOutput += `#EXTINF:-1 tvg-logo="${imgUrl}" group-title="Latest Movies",${titleText}\n`;
