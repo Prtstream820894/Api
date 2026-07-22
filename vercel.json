@@ -16,6 +16,10 @@
     {
       "source": "/api/license",
       "destination": "/api/license.js"
+    },
+    {
+      "source": "/api",
+      "destination": "/api/vega.js"
     }
   ]
 }
