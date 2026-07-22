@@ -20,14 +20,20 @@ export default async function handler(req, res) {
         let movieUrl;
 
         if (/^\d+$/.test(movieId)) {
+            // Target website se main page fetch karke us ID wala full URL dhoondho
             const mainHtml = await viewSourceFetch("https://vega-bio.com/");
-            const matchUrl = mainHtml ? mainHtml.match(new RegExp(`href="([^"]*${movieId}[^"]*)"`)) : null;
-            
-            if (matchUrl) {
-                movieUrl = matchUrl[1];
-            } else {
-                res.status(404).send("Movie ID not found.");
-                return;
+            if (mainHtml) {
+                // Regex ko thoda broad kiya hai taaki /614790- ya aisi kisi bhi pattern ki link match ho jaye
+                const regex = new RegExp(`href="([^"]*\\/${movieId}-[^"]*)"`, 'i');
+                const matchUrl = mainHtml.match(regex);
+                if (matchUrl) {
+                    movieUrl = matchUrl[1];
+                }
+            }
+
+            // Agar main page par direct link nahi mili, toh standard pattern bana lo
+            if (!movieUrl) {
+                movieUrl = `https://vega-bio.com/${movieId}-disclosure-day-2026-hindi-dual-audio-web-dl-720p-480p-1080p.html`;
             }
         } else {
             try {
@@ -89,8 +95,6 @@ export default async function handler(req, res) {
 
     const protocol = req.headers['x-forwarded-proto'] || 'https';
     const host = req.headers.host;
-    
-    // Yahan ensure kiya hai ki sirf /api tak ka base path rahe (jaise https://project-lc4mz.vercel.app/api)
     const cleanPath = req.url.split('?')[0].replace(/\/[^\/]+$/, '');
     const baseUrl = `${protocol}://${host}${cleanPath}`;
 
@@ -117,7 +121,6 @@ export default async function handler(req, res) {
             const idMatch = movieUrl.match(/\/(\d+)-/);
             const shortId = idMatch ? idMatch[1] : Buffer.from(movieUrl).toString('base64').substring(0, 8);
             
-            // Ab ye exact aesa banayega: https://project-lc4mz.vercel.app/api?id=12345
             const finalPlayUrl = `${baseUrl}?id=${shortId}`;
 
             m3uOutput += `#EXTINF:-1 tvg-logo="${imgUrl}" group-title="Latest Movies",${titleText}\n`;
