@@ -10,6 +10,7 @@ export default async function handler(req, res) {
     const url4 = "https://upcominge-dawn-7c6bve.poonamchouhan076.workers.dev/";
     const url5 = "https://fancode-art-c9de.poonamchouhan076.workers.dev/";
     const url6 = "https://sonyliv-event-5e05.poonamchouhan076.workers.dev/";
+    const url7 = "https://old-shape-1bd3.poonamchouhan076.workers.dev/"; // Nayi playlist add ki gayi hai
 
     const fetchWithTimeout = async (url, ms = 8000) => {
       if (!url) return "";
@@ -41,14 +42,15 @@ export default async function handler(req, res) {
       }
     };
 
-    // Sabhi 6 URLs ko ek saath live fetch kar rahe hain parallelly
+    // Sabhi 7 URLs ko ek saath live fetch kar rahe hain parallelly
     const responses = await Promise.all([
       fetchWithTimeout(url1, 8000),
       fetchWithTimeout(url2, 8000),
       fetchWithTimeout(url3, 15000),
       fetchWithTimeout(url4, 8000),
       fetchWithTimeout(url5, 8000),
-      fetchWithTimeout(url6, 8000)
+      fetchWithTimeout(url6, 8000),
+      fetchWithTimeout(url7, 8000)
     ]);
 
     if (!responses[0]) {
