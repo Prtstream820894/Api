@@ -20,23 +20,33 @@ export default async function handler(req, res) {
         let movieUrl = "";
 
         if (/^\d+$/.test(movieId)) {
-            // 1. Pehle main page se check karo
-            const mainHtml = await viewSourceFetch("https://vega-bio.com/");
-            if (mainHtml) {
-                const regex = new RegExp(`href="([^"]*\\/${movieId}[^"]*)"`, 'i');
-                const matchUrl = mainHtml.match(regex);
-                if (matchUrl) {
-                    movieUrl = matchUrl[1];
+            // Target website se search page directly hit karo
+            const searchHtml = await viewSourceFetch(`https://vega-bio.com/?s=${movieId}`);
+            if (searchHtml) {
+                // Saare href links nikal kar check karo jisme ye ID ho
+                const matches = searchHtml.match(/href="([^"]+)"/g);
+                if (matches) {
+                    for (let m of matches) {
+                        if (m.includes(movieId) && m.includes('.html')) {
+                            movieUrl = m.match(/href="([^"]+)"/)[1];
+                            break;
+                        }
+                    }
                 }
             }
 
-            // 2. Agar main page par nahi mila, toh search page se fetch karo (Ye ensure karega ki purane IDs bhi fail na ho)
+            // Agar search se bhi na mile, toh fallback direct URL pattern
             if (!movieUrl) {
-                const searchHtml = await viewSourceFetch(`https://vega-bio.com/?s=${movieId}`);
-                if (searchHtml) {
-                    const searchMatch = searchHtml.match(new RegExp(`href="([^"]*\\/${movieId}[^"]*)"`, 'i'));
-                    if (searchMatch) {
-                        movieUrl = searchMatch[1];
+                const mainHtml = await viewSourceFetch("https://vega-bio.com/");
+                if (mainHtml) {
+                    const matches = mainHtml.match(/href="([^"]+)"/g);
+                    if (matches) {
+                        for (let m of matches) {
+                            if (m.includes(movieId)) {
+                                movieUrl = m.match(/href="([^"]+)"/)[1];
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -51,7 +61,7 @@ export default async function handler(req, res) {
         }
 
         if (!movieUrl) {
-            res.status(404).send("Movie URL could not be resolved from ID.");
+            res.status(404).send("Movie URL not found for ID: " + movieId);
             return;
         }
 
