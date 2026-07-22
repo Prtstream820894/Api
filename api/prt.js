@@ -1,4 +1,4 @@
-export default {
+Export default {
   async fetch(request, env, ctx) {
     const playlistUrl = "https://project-lc4mz.vercel.app/api/indexplay?prtstream";
     const fifaPlaylistUrl = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
@@ -99,11 +99,12 @@ export default {
         if (fifaChannel) channels.push(fifaChannel);
       }
 
-      // 3. Setup Exact Order Config (✨Upcoming Events✨ live event ke just niche add kar diya)
+      // 3. Setup Exact Order Config (Updated positions for 4 groups)
       const groupOrder = [
         "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨", 
-        "✨Upcoming Events✨", // Live Events ke thik niche sequence lock kar diya
-        "highlights", 
+        "latest movies",        // Live Event ke theek niche
+        "highlights",           // Uske niche highlights
+        "✨Upcoming Events✨",   // Uske niche Upcoming Events
         "sports", 
         "south", 
         "bollywood movies", 
@@ -163,7 +164,7 @@ export default {
           ch.groupTitle = targetLiveKey;
           groupedChannels[targetLiveKey].push(ch);
         } 
-        // Upcoming Events group mapping condition (Agar main data source me direct name match kare)
+        // Upcoming Events group mapping condition
         else if (originalGroup === "✨Upcoming Events✨" || groupLower.includes("upcoming event")) {
           ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨Upcoming Events✨"');
           ch.groupTitle = "✨Upcoming Events✨";
@@ -189,7 +190,8 @@ export default {
         } 
         // Standard mapping channels
         else {
-          if (groupLower.includes("highlights")) groupedChannels["highlights"].push(ch);
+          if (groupLower.includes("latest movie") || groupLower.includes("latest movies")) groupedChannels["latest movies"].push(ch);
+          else if (groupLower.includes("highlights")) groupedChannels["highlights"].push(ch);
           else if (groupLower.includes("south")) groupedChannels["south"].push(ch);
           else if (groupLower.includes("bollywood")) groupedChannels["bollywood movies"].push(ch);
           else if (groupLower.includes("hollywood")) groupedChannels["hollywood movies"].push(ch);
