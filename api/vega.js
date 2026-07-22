@@ -23,7 +23,6 @@ export default async function handler(req, res) {
             // Target website se search page directly hit karo
             const searchHtml = await viewSourceFetch(`https://vega-bio.com/?s=${movieId}`);
             if (searchHtml) {
-                // Saare href links nikal kar check karo jisme ye ID ho
                 const matches = searchHtml.match(/href="([^"]+)"/g);
                 if (matches) {
                     for (let m of matches) {
@@ -35,7 +34,6 @@ export default async function handler(req, res) {
                 }
             }
 
-            // Agar search se bhi na mile, toh fallback direct URL pattern
             if (!movieUrl) {
                 const mainHtml = await viewSourceFetch("https://vega-bio.com/");
                 if (mainHtml) {
@@ -115,8 +113,9 @@ export default async function handler(req, res) {
 
     const protocol = req.headers['x-forwarded-proto'] || 'https';
     const host = req.headers.host;
-    const cleanPath = req.url.split('?')[0].replace(/\/[^\/]+$/, '');
-    const baseUrl = `${protocol}://${host}${cleanPath}`;
+    
+    // Yeh ensure karega ki link hamesha exact https://project-lc4mz.vercel.app/api?id=XXXXX bane
+    const baseUrl = `${protocol}://${host}/api`;
 
     for (let i = 1; i < articleParts.length; i++) {
         const part = articleParts[i];
