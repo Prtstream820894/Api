@@ -57,7 +57,7 @@ export default async function handler(req, res) {
             }
         }
 
-        // Direct Video Player Server par redirect
+        // Direct Video Player Server par redirect patak do!
         const finalRedirectUrl = `${dynamicDomain}/play/${imdbId}`;
         res.setHeader('Location', finalRedirectUrl);
         res.status(302).end();
@@ -87,10 +87,7 @@ export default async function handler(req, res) {
     // Auto-detect current host and path for Vercel
     const protocol = req.headers['x-forwarded-proto'] || 'https';
     const host = req.headers.host;
-    
-    // Yahan humne /video.mp4 ki jagah website jaisa structure lagaya hai (jaise /watch/movie)
-    const baseUrlWithoutQuery = req.url.split('?')[0];
-    const localBaseUrl = `${protocol}://${host}${baseUrlWithoutQuery}/watch/stream`;
+    const localBaseUrl = `${protocol}://${host}${req.url.split('?')[0]}`;
 
     for (let i = 1; i < articleParts.length; i++) {
         const part = articleParts[i];
@@ -110,12 +107,12 @@ export default async function handler(req, res) {
         const titleMatch = part.match(/post-title">\s*<a[^>]+href="([^"]+)"[^>]*>(.*?)<\/a>/s);
         if (titleMatch) {
             movieUrl = titleMatch[1];
+            // Strip tags and trim whitespace equivalent to PHP
             titleText = titleMatch[2].replace(/<\/?[^>]+(>|$)/g, "").trim();
         }
 
         if (titleText && imgUrl && movieUrl) {
             const encodedUrl = encodeURIComponent(Buffer.from(movieUrl).toString('base64'));
-            // Ab ye link bilkul ek website URL jaisa dikhega: .../api/vega/watch/stream?play=...
             const finalPlayUrl = `${localBaseUrl}?play=${encodedUrl}`;
 
             m3uOutput += `#EXTINF:-1 tvg-logo="${imgUrl}" group-title="Latest Movies",${titleText}\n`;
