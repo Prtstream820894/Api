@@ -8,7 +8,6 @@ const fetchOptions = {
 };  
 
 try {  
-  // 1. Parallel Fetch - Dono playlists ko ek saath hit karega (Super Fast)  
   const [res1, res2] = await Promise.all([  
     fetch(playlistUrl, fetchOptions).catch(() => null),  
     fetch(fifaPlaylistUrl, fetchOptions).catch(() => null)  
@@ -28,7 +27,6 @@ try {
   let channels = [];  
   let currentChannel = null;  
 
-  // 2. High-speed Parsing Loop for Original Playlist  
   for (let i = 0; i < lines.length; i++) {  
     const line = lines[i].trim();  
     if (!line) continue;  
@@ -59,7 +57,6 @@ try {
   }  
   if (currentChannel) channels.push(currentChannel);  
 
-  // Fast FIFA parsing  
   if (fifaText) {  
     const fifaLines = fifaText.split(/\r?\n/);  
     let fifaChannel = null;  
@@ -79,7 +76,6 @@ try {
           continue;  
         }  
 
-        // Fixed: Direct regex replacement optimization  
         fifaChannel = {  
           extinf: line.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"'),  
           groupTitle: "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",  
@@ -99,26 +95,24 @@ try {
     if (fifaChannel) channels.push(fifaChannel);  
   }  
 
-  // 3. Setup Exact Order Config (✨Upcoming Events✨ live event ke just niche add kar diya)  
   const groupOrder = [
-  "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
-  "latest movies",
-  "highlights",
-  "✨Upcoming Events✨",
-  "sports",
-  "south",
-  "bollywood movies",
-  "hollywood movies",
-  "web series",
-  "tv show",
-  "entertainment",
-  "movies",
-  "music",
-  "news",
-  "kids"
-];
+    "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
+    "latest movies",
+    "highlights",
+    "✨Upcoming Events✨",
+    "sports",
+    "south",
+    "bollywood movies",
+    "hollywood movies",
+    "web series",
+    "tv show",
+    "entertainment",
+    "movies",
+    "music",
+    "news",
+    "kids"
+  ];
 
-  // Dynamic key binding distribution  
   const targetLiveKey = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";  
 
   let groupedChannels = {};  
@@ -128,11 +122,7 @@ try {
   let otherChannels = [];  
 
   let sportsCount = 0;  
-  let uniqueUrls = new Set();  
-  let uniqueTitles = new Set();  
-  let uniqueLogos = new Set();  
 
-  // String slice algorithm for metadata extraction  
   const getMetadata = (extinf) => {  
     const commaIdx = extinf.lastIndexOf(",");  
     const title = commaIdx !== -1 ? extinf.substring(commaIdx + 1).trim().toLowerCase() : "";  
@@ -143,43 +133,25 @@ try {
     };  
   };  
 
-  // 4. Processing Channel distribution  
   for (let i = 0; i < channels.length; i++) {  
     const ch = channels[i];  
     const originalGroup = ch.groupTitle.trim();  
     const groupLower = originalGroup.toLowerCase();  
-    const streamUrl = ch.url.trim().toLowerCase();  
     const meta = getMetadata(ch.extinf);  
 
-    // Rule 1: Live events processing  
+    // Duplicate check yahan se hata diya gaya hai taaki saare channels aayein
     if (groupLower.includes("sonyliv") || groupLower.includes("fancode") || originalGroup === targetLiveKey || groupLower.includes("live event")) {  
-      if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {  
-        continue;   
-      }  
-      uniqueUrls.add(streamUrl);  
-      uniqueTitles.add(meta.title);  
-      if (meta.logo) uniqueLogos.add(meta.logo);  
-
       ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, `group-title="${targetLiveKey}"`);  
       ch.groupTitle = targetLiveKey;  
       groupedChannels[targetLiveKey].push(ch);  
     }   
-    // Upcoming Events group mapping condition (Agar main data source me direct name match kare)  
     else if (originalGroup === "✨Upcoming Events✨" || groupLower.includes("upcoming event")) {  
       ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨Upcoming Events✨"');  
       ch.groupTitle = "✨Upcoming Events✨";  
       groupedChannels["✨Upcoming Events✨"].push(ch);  
     }  
-    // Rule 2: Sports dynamic limitation  
     else if (groupLower === "sports") {  
       if (sportsCount < 0) {   
-        if (uniqueUrls.has(streamUrl) || uniqueTitles.has(meta.title) || (meta.logo && uniqueLogos.has(meta.logo))) {  
-          continue;  
-        }  
-        uniqueUrls.add(streamUrl);  
-        uniqueTitles.add(meta.title);  
-        if (meta.logo) uniqueLogos.add(meta.logo);  
-
         ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, `group-title="${targetLiveKey}"`);  
         ch.groupTitle = targetLiveKey;  
         groupedChannels[targetLiveKey].push(ch);  
@@ -188,9 +160,9 @@ try {
         groupedChannels["sports"].push(ch);  
       }  
     }   
-    // Standard mapping channels  
-    else if (groupLower.includes("latest movies"))
-    groupedChannels["latest movies"].push(ch);
+    else if (groupLower.includes("latest movies")) {
+      groupedChannels["latest movies"].push(ch);
+    }
     else {  
       if (groupLower.includes("highlights")) groupedChannels["highlights"].push(ch);  
       else if (groupLower.includes("south")) groupedChannels["south"].push(ch);  
@@ -207,7 +179,6 @@ try {
     }  
   }  
 
-  // 5. Final Fast Output Generation  
   let output = [headerLines.length > 0 ? headerLines.join("\n") : "#EXTM3U"];  
 
   for (let i = 0; i < groupOrder.length; i++) {  
@@ -240,4 +211,3 @@ try {
 
 }
 };
-
