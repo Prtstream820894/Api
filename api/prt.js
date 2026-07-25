@@ -98,6 +98,7 @@ try {
   const groupOrder = [
     "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
     "latest movies",
+    "filmyfy latest",
     "highlights",
     "✨Upcoming Events✨",
     "sports",
@@ -139,7 +140,6 @@ try {
     const groupLower = originalGroup.toLowerCase();  
     const meta = getMetadata(ch.extinf);  
 
-    // Duplicate check yahan se hata diya gaya hai taaki saare channels aayein
     if (groupLower.includes("sonyliv") || groupLower.includes("fancode") || originalGroup === targetLiveKey || groupLower.includes("live event")) {  
       ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, `group-title="${targetLiveKey}"`);  
       ch.groupTitle = targetLiveKey;  
@@ -162,6 +162,9 @@ try {
     }   
     else if (groupLower.includes("latest movies")) {
       groupedChannels["latest movies"].push(ch);
+    }
+    else if (groupLower.includes("filmyfy latest")) {
+      groupedChannels["filmyfy latest"].push(ch);
     }
     else {  
       if (groupLower.includes("highlights")) groupedChannels["highlights"].push(ch);  
