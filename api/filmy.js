@@ -51,7 +51,7 @@ export default async function handler(req, res) {
     }
 
     // Limit strictly to Top 5 movies
-    const top5Movies = movies.slice(0, );
+    const top5Movies = movies.slice(0, 16);
     const results = [];
 
     for (const movie of top5Movies) {
