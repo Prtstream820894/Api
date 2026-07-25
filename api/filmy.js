@@ -50,20 +50,22 @@ export default async function handler(req, res) {
       }
     }
 
-    // Limiting to first 3 movies for Step 2 execution to prevent serverless timeout
-    const limitedMovies = movies.slice(0, 3);
+    // Limit strictly to Top 5 movies
+    const top5Movies = movies.slice(0, 5);
     const results = [];
 
-    for (const movie of limitedMovies) {
+    for (const movie of top5Movies) {
       try {
         const movieRes = await fetch(movie.href, {
           headers: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36' }
         });
         
-        if (!movieRes.ok) continue;
+        if (!movieRes.ok) {
+          results.push({ ...movie, resolutionLink: movie.href });
+          continue;
+        }
+
         const movieHtml = await movieRes.text();
-        
-        // Extract resolution download page links (<center><div><div class="dlink dl"><a href="...">)
         let selectedLink = null;
         let candidateLinks = [];
         
@@ -89,61 +91,21 @@ export default async function handler(req, res) {
           selectedLink = candidateLinks[0].href;
         }
 
-        if (!selectedLink) continue;
-
-        // Open intermediate download page
-        const intermediateRes = await fetch(selectedLink, {
-          headers: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36' }
-        });
-
-        if (!intermediateRes.ok) continue;
-        const intermediateHtml = await intermediateRes.text();
-        
-        let finalStreamUrl = null;
-
-        // Check for Cloud Direct or Pixeldrain link pattern
-        if (intermediateHtml.includes('window.viewer_data')) {
-          const match = intermediateHtml.match(/window\.viewer_data\s*=\s*(\{.*?\});/);
-          if (match && match[1]) {
-            try {
-              const viewerData = JSON.parse(match[1]);
-              if (viewerData.api_response && viewerData.api_response.id) {
-                finalStreamUrl = `https://pixeldrain.com/api/file/${viewerData.api_response.id}`;
-              }
-            } catch (e) {}
-          }
-        }
-
-        if (!finalStreamUrl) {
-          const interLinkRegex = /<a\s+[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
-          let imMatch;
-          while ((imMatch = interLinkRegex.exec(intermediateHtml)) !== null) {
-            const h = imMatch[1];
-            const t = imMatch[2].replace(/<[^>]*>?/gm, '').trim();
-            if (t && (t.includes('Cloud Direct') || t.includes('Pixeldrain')) && h) {
-              finalStreamUrl = h.startsWith('http') ? h : new URL(h, selectedLink).href;
-              break;
-            }
-          }
-        }
-
+        // Replace old href with the new resolution link (fallback to old href if none found)
         results.push({
-          movieTitle: movie.title,
+          title: movie.title,
           poster: movie.img,
-          sourcePage: movie.href,
-          downloadPage: selectedLink,
-          finalDirectUrl: finalStreamUrl || 'Direct link pending secondary resolution'
+          href: selectedLink || movie.href
         });
 
       } catch (err) {
-        continue;
+        results.push({ ...movie, resolutionLink: movie.href });
       }
     }
 
     return res.status(200).json({
       success: true,
-      step: 2,
-      totalProcessed: results.length,
+      total: results.length,
       data: results
     });
 
