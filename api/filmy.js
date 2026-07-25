@@ -1,37 +1,56 @@
-import { parse } from 'node-html-parser';
-
 export default async function handler(req, res) {
   try {
     const targetUrl = 'https://filmyfly.faith/';
     
-    const mainResponse = await fetch(targetUrl, {
-      headers: { 
+    const response = await fetch(targetUrl, {
+      headers: {
         'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.5'
       }
     });
 
-    if (!mainResponse.ok) {
-      return res.status(502).json({ success: false, error: `Failed to fetch target site: ${mainResponse.status}` });
+    if (!response.ok) {
+      return res.status(502).json({ success: false, error: `HTTP error! status: ${response.status}` });
     }
 
-    const mainHtml = await mainResponse.text();
-    const mainRoot = parse(mainHtml);
-
+    const html = await response.text();
     const movies = [];
-    mainRoot.querySelectorAll('a').forEach(a => {
-      const text = a.text?.trim();
-      const href = a.getAttribute('href');
-      if (text && href && (text.includes('2026') || text.includes('2021')) && text.includes('Dual Audio')) {
-        const img = a.querySelector('img')?.getAttribute('src') || '';
-        // Ensure absolute URL if relative
-        const fullHref = href.startsWith('http') ? href : new URL(href, targetUrl).href;
-        movies.push({ title: text, href: fullHref, img });
-      }
-    });
+    const aTagRegex = /<a\s+(?:[^>]*?\s+)?href="([^"]*)"([^>]*)>([\s\S]*?)<\/a>/gi;
+    
+    let match;
+    while ((match = aTagRegex.exec(html)) !== null) {
+      const href = match[1];
+      const innerContent = match[3];
+      const cleanText = innerContent.replace(/<[^>]*>?/gm, '').trim();
+      
+      if (cleanText && (cleanText.includes('2026') || cleanText.includes('2021')) && (cleanText.includes('Dual Audio') || cleanText.includes('Movie'))) {
+        let imgMatch = innerContent.match(/src="([^"]+)"/i);
+        
+        if (!imgMatch) {
+          const index = match.index;
+          const precedingHtml = html.substring(Math.max(0, index - 300), index);
+          imgMatch = precedingHtml.match(/src="([^"]+)"/i);
+        }
 
-    // Limit to first 2-3 movies to prevent serverless execution timeout (500 Error)
+        let img = imgMatch ? imgMatch[1] : '';
+        if (img && !img.startsWith('http')) {
+          img = new URL(img, targetUrl).href;
+        }
+        
+        const fullHref = href.startsWith('http') ? href : new URL(href, targetUrl).href;
+        
+        if (!movies.some(m => m.href === fullHref)) {
+          movies.push({
+            title: cleanText,
+            img: img,
+            href: fullHref
+          });
+        }
+      }
+    }
+
+    // Limiting to first 3 movies for Step 2 execution to prevent serverless timeout
     const limitedMovies = movies.slice(0, 3);
     const results = [];
 
@@ -43,23 +62,27 @@ export default async function handler(req, res) {
         
         if (!movieRes.ok) continue;
         const movieHtml = await movieRes.text();
-        const movieRoot = parse(movieHtml);
-
+        
+        // Extract resolution download page links (<center><div><div class="dlink dl"><a href="...">)
         let selectedLink = null;
         let candidateLinks = [];
-
-        movieRoot.querySelectorAll('a').forEach(el => {
-          const linkText = el.text?.trim();
-          const linkHref = el.getAttribute('href');
+        
+        const linkRegex = /<a\s+[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+        let linkMatch;
+        while ((linkMatch = linkRegex.exec(movieHtml)) !== null) {
+          const linkHref = linkMatch[1];
+          const linkText = linkMatch[2].replace(/<[^>]*>?/gm, '').trim();
+          
           if (linkHref && linkText) {
             const fullLinkHref = linkHref.startsWith('http') ? linkHref : new URL(linkHref, movie.href).href;
-            if (linkText.includes('1080p') || linkText.includes('2.6Gb') || linkText.includes('1.2Gb')) {
+            
+            if (linkText.includes('1080p') || linkText.includes('1.2Gb') || linkText.includes('2.6Gb')) {
               candidateLinks.push({ priority: 1, href: fullLinkHref, text: linkText });
             } else if (linkText.includes('720p') || linkText.includes('730Mb')) {
               candidateLinks.push({ priority: 2, href: fullLinkHref, text: linkText });
             }
           }
-        });
+        }
 
         candidateLinks.sort((a, b) => a.priority - b.priority);
         if (candidateLinks.length > 0) {
@@ -68,6 +91,7 @@ export default async function handler(req, res) {
 
         if (!selectedLink) continue;
 
+        // Open intermediate download page
         const intermediateRes = await fetch(selectedLink, {
           headers: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36' }
         });
@@ -77,7 +101,7 @@ export default async function handler(req, res) {
         
         let finalStreamUrl = null;
 
-        // Check for Pixeldrain script viewer_data pattern
+        // Check for Cloud Direct or Pixeldrain link pattern
         if (intermediateHtml.includes('window.viewer_data')) {
           const match = intermediateHtml.match(/window\.viewer_data\s*=\s*(\{.*?\});/);
           if (match && match[1]) {
@@ -86,22 +110,21 @@ export default async function handler(req, res) {
               if (viewerData.api_response && viewerData.api_response.id) {
                 finalStreamUrl = `https://pixeldrain.com/api/file/${viewerData.api_response.id}`;
               }
-            } catch (e) {
-              // JSON parse fail fallback
-            }
+            } catch (e) {}
           }
         }
 
-        // Fallback to text matching for direct links
         if (!finalStreamUrl) {
-          const interRoot = parse(intermediateHtml);
-          interRoot.querySelectorAll('a').forEach(el => {
-            const t = el.text;
-            const h = el.getAttribute('href');
+          const interLinkRegex = /<a\s+[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+          let imMatch;
+          while ((imMatch = interLinkRegex.exec(intermediateHtml)) !== null) {
+            const h = imMatch[1];
+            const t = imMatch[2].replace(/<[^>]*>?/gm, '').trim();
             if (t && (t.includes('Cloud Direct') || t.includes('Pixeldrain')) && h) {
               finalStreamUrl = h.startsWith('http') ? h : new URL(h, selectedLink).href;
+              break;
             }
-          });
+          }
         }
 
         results.push({
@@ -109,18 +132,18 @@ export default async function handler(req, res) {
           poster: movie.img,
           sourcePage: movie.href,
           downloadPage: selectedLink,
-          finalDirectUrl: finalStreamUrl || 'Direct link extraction pending manual cookie/header match'
+          finalDirectUrl: finalStreamUrl || 'Direct link pending secondary resolution'
         });
 
-      } catch (innerErr) {
-        // Skip individual movie error to prevent full crash
+      } catch (err) {
         continue;
       }
     }
 
     return res.status(200).json({
       success: true,
-      processedCount: results.length,
+      step: 2,
+      totalProcessed: results.length,
       data: results
     });
 
