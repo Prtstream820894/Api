@@ -37,7 +37,11 @@ export default async function handler(req, res) {
         if (img && !img.startsWith('http')) {
           img = new URL(img, targetUrl).href;
         }
-        
+        // Low-res ko HD mein convert karne ke liye replacement
+if (img) {
+  img = img.replace(/60-65-2x/g, '280-380-3x');
+}
+
         const fullHref = href.startsWith('http') ? href : new URL(href, targetUrl).href;
         
         if (!movies.some(m => m.href === fullHref)) {
