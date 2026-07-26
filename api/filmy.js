@@ -16,20 +16,33 @@ export default async function handler(req, res) {
 
     const html = await response.text();
     const movies = [];
+
+    // Sirf '🔥🔥Latest Movies🔥🔥' ke baad ka hi content uthane ke liye
+    let targetHtml = html;
+    const latestIndex = html.indexOf('🔥🔥Latest Movies🔥🔥');
+    const trendingIndex = html.indexOf('🔥🔥 Treding Movies 🔥🔥');
+
+    if (latestIndex !== -1 && trendingIndex !== -1 && trendingIndex > latestIndex) {
+      targetHtml = html.substring(latestIndex, trendingIndex);
+    } else if (latestIndex !== -1) {
+      targetHtml = html.substring(latestIndex);
+    }
+
     const aTagRegex = /<a\s+(?:[^>]*?\s+)?href="([^"]*)"([^>]*)>([\s\S]*?)<\/a>/gi;
     
     let match;
-    while ((match = aTagRegex.exec(html)) !== null) {
+    while ((match = aTagRegex.exec(targetHtml)) !== null) {
       const href = match[1];
       const innerContent = match[3];
       const cleanText = innerContent.replace(/<[^>]*>?/gm, '').trim();
       
+      // Yahan aap apne hisaab se filters aur bhi strict kar sakte hain
       if (cleanText && (cleanText.includes('2026') || cleanText.includes('2021')) && (cleanText.includes('Dual Audio') || cleanText.includes('Movie'))) {
         let imgMatch = innerContent.match(/src="([^"]+)"/i);
         
         if (!imgMatch) {
           const index = match.index;
-          const precedingHtml = html.substring(Math.max(0, index - 300), index);
+          const precedingHtml = targetHtml.substring(Math.max(0, index - 300), index);
           imgMatch = precedingHtml.match(/src="([^"]+)"/i);
         }
 
@@ -37,10 +50,10 @@ export default async function handler(req, res) {
         if (img && !img.startsWith('http')) {
           img = new URL(img, targetUrl).href;
         }
-        // Low-res ko HD mein convert karne ke liye replacement
-if (img) {
-  img = img.replace(/60-65-2x/g, '280-380-3x');
-}
+
+        if (img) {
+          img = img.replace(/60-65-2x/g, '280-380-3x');
+        }
 
         const fullHref = href.startsWith('http') ? href : new URL(href, targetUrl).href;
         
@@ -54,11 +67,11 @@ if (img) {
       }
     }
 
-    // Limit strictly to Top 5 movies
-    const top5Movies = movies.slice(0, 16);
+    // Limit strictly to Top 16 movies
+    const topMovies = movies.slice(0, 16);
     const results = [];
 
-    for (const movie of top5Movies) {
+    for (const movie of topMovies) {
       try {
         const movieRes = await fetch(movie.href, {
           headers: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36' }
@@ -95,7 +108,6 @@ if (img) {
           selectedLink = candidateLinks[0].href;
         }
 
-        // Replace old href with the new resolution link (fallback to old href if none found)
         results.push({
           title: movie.title,
           poster: movie.img,
