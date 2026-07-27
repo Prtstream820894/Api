@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
     const userAgent = "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36";
-
+const SITE = "https://vegamovie.city/";
     async function viewSourceFetch(url) {
         try {
             const response = await fetch(url, {
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
         if (/^\d+$/.test(movieId)) {
             // Target website se search page directly hit karo
-            const searchHtml = await viewSourceFetch(`https://vegamovie.city/?s=${movieId}`);
+            const searchHtml = await viewSourceFetch(`${SITE}/?s=${movieId}`);
             if (searchHtml) {
                 const matches = searchHtml.match(/href="([^"]+)"/g);
                 if (matches) {
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
             }
 
             if (!movieUrl) {
-                const mainHtml = await viewSourceFetch("https://vegamovie.city/");
+                const mainHtml = await viewSourceFetch(`${SITE}/`);
                 if (mainHtml) {
                     const matches = mainHtml.match(/href="([^"]+)"/g);
                     if (matches) {
@@ -100,7 +100,7 @@ export default async function handler(req, res) {
 
     let m3uOutput = "#EXTM3U\n";
 
-    const targetUrl = "https://vega-bio.com/";
+    const targetUrl = `${SITE}/`;
     const html = await viewSourceFetch(targetUrl);
 
     if (!html) {
@@ -125,7 +125,7 @@ export default async function handler(req, res) {
         const imgMatch = part.match(/src="([^"]+)"/);
         if (imgMatch) {
             imgUrl = imgMatch[1];
-            if (imgUrl.startsWith('/')) imgUrl = "https://vega-no.com" + imgUrl;
+            if (imgUrl.startsWith('/')) imgUrl = SITE + imgUrl;
         }
 
         let movieUrl = "";
