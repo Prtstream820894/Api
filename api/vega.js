@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
         if (/^\d+$/.test(movieId)) {
             // Target website se search page directly hit karo
-            const searchHtml = await viewSourceFetch(`https://vega-bio.com/?s=${movieId}`);
+            const searchHtml = await viewSourceFetch(`https://vegamovie.city/?s=${movieId}`);
             if (searchHtml) {
                 const matches = searchHtml.match(/href="([^"]+)"/g);
                 if (matches) {
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
             }
 
             if (!movieUrl) {
-                const mainHtml = await viewSourceFetch("https://vega-bio.com/");
+                const mainHtml = await viewSourceFetch("https://vegamovie.city/");
                 if (mainHtml) {
                     const matches = mainHtml.match(/href="([^"]+)"/g);
                     if (matches) {
