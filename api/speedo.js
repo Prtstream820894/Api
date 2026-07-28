@@ -11,20 +11,6 @@ function getRandomUserAgent() {
     return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
 }
 
-function unpack(code) {
-    try {
-        const evalPattern = /eval\(function\(p,a,c,k,e,d\).+?\}\('(.+?)',(\d+),(\d+),'(.+?)'\.split\('\|'\)\)\)/;
-        const evalContent = code.match(evalPattern);
-        if (evalContent) {
-            let [_, p, a, c, k] = evalContent;
-            a = parseInt(a); c = parseInt(c); k = k.split('|');
-            while (c--) { if (k[c]) p = p.replace(new RegExp('\\b' + c.toString(a) + '\\b', 'g'), k[c]); }
-            return p;
-        }
-    } catch (e) {}
-    return code;
-}
-
 async function getLiveDomain(testUrls) {
     for (let url of testUrls) {
         try {
@@ -48,45 +34,12 @@ module.exports = async (req, res) => {
     try {
         // --- PLAY MODE ---
         if (play) {
-            play = play.replace('.m3u8', '');
-            const officialSite = await getLiveDomain(["https://prmovies.locker/", "https://yomovies.foundation/"]);
+            play = play.replace('.m3u8', '').replace('.html', '');
             const streamBase = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
             const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${play}.html`;
 
-            const streamRes = await fetch(embedUrl, {
-                headers: { 
-                    "User-Agent": getRandomUserAgent(), 
-                    "Referer": officialSite 
-                }
-            });
-
-            if (!streamRes.ok) {
-                return res.status(404).send("Stream source not reachable");
-            }
-
-            const source = await streamRes.text();
-            const decoded = unpack(source);
-            
-            // Multiple Regex Patterns for better M3U8 extraction
-            const m3u8Regexes = [
-                /(https?[:\/\/\w\.\-\%\!\?\&\=\,]+?\.m3u8[^\s"']*)/i,
-                /file:\s*["'](https?:\/\/[^"']+\.m3u8[^"']*)["']/i,
-                /source:\s*["'](https?:\/\/[^"']+\.m3u8[^"']*)["']/i
-            ];
-
-            let finalM3u8 = null;
-            for (let regex of m3u8Regexes) {
-                const match = decoded.match(regex) || source.match(regex);
-                if (match && match[1]) {
-                    finalM3u8 = match[1].replace(/\\/g, '');
-                    break;
-                }
-            }
-
-            if (finalM3u8) {
-                return res.redirect(302, finalM3u8);
-            }
-            return res.status(404).send("Link not found in stream response");
+            // Seedha embed URL par redirect kar diya taaki player ya browser wahi load kare
+            return res.redirect(302, embedUrl);
         }
 
         // --- LIST MODE ---
@@ -111,13 +64,13 @@ module.exports = async (req, res) => {
             return res.status(500).send("#EXTM3U\n#ERROR: JSON Parsing Failed.");
         }
 
-        const headersuffix = "|Referer=https://speedostream1.com/&Origin=https://speedostream1.com";
         let playlist = "#EXTM3U\n";
 
         const processItem = (item) => {
             if (item && item.id) {
                 const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
-                const playLink = `${host}/api/speedo/${cleanId}.m3u8${headersuffix}`;
+                // Ab yeh link seedha embed route par bhejega bina m3u8 extract kiye
+                const playLink = `${host}/api/speedo/${cleanId}.m3u8`;
                 playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
             }
         };
