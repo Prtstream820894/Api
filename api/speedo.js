@@ -2,12 +2,25 @@ const fetch = require('node-fetch');
 
 const USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2.1 Safari/605.1.15",
-    "Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2.1 Safari/605.1.15"
 ];
 
 function getRandomUserAgent() {
     return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
+}
+
+function unpack(code) {
+    try {
+        const evalPattern = /eval\(function\(p,a,c,k,e,d\).+?\}\('(.+?)',(\d+),(\d+),'(.+?)'\.split\('\|'\)\)\)/;
+        const evalContent = code.match(evalPattern);
+        if (evalContent) {
+            let [_, p, a, c, k] = evalContent;
+            a = parseInt(a); c = parseInt(c); k = k.split('|');
+            while (c--) { if (k[c]) p = p.replace(new RegExp('\\b' + c.toString(a) + '\\b', 'g'), k[c]); }
+            return p;
+        }
+    } catch (e) {}
+    return code;
 }
 
 async function getLiveDomain(testUrls) {
@@ -31,35 +44,49 @@ module.exports = async (req, res) => {
     const host = `https://${req.headers.host}`;
 
     try {
-        // --- PLAY MODE ---
+        // --- PLAY MODE (Background .m3u8 Extractor - 100% Working Method) ---
         if (play) {
             play = play.replace('.m3u8', '').replace('.html', '');
             const officialSite = await getLiveDomain(["https://prmovies.locker/", "https://yomovies.foundation/"]);
             const streamBase = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
             const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${play}.html`;
 
-            // Yahan 'origin-when-cross-origin' ya 'unsafe-url' meta tag add kiya hai 
-            // taaki streaming server ko official site ka referer mile.
-            const htmlResponse = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <meta name="referrer" content="unsafe-url">
-                <title>Player</title>
-                <style>
-                    body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
-                    iframe { width: 100%; height: 100%; border: none; }
-                </style>
-            </head>
-            <body>
-                <iframe src="${embedUrl}" referrerpolicy="unsafe-url" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
-            </body>
-            </html>`;
+            // Server-to-server request jisme official site ka referer jayega (No "Embeds disabled" error)
+            const streamRes = await fetch(embedUrl, {
+                headers: { 
+                    "User-Agent": getRandomUserAgent(), 
+                    "Referer": officialSite 
+                }
+            });
 
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            return res.status(200).send(htmlResponse);
+            if (!streamRes.ok) {
+                return res.status(404).send("Stream source not reachable");
+            }
+
+            const source = await streamRes.text();
+            const decoded = unpack(source);
+            
+            // Multiple Regex patterns taaki link kabhi miss na ho
+            const m3u8Regexes = [
+                /(https?[:\/\/\w\.\-\%\!\?\&\=\,]+?\.m3u8[^\s"']*)/i,
+                /file:\s*["'](https?:\/\/[^"']+\.m3u8[^"']*)["']/i,
+                /source:\s*["'](https?:\/\/[^"']+\.m3u8[^"']*)["']/i
+            ];
+
+            let finalM3u8 = null;
+            for (let regex of m3u8Regexes) {
+                const match = decoded.match(regex) || source.match(regex);
+                if (match && match[1]) {
+                    finalM3u8 = match[1].replace(/\\/g, '');
+                    break;
+                }
+            }
+
+            if (finalM3u8) {
+                // Seedha direct video stream redirect hogi IPTV ya Player ke liye
+                return res.redirect(302, finalM3u8);
+            }
+            return res.status(404).send("M3U8 Link not found in stream response");
         }
 
         // --- LIST MODE ---
@@ -84,12 +111,14 @@ module.exports = async (req, res) => {
             return res.status(500).send("#EXTM3U\n#ERROR: JSON Parsing Failed.");
         }
 
+        const streamBaseLive = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
+        const headersuffix = `|Referer=${streamBaseLive}&Origin=${streamBaseLive.replace(/\/$/, "")}`;
         let playlist = "#EXTM3U\n";
 
         const processItem = (item) => {
             if (item && item.id) {
                 const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
-                const playLink = `${host}/api/speedo/${cleanId}.m3u8`;
+                const playLink = `${host}/api/speedo/${cleanId}.m3u8${headersuffix}`;
                 playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
             }
         };
