@@ -28,14 +28,24 @@ async function getLiveDomain(testUrls) {
 }
 
 module.exports = async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    
-    let { play } = req.query;
-    const host = `https://${req.headers.host}`;
-
     try {
-        // --- PLAY MODE (Bypassed with Official Site Headers) ---
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        
+        let hostHeader = (req.headers && req.headers.host) ? req.headers.host : 'localhost';
+        const host = `https://${hostHeader}`;
+        
+        let play = req.query && req.query.play ? req.query.play : null;
+        let urlPath = req.url || '';
+        
+        if (!play) {
+            const matchId = urlPath.match(/\/([a-zA-Z0-9]+)\.m3u8/);
+            if (matchId && matchId[1] && matchId[1] !== 'speedo') {
+                play = matchId[1];
+            }
+        }
+
+        // --- PLAY MODE ---
         if (play) {
             play = play.replace('.m3u8', '').replace('.html', '');
             const officialSite = await getLiveDomain(["https://prmovies.locker/", "https://yomovies.foundation/"]);
@@ -51,18 +61,10 @@ module.exports = async (req, res) => {
                     "Host": new URL(streamBase).host,
                     "Connection": "keep-alive",
                     "Cache-Control": "max-age=0",
-                    "Sec-Ch-Ua": "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"120\", \"Google Chrome\";v=\"120\"",
-                    "Sec-Ch-Ua-Mobile": "?0",
-                    "Sec-Ch-Ua-Platform": "\"Windows\"",
-                    "Upgrade-Insecure-Requests": "1",
                     "User-Agent": getRandomUserAgent(),
-                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-                    "Sec-Fetch-Site": "cross-site",
-                    "Sec-Fetch-Mode": "navigate",
-                    "Sec-Fetch-Dest": "iframe",
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
                     "Referer": officialSite,
                     "Origin": cleanOrigin,
-                    "Accept-Encoding": "gzip, deflate, br",
                     "Accept-Language": "en-US,en;q=0.9"
                 },
                 signal: controller.signal
@@ -75,8 +77,16 @@ module.exports = async (req, res) => {
 
             const source = await streamRes.text();
             
-            res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-            return res.status(200).send(`=== BYPASSED AS OFFICIAL SITE ===\n\n${source}`);
+            // Ab yeh regex is HTML ke andar se exact master.m3u8 link nikal lega
+            const match = source.match(/file:\s*["'](https?:\/\/[^"']+\/master\.m3u8[^"']*)["']/i) || 
+                          source.match(/(https?:\/\/[^"']+\/master\.m3u8[^\s"']*)/i);
+
+            if (match && match[1]) {
+                const finalM3u8 = match[1].replace(/\\/g, '');
+                return res.redirect(302, finalM3u8);
+            }
+
+            return res.status(404).send("Master M3U8 Link not found inside embed source");
         }
 
         // --- LIST MODE ---
@@ -123,6 +133,7 @@ module.exports = async (req, res) => {
         return res.status(200).send(playlist);
 
     } catch (err) {
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         return res.status(200).send("#EXTM3U\n#ERROR: " + err.message);
     }
 };
