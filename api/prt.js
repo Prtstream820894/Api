@@ -96,23 +96,24 @@ try {
   }  
 
   const groupOrder = [
-    "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
-    "latest movies",
-    "filmyfy latest",
-    "highlights",
-    "✨Upcoming Events✨",
-    "sports",
-    "south",
-    "bollywood movies",
-    "hollywood movies",
-    "web series",
-    "tv show",
-    "entertainment",
-    "movies",
-    "music",
-    "news",
-    "kids"
-  ];
+  "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
+  "new movies",
+  "latest movies",
+  "filmyfy latest",
+  "highlights",
+  "✨Upcoming Events✨",
+  "sports",
+  "south",
+  "bollywood movies",
+  "hollywood movies",
+  "web series",
+  "tv show",
+  "entertainment",
+  "movies",
+  "music",
+  "news",
+  "kids"
+];
 
   const targetLiveKey = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";  
 
@@ -160,6 +161,9 @@ try {
         groupedChannels["sports"].push(ch);  
       }  
     }   
+    else if (groupLower.includes("new movies")) {
+  groupedChannels["new movies"].push(ch);
+}
     else if (groupLower.includes("latest movies")) {
       groupedChannels["latest movies"].push(ch);
     }
