@@ -1,5 +1,16 @@
 const fetch = require('node-fetch');
 
+// Alag-alag User-Agents taaki site block na kare
+const USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2.1 Safari/605.1.15",
+    "Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"
+];
+
+function getRandomUserAgent() {
+    return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
+}
+
 function unpack(code) {
     try {
         const evalPattern = /eval\(function\(p,a,c,k,e,d\).+?\}\('(.+?)',(\d+),(\d+),'(.+?)'\.split\('\|'\)\)\)/;
@@ -17,8 +28,10 @@ function unpack(code) {
 async function getLiveDomain(testUrls) {
     for (let url of testUrls) {
         try {
-            // node-fetch mein timeout handle karne ke liye AbortSignal ka use karein ya bina timeout ke test karein
-            const res = await fetch(url, { method: 'HEAD' });
+            const res = await fetch(url, { 
+                method: 'HEAD',
+                headers: { "User-Agent": getRandomUserAgent() }
+            });
             if (res.ok) return new URL(res.url).origin + "/";
         } catch (e) {}
     }
@@ -26,7 +39,6 @@ async function getLiveDomain(testUrls) {
 }
 
 module.exports = async (req, res) => {
-    // CORS headers basic allow-all
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     
@@ -43,32 +55,51 @@ module.exports = async (req, res) => {
 
             const streamRes = await fetch(embedUrl, {
                 headers: { 
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36", 
+                    "User-Agent": getRandomUserAgent(), 
                     "Referer": officialSite 
                 }
             });
 
+            if (!streamRes.ok) {
+                return res.status(404).send("Stream source not reachable");
+            }
+
             const source = await streamRes.text();
             const decoded = unpack(source);
-            const m3u8Regex = /(https?[:\/\/\w\.\-\%\!\?\&\=\,]+?\.m3u8[^\s"']*)/i;
-            const match = decoded.match(m3u8Regex) || source.match(m3u8Regex);
+            
+            // Multiple Regex Patterns for better M3U8 extraction
+            const m3u8Regexes = [
+                /(https?[:\/\/\w\.\-\%\!\?\&\=\,]+?\.m3u8[^\s"']*)/i,
+                /file:\s*["'](https?:\/\/[^"']+\.m3u8[^"']*)["']/i,
+                /source:\s*["'](https?:\/\/[^"']+\.m3u8[^"']*)["']/i
+            ];
 
-            if (match) {
-                const finalM3u8 = match[1].replace(/\\/g, '');
+            let finalM3u8 = null;
+            for (let regex of m3u8Regexes) {
+                const match = decoded.match(regex) || source.match(regex);
+                if (match && match[1]) {
+                    finalM3u8 = match[1].replace(/\\/g, '');
+                    break;
+                }
+            }
+
+            if (finalM3u8) {
                 return res.redirect(302, finalM3u8);
             }
-            return res.status(404).send("Link not found");
+            return res.status(404).send("Link not found in stream response");
         }
 
         // --- LIST MODE ---
-        const jsonRes = await fetch("https://ipl2020-46d2f.firebaseio.com/Json.json");
+        const jsonRes = await fetch("https://ipl2020-46d2f.firebaseio.com/Json.json", {
+            headers: { "User-Agent": getRandomUserAgent() }
+        });
+        
         if (!jsonRes.ok) {
             throw new Error(`Firebase returned status ${jsonRes.status}`);
         }
         
         let text = await jsonRes.text();
         
-        // Trailing commas remove karne ke liye safe cleaner
         try {
             text = text.replace(/,[ \t\r\n]*([\]}])/g, '$1');
         } catch(err) {}
@@ -77,37 +108,30 @@ module.exports = async (req, res) => {
         try {
             data = JSON.parse(text);
         } catch (parseErr) {
-            return res.status(500).send("#EXTM3U\n#ERROR: JSON Parsing Failed. Check database response.");
+            return res.status(500).send("#EXTM3U\n#ERROR: JSON Parsing Failed.");
         }
 
         const headersuffix = "|Referer=https://speedostream1.com/&Origin=https://speedostream1.com";
         let playlist = "#EXTM3U\n";
 
+        const processItem = (item) => {
+            if (item && item.id) {
+                const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
+                const playLink = `${host}/api/speedo/${cleanId}.m3u8${headersuffix}`;
+                playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
+            }
+        };
+
         if (Array.isArray(data)) {
-            data.forEach(item => {
-                if (item && item.id) {
-                    const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
-                    const playLink = `${host}/api/speedo/${cleanId}.m3u8${headersuffix}`;
-                    playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
-                }
-            });
+            data.forEach(processItem);
         } else if (data && typeof data === 'object') {
-            // Agar Firebase ka data object roop mein aa raha hai toh:
-            Object.keys(data).forEach(key => {
-                const item = data[key];
-                if (item && item.id) {
-                    const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
-                    const playLink = `${host}/api/speedo/${cleanId}.m3u8${headersuffix}`;
-                    playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
-                }
-            });
+            Object.keys(data).forEach(key => processItem(data[key]));
         }
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         return res.status(200).send(playlist);
 
     } catch (err) {
-        // Taaki crash hone par error message M3U ke andhar saaf dikhe
         return res.status(200).send("#EXTM3U\n#ERROR: " + err.message);
     }
 };
