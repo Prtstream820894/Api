@@ -38,8 +38,26 @@ module.exports = async (req, res) => {
             const streamBase = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
             const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${play}.html`;
 
-            // Seedha embed URL par redirect kar diya taaki player ya browser wahi load kare
-            return res.redirect(302, embedUrl);
+            // HTML Page with Iframe taaki "Embeds disabled" error na aaye
+            const htmlResponse = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Player</title>
+                <style>
+                    body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+                    iframe { width: 100%; height: 100%; border: none; }
+                </style>
+            </head>
+            <body>
+                <iframe src="${embedUrl}" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            </body>
+            </html>`;
+
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+            return res.status(200).send(htmlResponse);
         }
 
         // --- LIST MODE ---
@@ -69,7 +87,6 @@ module.exports = async (req, res) => {
         const processItem = (item) => {
             if (item && item.id) {
                 const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
-                // Ab yeh link seedha embed route par bhejega bina m3u8 extract kiye
                 const playLink = `${host}/api/speedo/${cleanId}.m3u8`;
                 playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
             }
