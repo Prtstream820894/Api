@@ -26,10 +26,14 @@ function unpack(code) {
 async function getLiveDomain(testUrls) {
     for (let url of testUrls) {
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000); // 4 seconds timeout
             const res = await fetch(url, { 
                 method: 'HEAD',
-                headers: { "User-Agent": getRandomUserAgent() }
+                headers: { "User-Agent": getRandomUserAgent() },
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
             if (res.ok) return new URL(res.url).origin + "/";
         } catch (e) {}
     }
@@ -44,20 +48,24 @@ module.exports = async (req, res) => {
     const host = `https://${req.headers.host}`;
 
     try {
-        // --- PLAY MODE (Background .m3u8 Extractor - 100% Working Method) ---
+        // --- PLAY MODE ---
         if (play) {
             play = play.replace('.m3u8', '').replace('.html', '');
             const officialSite = await getLiveDomain(["https://prmovies.locker/", "https://yomovies.foundation/"]);
             const streamBase = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
             const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${play}.html`;
 
-            // Server-to-server request jisme official site ka referer jayega (No "Embeds disabled" error)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 seconds timeout for embed
+
             const streamRes = await fetch(embedUrl, {
                 headers: { 
                     "User-Agent": getRandomUserAgent(), 
                     "Referer": officialSite 
-                }
+                },
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
 
             if (!streamRes.ok) {
                 return res.status(404).send("Stream source not reachable");
@@ -66,7 +74,6 @@ module.exports = async (req, res) => {
             const source = await streamRes.text();
             const decoded = unpack(source);
             
-            // Multiple Regex patterns taaki link kabhi miss na ho
             const m3u8Regexes = [
                 /(https?[:\/\/\w\.\-\%\!\?\&\=\,]+?\.m3u8[^\s"']*)/i,
                 /file:\s*["'](https?:\/\/[^"']+\.m3u8[^"']*)["']/i,
@@ -83,10 +90,9 @@ module.exports = async (req, res) => {
             }
 
             if (finalM3u8) {
-                // Seedha direct video stream redirect hogi IPTV ya Player ke liye
                 return res.redirect(302, finalM3u8);
             }
-            return res.status(404).send("M3U8 Link not found in stream response");
+            return res.status(404).send("M3U8 Link not found");
         }
 
         // --- LIST MODE ---
