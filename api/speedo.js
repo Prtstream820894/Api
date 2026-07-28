@@ -9,25 +9,11 @@ function getRandomUserAgent() {
     return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
 }
 
-function unpack(code) {
-    try {
-        const evalPattern = /eval\(function\(p,a,c,k,e,d\).+?\}\('(.+?)',(\d+),(\d+),'(.+?)'\.split\('\|'\)\)\)/;
-        const evalContent = code.match(evalPattern);
-        if (evalContent) {
-            let [_, p, a, c, k] = evalContent;
-            a = parseInt(a); c = parseInt(c); k = k.split('|');
-            while (c--) { if (k[c]) p = p.replace(new RegExp('\\b' + c.toString(a) + '\\b', 'g'), k[c]); }
-            return p;
-        }
-    } catch (e) {}
-    return code;
-}
-
 async function getLiveDomain(testUrls) {
     for (let url of testUrls) {
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 4000); // 4 seconds timeout
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
             const res = await fetch(url, { 
                 method: 'HEAD',
                 headers: { "User-Agent": getRandomUserAgent() },
@@ -48,7 +34,7 @@ module.exports = async (req, res) => {
     const host = `https://${req.headers.host}`;
 
     try {
-        // --- PLAY MODE ---
+        // --- DEBUG MODE: SHOW RAW EMBED SOURCE CODE ---
         if (play) {
             play = play.replace('.m3u8', '').replace('.html', '');
             const officialSite = await getLiveDomain(["https://prmovies.locker/", "https://yomovies.foundation/"]);
@@ -56,7 +42,7 @@ module.exports = async (req, res) => {
             const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${play}.html`;
 
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 seconds timeout for embed
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
 
             const streamRes = await fetch(embedUrl, {
                 headers: { 
@@ -68,31 +54,14 @@ module.exports = async (req, res) => {
             clearTimeout(timeoutId);
 
             if (!streamRes.ok) {
-                return res.status(404).send("Stream source not reachable");
+                return res.status(404).send(`Stream source not reachable. Status: ${streamRes.status}`);
             }
 
             const source = await streamRes.text();
-            const decoded = unpack(source);
             
-            const m3u8Regexes = [
-                /(https?[:\/\/\w\.\-\%\!\?\&\=\,]+?\.m3u8[^\s"']*)/i,
-                /file:\s*["'](https?:\/\/[^"']+\.m3u8[^"']*)["']/i,
-                /source:\s*["'](https?:\/\/[^"']+\.m3u8[^"']*)["']/i
-            ];
-
-            let finalM3u8 = null;
-            for (let regex of m3u8Regexes) {
-                const match = decoded.match(regex) || source.match(regex);
-                if (match && match[1]) {
-                    finalM3u8 = match[1].replace(/\\/g, '');
-                    break;
-                }
-            }
-
-            if (finalM3u8) {
-                return res.redirect(302, finalM3u8);
-            }
-            return res.status(404).send("M3U8 Link not found");
+            // Yahan hum .m3u8 extract nahi kar rahe, balki seedha HTML code browser par text format me dikha rahe hain
+            res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+            return res.status(200).send(`=== EMBED URL: ${embedUrl} ===\n\n=== SOURCE CODE BELOW ===\n\n${source}`);
         }
 
         // --- LIST MODE ---
@@ -124,7 +93,7 @@ module.exports = async (req, res) => {
         const processItem = (item) => {
             if (item && item.id) {
                 const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
-                const playLink = `${host}/api/speedo/${cleanId}.m3u8${headersuffix}`;
+                const playLink = `${host}/api/speedo/${cleanId}.m3u8`;
                 playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
             }
         };
