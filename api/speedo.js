@@ -1,6 +1,5 @@
 const fetch = require('node-fetch');
 
-// Alag-alag User-Agents taaki site block na kare
 const USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2.1 Safari/605.1.15",
@@ -35,16 +34,19 @@ module.exports = async (req, res) => {
         // --- PLAY MODE ---
         if (play) {
             play = play.replace('.m3u8', '').replace('.html', '');
+            const officialSite = await getLiveDomain(["https://prmovies.locker/", "https://yomovies.foundation/"]);
             const streamBase = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
             const embedUrl = `${streamBase.replace(/\/$/, "")}/embed-${play}.html`;
 
-            // HTML Page with Iframe taaki "Embeds disabled" error na aaye
+            // Yahan 'origin-when-cross-origin' ya 'unsafe-url' meta tag add kiya hai 
+            // taaki streaming server ko official site ka referer mile.
             const htmlResponse = `
             <!DOCTYPE html>
             <html lang="en">
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta name="referrer" content="unsafe-url">
                 <title>Player</title>
                 <style>
                     body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
@@ -52,7 +54,7 @@ module.exports = async (req, res) => {
                 </style>
             </head>
             <body>
-                <iframe src="${embedUrl}" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+                <iframe src="${embedUrl}" referrerpolicy="unsafe-url" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
             </body>
             </html>`;
 
