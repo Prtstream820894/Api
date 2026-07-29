@@ -90,7 +90,7 @@ module.exports = async (req, res) => {
         }
 
         // --- LIST MODE ---
-        const jsonRes = await fetch("https://il2020-46d2f.firebaseio.com/Json.json", {
+        const jsonRes = await fetch("https://ipl2020-46d2f.firebaseio.com/Json.json", {
             headers: { "User-Agent": getRandomUserAgent() }
         });
         
