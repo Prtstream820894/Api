@@ -58,7 +58,7 @@ export default async function handler(req, res) {
 
     const responses = await Promise.all([
       fetchWithTimeout(url1, 8000),
-      fetchWithTimeout(url2, 8000),
+      fetchWithTimeout(url2, 18000),
       fetchWithTimeout(url3, 15000),
       fetchWithTimeout(url4, 8000),
       fetchWithTimeout(url5, 8000),
