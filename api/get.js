@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   const default_cookie = "hdntl=exp=1785412849~acl=%2f*~id=974874219d64f0a096de2e1e66d930b1~data=hdntl~hmac=06d84d64801265483bf23daa2d796ec762d722bfce552c60b4d3e2e4a9434792";
 
-  const url = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
+  const url = "https://serv.vodep39240327.workers.dev/channel/raw?=m3u";
 
   try {
     const response = await fetch(url, {
