@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  const default_cookie = "hdntl=exp=1781767487~acl=%2f*~id=8e41937c37ab23abe848bc088cf6998f~data=hdntl~hmac=6392df81306225502202a1f5de2c7af43f51e2c8d2b30d2d966a49d416081afc";
+  const default_cookie = "hdntl=exp=1785412849~acl=%2f*~id=974874219d64f0a096de2e1e66d930b1~data=hdntl~hmac=06d84d64801265483bf23daa2d796ec762d722bfce552c60b4d3e2e4a9434792";
 
   const url = "https://server.vodep39240327.workers.dev/channel/raw?=m3u";
 
