@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     const url6 = "https://sonyliv-event-5e05.poonamchouhan076.workers.dev/";
     const url7 = "https://old-shape-1bd3.poonamchouhan076.workers.dev/";
     const url8 = "https://filmyfly-tooth-1662.poonamchouhan076.workers.dev/";
-    const url9 = "https://prmoviesfastloadingt-mode-02b4.poonamchouhan076.workers.dev/";
+    
 
     const fetchWithTimeout = async (url, ms = 8000) => {
       if (!url) return "";
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
       fetchWithTimeout(url6, 8000),
       fetchWithTimeout(url7, 8000),
       fetchWithTimeout(url8, 8000),
-      fetchWithTimeout(url9, 8000),
+      
     ]);
 
     if (!responses[0]) {
