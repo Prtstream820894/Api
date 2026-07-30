@@ -27,26 +27,6 @@ async function getLiveDomain(testUrls) {
     return testUrls[0];
 }
 
-let cachedPlaylistText = '[]'; 
-
-async function fetchWithTimeout(url, options = {}, timeoutMs = 9000) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-        const response = await fetch(url, {
-            ...options,
-            signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        return response;
-    } catch (error) {
-        clearTimeout(timeoutId);
-        throw error;
-    }
-}
-
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
 module.exports = async (req, res) => {
     try {
         res.setHeader('Access-Control-Allow-Origin', '*');
@@ -97,6 +77,7 @@ module.exports = async (req, res) => {
 
             const source = await streamRes.text();
             
+            // Ab yeh regex is HTML ke andar se exact master.m3u8 link nikal lega
             const match = source.match(/file:\s*["'](https?:\/\/[^"']+\/master\.m3u8[^"']*)["']/i) || 
                           source.match(/(https?:\/\/[^"']+\/master\.m3u8[^\s"']*)/i);
 
@@ -108,52 +89,51 @@ module.exports = async (req, res) => {
             return res.status(404).send("Master M3U8 Link not found inside embed source");
         }
 
-        // --- LIST MODE WITH RETRY & FALLBACK ---
-        let jsonRes = null;
-        let text = null;
-        const targetUrl = "https://autumn-cake-618e.poonamchouhan076.workers.dev/";
-        const fetchOptions = { headers: { "User-Agent": getRandomUserAgent() } };
-
-        try {
-            jsonRes = await fetchWithTimeout(targetUrl, fetchOptions, 9000);
-            if (!jsonRes.ok) throw new Error(`Status ${jsonRes.status}`);
-            text = await jsonRes.text();
-        } catch (err1) {
-            await sleep(1000);
-            try {
-                jsonRes = await fetchWithTimeout(targetUrl, fetchOptions, 9000);
-                if (!jsonRes.ok) throw new Error(`Status ${jsonRes.status}`);
-                text = await jsonRes.text();
-            } catch (err2) {
-                await sleep(1000);
-                try {
-                    jsonRes = await fetchWithTimeout(targetUrl, fetchOptions, 9000);
-                    if (!jsonRes.ok) throw new Error(`Status ${jsonRes.status}`);
-                    text = await jsonRes.text();
-                } catch (err3) {
-                    text = cachedPlaylistText;
-                }
-            }
+        // --- LIST MODE ---
+        const jsonRes = await fetch("https://autumn-cake-618e.poonamchouhan076.workers.dev/", {
+            headers: { "User-Agent": getRandomUserAgent() }
+        });
+        
+        if (!jsonRes.ok) {
+            throw new Error(`Firebase returned status ${jsonRes.status}`);
         }
+        
+        let text = await jsonRes.text();
         
         try {
             text = text.replace(/,[ \t\r\n]*([\]}])/g, '$1');
-        } catch (e) {}
+        } catch(err) {}
 
+        let data;
         try {
-            JSON.parse(text);
-
-            if (text && text.trim() && text.trim() !== "[]") {
-                cachedPlaylistText = text;
-            }
-        } catch (e) {
-            console.log("Invalid JSON received, using cached playlist.");
-            text = cachedPlaylistText;
+            data = JSON.parse(text);
+        } catch (parseErr) {
+            return res.status(500).send("#EXTM3U\n#ERROR: JSON Parsing Failed.");
         }
 
-        return res.setHeader('Content-Type', 'application/json').status(200).send(text);
+        const streamBaseLive = await getLiveDomain(["https://speedostream1.com/", "https://speedostream.com/"]);
+        const headersuffix = `|Referer=${streamBaseLive}&Origin=${streamBaseLive.replace(/\/$/, "")}`;
+        let playlist = "#EXTM3U\n";
 
-    } catch (error) {
-        return res.status(500).json({ error: "Internal Server Error", details: error.message });
+        const processItem = (item) => {
+            if (item && item.id) {
+                const cleanId = item.id.replace(/[^a-zA-Z0-9]/g, '');
+                const playLink = `${host}/api/speedo/${cleanId}.m3u8${headersuffix}`;
+                playlist += `#EXTINF:-1 tvg-id="${item.id}" tvg-logo="${item.logo || ''}" group-title="${item.group || 'Movies'}",${item.name || 'No Name'}\n${playLink}\n`;
+            }
+        };
+
+        if (Array.isArray(data)) {
+            data.forEach(processItem);
+        } else if (data && typeof data === 'object') {
+            Object.keys(data).forEach(key => processItem(data[key]));
+        }
+
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        return res.status(200).send(playlist);
+
+    } catch (err) {
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        return res.status(200).send("#EXTM3U\n#ERROR: " + err.message);
     }
 };
