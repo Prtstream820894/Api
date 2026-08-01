@@ -13,20 +13,23 @@ export default async function handler(req, res) {
   }
 
   let extracted_cookie = null;
+  let debug_status = "";
 
   try {
-    // Browser jaisa realistic header bhejna zaroori hai taaki server empty response na de
     const response = await fetch(new_playlist_url, {
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
+        "Accept": "*/*",
         "Referer": "https://game.denver69.fun/"
       }
     });
 
+    debug_status += `Denver HTTP Status: ${response.status} | `;
+
     if (response.ok) {
       const text = await response.text();
+      debug_status += `Text Length: ${text.length} | `;
+      
       const lines = text.split("\n");
 
       for (let i = 0; i < lines.length; i++) {
@@ -53,15 +56,14 @@ export default async function handler(req, res) {
       }
     }
   } catch (err) {
-    console.log("New playlist fetch failed, trying fallback...");
+    debug_status += `Denver Error: ${err.message} | `;
   }
 
-  // Agar Denver se na mile toh fallback server try karo
   if (!extracted_cookie) {
     try {
       const response = await fetch(fallback_url, {
         headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+          "User-Agent": "Mozilla/5.0"
         }
       });
 
@@ -81,15 +83,17 @@ export default async function handler(req, res) {
         }
       }
     } catch (err) {
-      console.log("Fallback server also failed.");
+      console.log("Fallback failed");
     }
   }
 
   const final_cookie = extracted_cookie || default_fallback_cookie;
-  const source_label = extracted_cookie ? "Live Extracted Cookie (Denver)" : "Default Cookie (Fallback)";
+  const source_label = extracted_cookie ? "Live Extracted Cookie" : "Default Cookie (Fallback)";
 
   res.status(200).send(`
     <h3>🍪 ${source_label}:</h3>
     ${final_cookie}
+    <hr>
+    <p style="font-size: 11px; color: gray;"><b>Debug Info:</b> ${debug_status}</p>
   `);
 }
