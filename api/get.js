@@ -50,17 +50,20 @@ export default async function handler(req, res) {
     console.log("New playlist fetch failed, trying Firebase REST...");
   }
 
-  // 2. Step 2: Firebase REST API se Denver node uthao (No Crash / No SDK required)
+  // 2. Step 2: Sahi Firebase REST URL se Denver node uthao
   if (!extracted_cookie) {
     try {
-      const fbRes = await fetch("https://ipl2020-46d2f-default-rtdb.firebaseio.com/Denver.json");
+      const fbRes = await fetch("https://ipl2020-46d2f.firebaseio.com/Denver.json");
       const denverData = await fbRes.json();
 
       if (denverData) {
+        // Agar direct stored cookie milti hai jo 'xyz' nahi hai
         if (denverData.cookie && denverData.cookie !== "xyz") {
           extracted_cookie = denverData.cookie;
           source_label = "Firebase Stored Cookie";
-        } else if (denverData.Link) {
+        } 
+        // Nahi toh Firebase me diye gaye 'Link' se fetch karo
+        else if (denverData.Link) {
           const fbResponse = await fetch(denverData.Link, {
             headers: {
               "User-Agent": "Mozilla/5.0",
