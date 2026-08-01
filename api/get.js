@@ -18,22 +18,21 @@ export default async function handler(req, res) {
   try {
     const response = await fetch(new_playlist_url, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Referer": "https://game.denver69.fun/"
+        "User-Agent": "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36 IPTVPlayer/1.0",
+        "Accept": "application/x-mpegURL, application/vnd.apple.mpegurl, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://game.denver69.fun/",
+        "Origin": "https://game.denver69.fun",
+        "Connection": "keep-alive",
+        "Cache-Control": "no-cache"
       }
     });
 
     debug_status += `Denver HTTP Status: ${response.status} | `;
 
     if (response.ok) {
-      // ArrayBuffer ya text ko safe read karne ka tareeqa
-      const arrayBuffer = await response.arrayBuffer();
-      const decoder = new TextDecoder("utf-8");
-      const text = decoder.decode(arrayBuffer);
-
-      debug_status += `Decoded Length: ${text.length} | `;
+      const text = await response.text();
+      debug_status += `Text Length: ${text.length} | `;
 
       if (text.length > 0) {
         const lines = text.split("\n");
@@ -70,7 +69,7 @@ export default async function handler(req, res) {
     try {
       const response = await fetch(fallback_url, {
         headers: {
-          "User-Agent": "Mozilla/5.0"
+          "User-Agent": "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
         }
       });
 
