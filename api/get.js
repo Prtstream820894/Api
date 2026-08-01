@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     `);
   }
 
-  const new_playlist_url = "https://game.denver69.fun/Jtv/8qpUVH/Playlist.m3u";
+  const new_playlist_url = "https://game.denver69.fun/Jtv/TDqHlI/Playlist.m3u";
   const fallback_url = "https://serv.vodep39240327.workers.dev/channel/raw?=m3u";
   const default_fallback_cookie = "hdntl=exp=1785499260~acl=%2f*~id=f4259cda851c7a4eaf1a3a64027227b0~data=hdntl~hmac=75637db8b9691f231d00d9095e1c7961ed59c3fc371020edcc7fe373c7b5ba08";
 
