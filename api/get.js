@@ -1,9 +1,18 @@
 export default async function handler(req, res) {
+  let current_cookie = ""; 
+
   const new_playlist_url = "https://game.denver69.fun/Jtv/8qpUVH/Playlist.m3u";
+  const fallback_url = "https://serv.vodep39240327.workers.dev/channel/raw?=m3u";
   const default_fallback_cookie = "hdntl=exp=1785499260~acl=%2f*~id=f4259cda851c7a4eaf1a3a64027227b0~data=hdntl~hmac=75637db8b9691f231d00d9095e1c7961ed59c3fc371020edcc7fe373c7b5ba08";
 
+  if (current_cookie && current_cookie.trim() !== "") {
+    return res.status(200).send(`
+      <h3>🍪 Pre-configured Cookie:</h3>
+      ${current_cookie}
+    `);
+  }
+
   let extracted_cookie = null;
-  let debug_error = null;
 
   try {
     const response = await fetch(new_playlist_url, {
@@ -13,56 +22,71 @@ export default async function handler(req, res) {
       }
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP Error! Status: ${response.status} ${response.statusText}`);
-    }
+    if (response.ok) {
+      const text = await response.text();
+      const lines = text.split("\n");
 
-    const text = await response.text();
-    const lines = text.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        const currentLine = lines[i];
 
-    let channelFound = false;
+        if (currentLine.toLowerCase().includes("jcevent")) {
+          let match = currentLine.match(/Cookie=([^&\s]+)/i);
 
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].includes("jcevents.hotstar.com") || lines[i].includes("JC_ColorsHD")) {
-        channelFound = true;
-        const line = lines[i];
-        let match = line.match(/Cookie=([^&]+)/);
-        
-        if (!match) {
-          const optLine = lines[i - 2] || "";
-          match = optLine.match(/http-cookie=(.+)/);
-        }
+          if (!match) {
+            for (let j = i - 1; j >= Math.max(0, i - 4); j--) {
+              const upperLine = lines[j];
+              match = upperLine.match(/http-cookie=(.+)/i) || 
+                      upperLine.match(/"Cookie":"([^"]+)"/i) || 
+                      upperLine.match(/Cookie=([^&\s]+)/i);
+              if (match) break;
+            }
+          }
 
-        if (match) {
-          extracted_cookie = match[1].trim();
-          break;
+          if (match) {
+            extracted_cookie = match[1].trim();
+            break;
+          }
         }
       }
     }
-
-    if (!channelFound) {
-      debug_error = "Playlist fetched successfully, but target channel ('jcevents.hotstar.com' or 'JC_ColorsHD') was not found inside the playlist.";
-    } else if (!extracted_cookie) {
-      debug_error = "Target channel found, but failed to extract the cookie from the line format.";
-    }
-
   } catch (err) {
-    debug_error = `Failed to fetch Denver playlist: ${err.message}`;
+    console.log("New playlist fetch failed, trying fallback...");
   }
 
-  // Agar Denver se cookie mil gayi toh wo do, warna error print karke default cookie do
-  if (extracted_cookie) {
-    return res.status(200).send(`
-      <h3>🍪 Live Extracted Cookie (Denver):</h3>
-      ${extracted_cookie}
-    `);
+  if (!extracted_cookie) {
+    try {
+      const response = await fetch(fallback_url, {
+        headers: {
+          "User-Agent": "Mozilla/5.0",
+          "Accept": "*/*"
+        }
+      });
+
+      if (response.ok) {
+        const text = await response.text();
+        const lines = text.split("\n");
+
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].includes("JC_ColorsHD.m3u8")) {
+            const extinf = lines[i - 1] || "";
+            const match = extinf.match(/"Cookie":"([^"]+)"/);
+            if (match) {
+              extracted_cookie = match[1];
+            }
+            break;
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Fallback server also failed.");
+    }
   }
+
+  const final_cookie = extracted_cookie || default_fallback_cookie;
+  const source_label = extracted_cookie ? "Live Extracted Cookie" : "Default Cookie (Fallback)";
 
   res.status(200).send(`
-    <h3 style="color: red;">❌ Denver Playlist Error:</h3>
-    <p>${debug_error}</p>
-    <hr>
-    <h3>🍪 Fallback Cookie Used:</h3>
-    ${default_fallback_cookie}
+    <h3>🍪 ${source_label}:</h3>
+    ${final_cookie}
   `);
 }
