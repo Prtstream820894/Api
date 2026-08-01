@@ -1,15 +1,5 @@
-import { initializeApp, getApps } from "firebase-admin/app";
-import { getDatabase } from "firebase-admin/database";
-
-if (!getApps().length) {
-  initializeApp({
-    databaseURL: "https://ipl2020-46d2f-default-rtdb.firebaseio.com/"
-  });
-}
-
 export default async function handler(req, res) {
-  // 1. SABSE PEHLE YAHAN CHECK HOGA: Agar aapne yahan cookie dal rakhi hai, toh turant yahi return ho jayegi
-  let current_cookie = ""; // Jab bhi badalna ho, yahan string ke andar apni nayi cookie daal dena
+  let current_cookie = ""; // Jab bhi pre-configured rakhni ho yahan daal dena
 
   if (current_cookie && current_cookie.trim() !== "") {
     return res.status(200).send(`
@@ -25,7 +15,7 @@ export default async function handler(req, res) {
   let extracted_cookie = null;
   let source_label = "Live Extracted Cookie";
 
-  // 2. Step 2: Agar current_cookie khali hai, tab Denver playlist se fetch hoga
+  // 1. Step 1: Denver playlist se fetch karne ki koshish karo
   try {
     const response = await fetch(new_playlist_url, {
       headers: {
@@ -57,16 +47,14 @@ export default async function handler(req, res) {
       }
     }
   } catch (err) {
-    console.log("New playlist fetch failed, trying Firebase...");
+    console.log("New playlist fetch failed, trying Firebase REST...");
   }
 
-  // 3. Step 3: Agar Denver se na mile, toh Firebase se check karo
+  // 2. Step 2: Firebase REST API se Denver node uthao (No Crash / No SDK required)
   if (!extracted_cookie) {
     try {
-      const db = getDatabase();
-      const denverRef = db.ref("Denver");
-      const snapshot = await denverRef.once("value");
-      const denverData = snapshot.val();
+      const fbRes = await fetch("https://ipl2020-46d2f-default-rtdb.firebaseio.com/Denver.json");
+      const denverData = await fbRes.json();
 
       if (denverData) {
         if (denverData.cookie && denverData.cookie !== "xyz") {
@@ -97,11 +85,11 @@ export default async function handler(req, res) {
         }
       }
     } catch (fbErr) {
-      console.log("Firebase fetch failed:", fbErr.message);
+      console.log("Firebase REST fetch failed:", fbErr.message);
     }
   }
 
-  // 4. Step 4: Agar kahin se na mile, toh purana fallback worker try karo
+  // 3. Step 3: Purana worker fallback
   if (!extracted_cookie) {
     try {
       const response = await fetch(fallback_url, {
@@ -130,7 +118,6 @@ export default async function handler(req, res) {
     }
   }
 
-  // Final Output
   const final_cookie = extracted_cookie || default_fallback_cookie;
   if (!extracted_cookie) source_label = "Default Cookie (Fallback)";
 
