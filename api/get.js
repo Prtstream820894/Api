@@ -19,7 +19,8 @@ export default async function handler(req, res) {
     const response = await fetch(new_playlist_url, {
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Accept": "*/*",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Encoding": "gzip, deflate, br",
         "Referer": "https://game.denver69.fun/"
       }
     });
@@ -27,30 +28,36 @@ export default async function handler(req, res) {
     debug_status += `Denver HTTP Status: ${response.status} | `;
 
     if (response.ok) {
-      const text = await response.text();
-      debug_status += `Text Length: ${text.length} | `;
-      
-      const lines = text.split("\n");
+      // ArrayBuffer ya text ko safe read karne ka tareeqa
+      const arrayBuffer = await response.arrayBuffer();
+      const decoder = new TextDecoder("utf-8");
+      const text = decoder.decode(arrayBuffer);
 
-      for (let i = 0; i < lines.length; i++) {
-        const currentLine = lines[i];
+      debug_status += `Decoded Length: ${text.length} | `;
 
-        if (currentLine.toLowerCase().includes("jcevent")) {
-          let match = currentLine.match(/Cookie=([^&\s]+)/i);
+      if (text.length > 0) {
+        const lines = text.split("\n");
 
-          if (!match) {
-            for (let j = i - 1; j >= Math.max(0, i - 4); j--) {
-              const upperLine = lines[j];
-              match = upperLine.match(/http-cookie=(.+)/i) || 
-                      upperLine.match(/"Cookie":"([^"]+)"/i) || 
-                      upperLine.match(/Cookie=([^&\s]+)/i);
-              if (match) break;
+        for (let i = 0; i < lines.length; i++) {
+          const currentLine = lines[i];
+
+          if (currentLine.toLowerCase().includes("jcevent")) {
+            let match = currentLine.match(/Cookie=([^&\s]+)/i);
+
+            if (!match) {
+              for (let j = i - 1; j >= Math.max(0, i - 4); j--) {
+                const upperLine = lines[j];
+                match = upperLine.match(/http-cookie=(.+)/i) || 
+                        upperLine.match(/"Cookie":"([^"]+)"/i) || 
+                        upperLine.match(/Cookie=([^&\s]+)/i);
+                if (match) break;
+              }
             }
-          }
 
-          if (match) {
-            extracted_cookie = match[1].trim();
-            break;
+            if (match) {
+              extracted_cookie = match[1].trim();
+              break;
+            }
           }
         }
       }
