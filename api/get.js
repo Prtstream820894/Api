@@ -1,25 +1,35 @@
+import { initializeApp, getApps } from "firebase-admin/app";
+import { getDatabase } from "firebase-admin/database";
+
+if (!getApps().length) {
+  initializeApp({
+    databaseURL: "https://ipl2020-46d2f-default-rtdb.firebaseio.com/"
+  });
+}
+
 export default async function handler(req, res) {
-  // 1. Agar yahan pehle se hi cookie dali hui hai, toh yeh direct wahi use kar lega
-  let current_cookie = ""; 
+  // 1. SABSE PEHLE YAHAN CHECK HOGA: Agar aapne yahan cookie dal rakhi hai, toh turant yahi return ho jayegi
+  let current_cookie = ""; // Jab bhi badalna ho, yahan string ke andar apni nayi cookie daal dena
 
-  const fallback_url = "https://serv.vodep39240327.workers.dev/channel/raw?=m3u";
-  const default_fallback_cookie = "hdntl=exp=1785499260~acl=%2f*~id=f4259cda851c7a4eaf1a3a64027227b0~data=hdntl~hmac=75637db8b9691f231d00d9095e1c7961ed59c3fc371020edcc7fe373c7b5ba08";
-
-  // Agar code ke andar pehle se cookie set hai toh wahi bhej do
   if (current_cookie && current_cookie.trim() !== "") {
     return res.status(200).send(`
-      <h3>🍪 Pre-configured Cookie:</h3>
+      <h3>🍪 Pre-configured Cookie (Top Priority):</h3>
       ${current_cookie}
     `);
   }
 
-  let extracted_cookie = null;
+  const new_playlist_url = "https://game.denver69.fun/Jtv/8qpUVH/Playlist.m3u";
+  const fallback_url = "https://serv.vodep39240327.workers.dev/channel/raw?=m3u";
+  const default_fallback_cookie = "hdntl=exp=1785499260~acl=%2f*~id=f4259cda851c7a4eaf1a3a64027227b0~data=hdntl~hmac=75637db8b9691f231d00d9095e1c7961ed59c3fc371020edcc7fe373c7b5ba08";
 
-  // 2. Step 2: Fallback server se fetch karke cookie listener / parser ke zariye cookie uthao
+  let extracted_cookie = null;
+  let source_label = "Live Extracted Cookie";
+
+  // 2. Step 2: Agar current_cookie khali hai, tab Denver playlist se fetch hoga
   try {
-    const response = await fetch(fallback_url, {
+    const response = await fetch(new_playlist_url, {
       headers: {
-        "User-Agent": "Mozilla/5.0",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         "Accept": "*/*"
       }
     });
@@ -28,30 +38,101 @@ export default async function handler(req, res) {
     const lines = text.split("\n");
 
     for (let i = 0; i < lines.length; i++) {
-      if (lines[i].includes("JC_ColorsHD.m3u8") || lines[i].includes("JC_ColorsHD") || lines[i].includes("jcevent")) {
+      if (lines[i].includes("jcevents.hotstar.com") || lines[i].includes("JC_ColorsHD") || lines[i].toLowerCase().includes("jcevent")) {
         const line = lines[i];
-        const extinf = lines[i - 1] || "";
-        const optLine = lines[i - 2] || "";
-
-        // Multi-pattern cookie listener to catch cookie from various formats
-        let match = line.match(/Cookie=([^&]+)/i) || 
-                    extinf.match(/"Cookie":"([^"]+)"/i) || 
-                    optLine.match(/http-cookie=(.+)/i) ||
-                    line.match(/(hdntl=[^&\s"]+)/i);
+        let match = line.match(/Cookie=([^&]+)/);
+        if (!match) {
+          const optLine = lines[i - 2] || "";
+          match = optLine.match(/http-cookie=(.+)/);
+        }
+        if (!match && line.includes("?")) {
+          extracted_cookie = line.substring(line.indexOf("?") + 1).trim();
+          break;
+        }
 
         if (match) {
-          extracted_cookie = (match[1] || match[0]).trim();
+          extracted_cookie = match[1].trim();
           break;
         }
       }
     }
   } catch (err) {
-    console.log("Fallback server fetch failed.");
+    console.log("New playlist fetch failed, trying Firebase...");
   }
 
-  // Final Output: Agar fallback server se cookie mil gayi toh wo do, warna hardcoded default do
+  // 3. Step 3: Agar Denver se na mile, toh Firebase se check karo
+  if (!extracted_cookie) {
+    try {
+      const db = getDatabase();
+      const denverRef = db.ref("Denver");
+      const snapshot = await denverRef.once("value");
+      const denverData = snapshot.val();
+
+      if (denverData) {
+        if (denverData.cookie && denverData.cookie !== "xyz") {
+          extracted_cookie = denverData.cookie;
+          source_label = "Firebase Stored Cookie";
+        } else if (denverData.Link) {
+          const fbResponse = await fetch(denverData.Link, {
+            headers: {
+              "User-Agent": "Mozilla/5.0",
+              "Accept": "*/*"
+            }
+          });
+          const fbText = await fbResponse.text();
+          const fbLines = fbText.split("\n");
+          for (let line of fbLines) {
+            if (line.includes("jcevent") || line.includes("Cookie=")) {
+              let match = line.match(/Cookie=([^&]+)/);
+              if (match) {
+                extracted_cookie = match[1].trim();
+                break;
+              } else if (line.includes("?")) {
+                extracted_cookie = line.substring(line.indexOf("?") + 1).trim();
+                break;
+              }
+            }
+          }
+          if (extracted_cookie) source_label = "Firebase Link Extracted Cookie";
+        }
+      }
+    } catch (fbErr) {
+      console.log("Firebase fetch failed:", fbErr.message);
+    }
+  }
+
+  // 4. Step 4: Agar kahin se na mile, toh purana fallback worker try karo
+  if (!extracted_cookie) {
+    try {
+      const response = await fetch(fallback_url, {
+        headers: {
+          "User-Agent": "Mozilla/5.0",
+          "Accept": "*/*"
+        }
+      });
+
+      const text = await response.text();
+      const lines = text.split("\n");
+
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes("JC_ColorsHD.m3u8")) {
+          const extinf = lines[i - 1] || "";
+          const match = extinf.match(/"Cookie":"([^"]+)"/);
+          if (match) {
+            extracted_cookie = match[1];
+            source_label = "Worker Fallback Cookie";
+          }
+          break;
+        }
+      }
+    } catch (err) {
+      console.log("Fallback server also failed.");
+    }
+  }
+
+  // Final Output
   const final_cookie = extracted_cookie || default_fallback_cookie;
-  const source_label = extracted_cookie ? "Live Extracted Cookie (Fallback Listener)" : "Default Cookie (Fallback)";
+  if (!extracted_cookie) source_label = "Default Cookie (Fallback)";
 
   res.status(200).send(`
     <h3>🍪 ${source_label}:</h3>
