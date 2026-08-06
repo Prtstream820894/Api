@@ -99,6 +99,7 @@ try {
   "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
   "new movies",
   "latest movies",
+  "🔞18+",
   "filmyfy latest",
   "highlights",
   "✨Upcoming Events✨",
@@ -166,6 +167,11 @@ try {
 }
     else if (groupLower.includes("latest movies")) {
       groupedChannels["latest movies"].push(ch);
+    }
+    else if (groupLower.includes("18+") || groupLower.includes("adult")) {
+      ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="🔞18+"');
+      ch.groupTitle = "🔞18+";
+      groupedChannels["🔞18+"].push(ch);
     }
     else if (groupLower.includes("filmyfy latest")) {
       groupedChannels["filmyfy latest"].push(ch);
