@@ -15,6 +15,7 @@ export default async function handler(req, res) {
     const url5 = "https://fancode-art-c9de.poonamchouhan076.workers.dev/";
     const url6 = "https://sonyliv-event-5e05.poonamchouhan076.workers.dev/";
     const url7 = "https://old-shape-1bd3.poonamchouhan076.workers.dev/";
+    const url8 = "https://server-iota-nine-71.vercel.app/api/nc"; // Nayi playlist add ki gayi hai
   
     
 
@@ -64,8 +65,7 @@ export default async function handler(req, res) {
       fetchWithTimeout(url5, 8000),
       fetchWithTimeout(url6, 8000),
       fetchWithTimeout(url7, 8000),
-    
-      
+      fetchWithTimeout(url8, 15000), // Nayi URL ke liye timeout add kiya gaya hai
     ]);
 
     if (!responses[0]) {
