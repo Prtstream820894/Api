@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     const url6 = "https://sonyliv-event-5e05.poonamchouhan076.workers.dev/";
     const url7 = "https://old-shape-1bd3.poonamchouhan076.workers.dev/";
     const url8 = "https://bitter-recipe-3d25.poonamchouhan076.workers.dev/"; // Nayi playlist add ki gayi hai
-    const url9 = "https://server-iota-nine-71.vercel.app/api/ncc"; // Nayi NCC playlist add ki gayi hai
+    const url9 = "https://icy-pond-60ea.poonamchouhan076.workers.dev/"; // Nayi NCC playlist add ki gayi hai
   
     
 
