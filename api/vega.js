@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
     const userAgent = "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36";
-const SITE = "https://vegamoviess.fun/";
+const SITE = "https://bold-darkness-d959.poonamchouhan076.workers.dev/?site=https://vegamoviess.fun/";
     async function viewSourceFetch(url) {
         try {
             const response = await fetch(url, {
