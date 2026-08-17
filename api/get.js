@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  let current_cookie = "hdntl=exp=1786970874~acl=%2f*~id=18bc9962b90c45d6477ad2623a8f07ad~data=hdntl~hmac=0d10da8793607e46ac97748934598aba869da1d63a16849d4e545d9113543c4b"; // Jab bhi pre-configured rakhni ho yahan daal dena
+  let current_cookie = "hdntl=exp=1787058629~acl=%2f*~id=b20b7da9f37c18a9c9fa75a1dc531eea~data=hdntl~hmac=84ee05eeae55d1c6fd9632b146317653cf142edcf70f1aa54e19c32dceb3d49b"; // Jab bhi pre-configured rakhni ho yahan daal dena
 
   if (current_cookie && current_cookie.trim() !== "") {
     return res.status(200).send(`
