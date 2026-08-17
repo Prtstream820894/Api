@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     const url2 = "https://allmovieslist.poonamchouhan076.workers.dev/";
     const url3 = "https://wandering-morning-5534.poonamchouhan076.workers.dev/";
     const url4 = "https://upcominge-dawn-7c6bve.poonamchouhan076.workers.dev/";
-    const url5 = "https://fancode2-morning-7f65.poonamchouhan076.workers.dev/";
+    const url5 = "https://fancode4-smoke-85a1.poonamchouhan076.workers.dev/";
     const url6 = "https://sonyliv-event-5e05.poonamchouhan076.workers.dev/";
     const url7 = "https://old-shape-1bd3.poonamchouhan076.workers.dev/";
     const url8 = "https://bitter-recipe-3d25.poonamchouhan076.workers.dev/"; // Nayi playlist add ki gayi hai
