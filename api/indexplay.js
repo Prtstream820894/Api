@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     const url8 = "https://bitter-recipe-3d25.poonamchouhan076.workers.dev/"; // Nayi playlist add ki gayi hai
     const url9 = "https://icy-pond-60ea.poonamchouhan076.workers.dev/";
     const ur20 = "https://divine-moon-058f.poonamchouhan076.workers.dev/";
-    const ur21 = "https://raw.githubusercontent.com/Prtstream820894/mystream/refs/heads/main/world.txt";// Nayi NCC playlist add ki gayi hai
+    const ur21 = "https://raw.githubusercontent.com/Prtstream820894/Api/refs/heads/main/world.m3u";// Nayi NCC playlist add ki gayi hai
   
     
 
