@@ -67,6 +67,8 @@ export default {
         "highlights",
         "✨Upcoming Events✨",
         "sports",
+        "infotainment",
+        "devotional",
         "south",
         "bollywood movies",
         "hollywood movies",
@@ -90,7 +92,6 @@ export default {
         const originalGroup = ch.groupTitle.trim();
         const groupLower = originalGroup.toLowerCase();
 
-        // Pehle upcoming check karenge taaki woh live mein na jaye
         if (groupLower.includes("upcoming")) {
           ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨Upcoming Events✨"');
           ch.groupTitle = "✨Upcoming Events✨";
@@ -101,6 +102,10 @@ export default {
           groupedChannels[targetLiveKey].push(ch);
         } else if (groupLower === "sports") {
           groupedChannels["sports"].push(ch);
+        } else if (groupLower.includes("infotainment") || groupLower.includes("knowledge") || groupLower.includes("nat geo") || groupLower.includes("history") || groupLower.includes("bbc earth")) {
+          groupedChannels["infotainment"].push(ch);
+        } else if (groupLower.includes("devot") || groupLower.includes("bhakti") || groupLower.includes("satsang") || groupLower.includes("shraddha") || groupLower.includes("spiritual")) {
+          groupedChannels["devotional"].push(ch);
         } else if (groupLower.includes("new movies")) {
           groupedChannels["new movies"].push(ch);
         } else if (groupLower.includes("lastest hub movies") || groupLower.includes("hub movies")) {
