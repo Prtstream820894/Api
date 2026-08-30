@@ -8,18 +8,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    const url1 = "https://mainplaylist.poonamchouhan076.workers.dev/";
+    const url1 = "https://server-iota-nine-71.vercel.app/api/smarttv";
     const url2 = "https://allmovieslist.poonamchouhan076.workers.dev/";
-    const url3 = "https://wandering-morning-5534.poonamchouhan076.workers.dev/";
-    const url4 = "https://upcominge-dawn-7c6bve.poonamchouhan076.workers.dev/";
-    const url5 = "https://fancode4-smoke-85a1.poonamchouhan076.workers.dev/";
-    const url6 = "https://sonyliv-event-5e05.poonamchouhan076.workers.dev/";
-    const url7 = "https://old-shape-1bd3.poonamchouhan076.workers.dev/";
-    const url8 = "https://bitter-recipe-3d25.poonamchouhan076.workers.dev/"; // Nayi playlist add ki gayi hai
-    const url9 = "https://icy-pond-60ea.poonamchouhan076.workers.dev/";
-    const ur20 = "https://divine-moon-058f.poonamchouhan076.workers.dev/";
-    const ur21 = "https://raw.githubusercontent.com/Prtstream820894/Api/refs/heads/main/world.m3u";
-    const ur22 = "https://hdhub4u-lake-f103.poonamchouhan076.workers.dev/";// Nayi NCC playlist add ki gayi hai
+    const url3 = "https://old-shape-1bd3.poonamchouhan076.workers.dev/";
+    const url4 = "https://bitter-recipe-3d25.poonamchouhan076.workers.dev/"; // Nayi playlist add ki gayi hai
+    const url5 = "https://icy-pond-60ea.poonamchouhan076.workers.dev/";
+    const url6 = "https://divine-moon-058f.poonamchouhan076.workers.dev/";
+    const url7 = "https://raw.githubusercontent.com/Prtstream820894/Api/refs/heads/main/world.m3u";
+    const url8 = "https://hdhub4u-lake-f103.poonamchouhan076.workers.dev/";// Nayi NCC playlist add ki gayi hai
   
     
 
@@ -69,11 +65,7 @@ export default async function handler(req, res) {
       fetchWithTimeout(url5, 8000),
       fetchWithTimeout(url6, 8000),
       fetchWithTimeout(url7, 8000),
-      fetchWithTimeout(url8, 30000),
-      fetchWithTimeout(url9, 10000),
-      fetchWithTimeout(ur20, 10000),
-      fetchWithTimeout(ur21, 10000),
-      fetchWithTimeout(ur22, 10000),// Nayi URL ke liye timeout add kiya gaya hai
+      fetchWithTimeout(url8, 30000),// Nayi URL ke liye timeout add kiya gaya hai
     ]);
 
     if (!responses[0]) {
