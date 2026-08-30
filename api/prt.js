@@ -55,8 +55,10 @@ export default {
       }
       if (currentChannel) channels.push(currentChannel);
 
+      const targetLiveKey = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";
+      
       const groupOrder = [
-        "✨ Live Events ✨",
+        targetLiveKey,
         "new movies",
         "✨ Lastest Hub Movies",
         "latest movies",
@@ -82,24 +84,23 @@ export default {
         groupedChannels[groupOrder[j]] = [];
       }
       let otherChannels = [];
-      let sportsCount = 0;
 
       for (let i = 0; i < channels.length; i++) {
         const ch = channels[i];
         const originalGroup = ch.groupTitle.trim();
         const groupLower = originalGroup.toLowerCase();
 
-        if (groupLower.includes("upcoming event")) {
+        // Font/Unicode se bachne ke liye keywords check kar rahe hain
+        if (groupLower.includes("live") || groupLower.includes("event") || groupLower.includes("ʟɪᴠᴇ") || groupLower.includes("ᴇᴠᴇɴᴛ")) {
+          ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, `group-title="${targetLiveKey}"`);
+          ch.groupTitle = targetLiveKey;
+          groupedChannels[targetLiveKey].push(ch);
+        } else if (groupLower.includes("upcoming")) {
           ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨Upcoming Events✨"');
           ch.groupTitle = "✨Upcoming Events✨";
           groupedChannels["✨Upcoming Events✨"].push(ch);
         } else if (groupLower === "sports") {
-          if (sportsCount < 0) {
-            // (Condition preserved from original structure if needed later)
-            groupedChannels["sports"].push(ch);
-          } else {
-            groupedChannels["sports"].push(ch);
-          }
+          groupedChannels["sports"].push(ch);
         } else if (groupLower.includes("new movies")) {
           groupedChannels["new movies"].push(ch);
         } else if (groupLower.includes("lastest hub movies") || groupLower.includes("hub movies")) {
