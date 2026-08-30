@@ -98,6 +98,7 @@ try {
   const groupOrder = [
   "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
   "new movies",
+  "latest hub movies",
   "latest movies",
   "🔞18+",
   "filmyfy latest",
@@ -163,8 +164,11 @@ try {
       }  
     }   
     else if (groupLower.includes("new movies")) {
-  groupedChannels["new movies"].push(ch);
-}
+      groupedChannels["new movies"].push(ch);
+    }
+    else if (groupLower.includes("latest hub movies")) {
+      groupedChannels["latest hub movies"].push(ch);
+    }
     else if (groupLower.includes("latest movies")) {
       groupedChannels["latest movies"].push(ch);
     }
