@@ -77,8 +77,8 @@ try {
         }  
 
         fifaChannel = {  
-          extinf: line.replace(/group-title="[^"]+"/, 'group-title="✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨"'),  
-          groupTitle: "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",  
+          extinf: line.replace(/group-title="[^"]+"/, 'group-title="âœ¨âœ¦ÊŸÉªá´ á´‡ á´‡á´ á´‡É´á´›êœ±âœ¦âœ¨"'),  
+          groupTitle: "âœ¨âœ¦ÊŸÉªá´ á´‡ á´‡á´ á´‡É´á´›êœ±âœ¦âœ¨",  
           extraMetadata: [],  
           url: ""  
         };  
@@ -96,14 +96,14 @@ try {
   }  
 
   const groupOrder = [
-  "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨",
+  "âœ¨âœ¦ÊŸÉªá´ á´‡ á´‡á´ á´‡É´á´›êœ±âœ¦âœ¨",
   "new movies",
-  "latest hub movies",
+  "✨ Lastest Hub Movies",
   "latest movies",
-  "🔞18+",
+  "ðŸ”ž18+",
   "filmyfy latest",
   "highlights",
-  "✨Upcoming Events✨",
+  "âœ¨Upcoming Eventsâœ¨",
   "sports",
   "south",
   "bollywood movies",
@@ -117,7 +117,7 @@ try {
   "kids"
 ];
 
-  const targetLiveKey = "✨✦ʟɪᴠᴇ ᴇᴠᴇɴᴛꜱ✦✨";  
+  const targetLiveKey = "âœ¨âœ¦ÊŸÉªá´ á´‡ á´‡á´ á´‡É´á´›êœ±âœ¦âœ¨";  
 
   let groupedChannels = {};  
   for (let j = 0; j < groupOrder.length; j++) {  
@@ -148,10 +148,10 @@ try {
       ch.groupTitle = targetLiveKey;  
       groupedChannels[targetLiveKey].push(ch);  
     }   
-    else if (originalGroup === "✨Upcoming Events✨" || groupLower.includes("upcoming event")) {  
-      ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨Upcoming Events✨"');  
-      ch.groupTitle = "✨Upcoming Events✨";  
-      groupedChannels["✨Upcoming Events✨"].push(ch);  
+    else if (originalGroup === "âœ¨Upcoming Eventsâœ¨" || groupLower.includes("upcoming event")) {  
+      ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="âœ¨Upcoming Eventsâœ¨"');  
+      ch.groupTitle = "âœ¨Upcoming Eventsâœ¨";  
+      groupedChannels["âœ¨Upcoming Eventsâœ¨"].push(ch);  
     }  
     else if (groupLower === "sports") {  
       if (sportsCount < 0) {   
@@ -166,16 +166,16 @@ try {
     else if (groupLower.includes("new movies")) {
       groupedChannels["new movies"].push(ch);
     }
-    else if (groupLower.includes("latest hub movies")) {
-      groupedChannels["latest hub movies"].push(ch);
+    else if (groupLower.includes("✨ Lastest Hub Movies")) {
+      groupedChannels["✨ Lastest Hub Movies"].push(ch);
     }
     else if (groupLower.includes("latest movies")) {
       groupedChannels["latest movies"].push(ch);
     }
     else if (groupLower.includes("18+") || groupLower.includes("adult")) {
-      ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="🔞18+"');
-      ch.groupTitle = "🔞18+";
-      groupedChannels["🔞18+"].push(ch);
+      ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="ðŸ”ž18+"');
+      ch.groupTitle = "ðŸ”ž18+";
+      groupedChannels["ðŸ”ž18+"].push(ch);
     }
     else if (groupLower.includes("filmyfy latest")) {
       groupedChannels["filmyfy latest"].push(ch);
