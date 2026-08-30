@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     const url9 = "https://icy-pond-60ea.poonamchouhan076.workers.dev/";
     const ur20 = "https://divine-moon-058f.poonamchouhan076.workers.dev/";
     const ur21 = "https://raw.githubusercontent.com/Prtstream820894/Api/refs/heads/main/world.m3u";
-    const ur22 = "https://divine-moon-058f.poonamchouhan076.workers.dev/";// Nayi NCC playlist add ki gayi hai
+    const ur22 = "https://hdhub4u-lake-f103.poonamchouhan076.workers.dev/";// Nayi NCC playlist add ki gayi hai
   
     
 
