@@ -90,15 +90,15 @@ export default {
         const originalGroup = ch.groupTitle.trim();
         const groupLower = originalGroup.toLowerCase();
 
-        // Font/Unicode se bachne ke liye keywords check kar rahe hain
-        if (groupLower.includes("live") || groupLower.includes("event") || groupLower.includes("ʟɪᴠᴇ") || groupLower.includes("ᴇᴠᴇɴᴛ")) {
-          ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, `group-title="${targetLiveKey}"`);
-          ch.groupTitle = targetLiveKey;
-          groupedChannels[targetLiveKey].push(ch);
-        } else if (groupLower.includes("upcoming")) {
+        // Pehle upcoming check karenge taaki woh live mein na jaye
+        if (groupLower.includes("upcoming")) {
           ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨Upcoming Events✨"');
           ch.groupTitle = "✨Upcoming Events✨";
           groupedChannels["✨Upcoming Events✨"].push(ch);
+        } else if (groupLower.includes("live") || groupLower.includes("event") || groupLower.includes("ʟɪᴠᴇ") || groupLower.includes("ᴇᴠᴇɴᴛ")) {
+          ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, `group-title="${targetLiveKey}"`);
+          ch.groupTitle = targetLiveKey;
+          groupedChannels[targetLiveKey].push(ch);
         } else if (groupLower === "sports") {
           groupedChannels["sports"].push(ch);
         } else if (groupLower.includes("new movies")) {
