@@ -77,8 +77,8 @@ try {
         }  
 
         fifaChannel = {  
-          extinf: line.replace(/group-title="[^"]+"/, 'group-title="âœ¨âœ¦ÊŸÉªá´ á´‡ á´‡á´ á´‡É´á´›êœ±âœ¦âœ¨"'),  
-          groupTitle: "âœ¨âœ¦ÊŸÉªá´ á´‡ á´‡á´ á´‡É´á´›êœ±âœ¦âœ¨",  
+          extinf: line.replace(/group-title="[^"]+"/, 'group-title="✨ Live Events ✨"'),  
+          groupTitle: "✨ Live Events ✨",  
           extraMetadata: [],  
           url: ""  
         };  
@@ -96,28 +96,28 @@ try {
   }  
 
   const groupOrder = [
-  "âœ¨âœ¦ÊŸÉªá´ á´‡ á´‡á´ á´‡É´á´›êœ±âœ¦âœ¨",
-  "new movies",
-  "✨ Lastest Hub Movies",
-  "latest movies",
-  "ðŸ”ž18+",
-  "filmyfy latest",
-  "highlights",
-  "âœ¨Upcoming Eventsâœ¨",
-  "sports",
-  "south",
-  "bollywood movies",
-  "hollywood movies",
-  "web series",
-  "tv show",
-  "entertainment",
-  "movies",
-  "music",
-  "news",
-  "kids"
-];
+    "✨ Live Events ✨",
+    "new movies",
+    "✨ Lastest Hub Movies",
+    "latest movies",
+    "🔞18+",
+    "filmyfy latest",
+    "highlights",
+    "✨Upcoming Events✨",
+    "sports",
+    "south",
+    "bollywood movies",
+    "hollywood movies",
+    "web series",
+    "tv show",
+    "entertainment",
+    "movies",
+    "music",
+    "news",
+    "kids"
+  ];
 
-  const targetLiveKey = "âœ¨âœ¦ÊŸÉªá´ á´‡ á´‡á´ á´‡É´á´›êœ±âœ¦âœ¨";  
+  const targetLiveKey = "✨ Live Events ✨";  
 
   let groupedChannels = {};  
   for (let j = 0; j < groupOrder.length; j++) {  
@@ -127,31 +127,20 @@ try {
 
   let sportsCount = 0;  
 
-  const getMetadata = (extinf) => {  
-    const commaIdx = extinf.lastIndexOf(",");  
-    const title = commaIdx !== -1 ? extinf.substring(commaIdx + 1).trim().toLowerCase() : "";  
-    const logoMatch = extinf.match(/tvg-logo="([^"]+)"/i);  
-    return {  
-      title,  
-      logo: logoMatch ? logoMatch[1].trim().toLowerCase() : ""  
-    };  
-  };  
-
   for (let i = 0; i < channels.length; i++) {  
     const ch = channels[i];  
     const originalGroup = ch.groupTitle.trim();  
     const groupLower = originalGroup.toLowerCase();  
-    const meta = getMetadata(ch.extinf);  
 
     if (groupLower.includes("sonyliv") || groupLower.includes("fancode") || originalGroup === targetLiveKey || groupLower.includes("live event")) {  
       ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, `group-title="${targetLiveKey}"`);  
       ch.groupTitle = targetLiveKey;  
       groupedChannels[targetLiveKey].push(ch);  
     }   
-    else if (originalGroup === "âœ¨Upcoming Eventsâœ¨" || groupLower.includes("upcoming event")) {  
-      ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="âœ¨Upcoming Eventsâœ¨"');  
-      ch.groupTitle = "âœ¨Upcoming Eventsâœ¨";  
-      groupedChannels["âœ¨Upcoming Eventsâœ¨"].push(ch);  
+    else if (groupLower.includes("upcoming event")) {  
+      ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨Upcoming Events✨"');  
+      ch.groupTitle = "✨Upcoming Events✨";  
+      groupedChannels["✨Upcoming Events✨"].push(ch);  
     }  
     else if (groupLower === "sports") {  
       if (sportsCount < 0) {   
@@ -166,16 +155,20 @@ try {
     else if (groupLower.includes("new movies")) {
       groupedChannels["new movies"].push(ch);
     }
-    else if (groupLower.includes("✨ Lastest Hub Movies")) {
+    // Updated check using includes to safely catch "lastest hub movies" regardless of special character encoding issues
+    else if (groupLower.includes("lastest hub movies") || groupLower.includes("hub movies")) {
+      // Normalize group title in playlist to match the exact order key
+      ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="✨ Lastest Hub Movies"');
+      ch.groupTitle = "✨ Lastest Hub Movies";
       groupedChannels["✨ Lastest Hub Movies"].push(ch);
     }
     else if (groupLower.includes("latest movies")) {
       groupedChannels["latest movies"].push(ch);
     }
     else if (groupLower.includes("18+") || groupLower.includes("adult")) {
-      ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="ðŸ”ž18+"');
-      ch.groupTitle = "ðŸ”ž18+";
-      groupedChannels["ðŸ”ž18+"].push(ch);
+      ch.extinf = ch.extinf.replace(/group-title="[^"]+"/, 'group-title="🔞18+"');
+      ch.groupTitle = "🔞18+";
+      groupedChannels["🔞18+"].push(ch);
     }
     else if (groupLower.includes("filmyfy latest")) {
       groupedChannels["filmyfy latest"].push(ch);
