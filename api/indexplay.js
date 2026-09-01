@@ -59,12 +59,12 @@ export default async function handler(req, res) {
 
     const responses = await Promise.all([
       fetchWithTimeout(url1, 20000),
-      fetchWithTimeout(url2, 18000),
-      fetchWithTimeout(url3, 15000),
-      fetchWithTimeout(url4, 8000),
-      fetchWithTimeout(url5, 8000),
-      fetchWithTimeout(url6, 8000),
-      fetchWithTimeout(url7, 8000),
+      fetchWithTimeout(url2, 20000),
+      fetchWithTimeout(url3, 20000),
+      fetchWithTimeout(url4, 20000),
+      fetchWithTimeout(url5, 20000),
+      fetchWithTimeout(url6, 20000),
+      fetchWithTimeout(url7, 20000),
       fetchWithTimeout(url8, 30000),// Nayi URL ke liye timeout add kiya gaya hai
     ]);
 
