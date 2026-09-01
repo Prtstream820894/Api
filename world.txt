@@ -1,5 +1,34 @@
 #EXTM3U
 
+
+
+#EXTINF:-1 tvg-id="SET HD.in" tvg-name="SET HD" group-title="🌍Worldwide" tvg-logo="https://i.postimg.cc/zXgMfMMw/sethd.webp",SET HD
+http://38.96.178.205/SONYHD/index.m3u8
+
+#EXTINF:-1 group-title="🌍Worldwide" tvg-logo="https://i.ytimg.com/vi/Z8C6dto0Qjc/maxresdefault.jpg",Sony One | Action HITS
+https://89514e758f814907be6d14bbc0aa66b7.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-800-UK-SONYONEACTIONHITS-LG_UK/playlist.m3u8
+
+#EXTINF:-1 group-title="🌍Worldwide" tvg-logo="https://i.ytimg.com/vi/RlgBes0LMXo/sddefault.jpg",Sony One | Comedy HITS
+https://9f8e2ffcd87f4c469be7194e48f84874.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-802-UK-SONYONECOMEDYHITS-LG_UK/playlist.m3u8
+
+#EXTINF:-1 group-title="🌍Worldwide" tvg-logo="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/e9c044f2-3aa1-4fee-94ae-5445d49a988a/delgzci-8a48149c-b3d2-4384-92aa-e37c8f329316.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi9lOWMwNDRmMi0zYWExLTRmZWUtOTRhZS01NDQ1ZDQ5YTk4OGEvZGVsZ3pjaS04YTQ4MTQ5Yy1iM2QyLTQzODQtOTJhYS1lMzdjOGYzMjkzMTYucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.RUi6S8BWV0LLmlF3VfOzMUaJC1TBZEaWILW4ZoPvs4w",Sony One | Comedy TV
+https://ec613694ee5049d3b8f30913b619662e.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-804-UK-SONYONECOMEDYTV-LG_UK/playlist.m3u8
+
+#EXTINF:-1 group-title="🌍Worldwide" tvg-logo="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVdUeFz8yY_bPQGTiYZ4xReqeNIWjfihHBcqOpbe-3BkJXBj_X9kntPBs&s=10",Sony One | Dragons' Den
+https://5dae1f2dfec54d8f9992b7d2ac0bc627.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-810-UK-SONYONEDRAGONSDEN-LG_UK/playlist.m3u8
+
+#EXTINF:-1 group-title="🌍Worldwide" tvg-logo="https://www.notebookcheck.net/fileadmin/Notebooks/News/_nc4/Notebookcheck17.jpg",Sony One | FAVES
+https://8a4805800dac428ebbf1d3cde0cdcf87.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-806-UK-SONYONEFAVES-LG_UK/playlist.m3u8
+
+#EXTINF:-1 group-title="🌍Worldwide" tvg-logo="https://i.ytimg.com/vi/R_P0_UIGSsQ/maxresdefault.jpg",Sony One | Thriller TV
+https://52aad07d9d4f4d479d9b27e08ddf9e8b.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-808-UK-SONYONETHRILLERTV-LG_UK/playlist.m3u8
+
+#EXTINF:-1 group-title="🌍Worldwide" tvg-chno="114" tvg-id="National.Geographic.HD.us2" tvg-name="Nat Geo" tvg-logo="https://downloadr2.apkmirror.com/wp-content/uploads/2018/04/5aca89bad1118.png",NAT GEO (US)
+http://23.237.104.106:8080/USA_NAT_GEO/index.m3u8
+
+#EXTINF:-1 group-title="🌍Worldwide" tvg-chno="115" tvg-id="National.Geographic.Wild.HD.us2" tvg-name="Nat Geo Wild" tvg-logo="https://yt3.googleusercontent.com/ytc/AIdro_nfdGvnXdpe3olxwYAXGzKLYZY-I-_wzbWDdAN8Na7r=s900-c-k-c0x00ffffff-no-rj",NAT GEO WILD (US)
+http://23.237.104.106:8080/USA_NAT_GEO_WILD/index.m3u8
+
 #EXTINF:-1 group-title="🌍Worldwide" tvg-id="&TV HD" tvg-logo="https://i.ibb.co.com/Kj5gRmgZ/andtv.png",&TV HD
 #KODIPROP:inputstream.adaptive.license_type=clearkey
 #KODIPROP:inputstream.adaptive.license_key=67d18634ccb04875875c60fb8d9caaba:99a66471c09e4b8a8dc39a0de6803f75
@@ -151,33 +180,6 @@ https://d1g8wgjurz8via.cloudfront.net/bpk-tv/Shortstv2/default/manifest.mpd
 #KODIPROP:inputstream.adaptive.manifest.type=mpd
 https://s2129134.cdn.mytvnet.vn/pkg20/live_dzones/ap.smil/manifest.mpd
 
-#EXTINF:-1 tvg-id="SET HD.in" tvg-name="SET HD" group-title="🌍Worldwide" tvg-logo="https://i.postimg.cc/zXgMfMMw/sethd.webp",SET HD
-http://38.96.178.205/SONYHD/index.m3u8
-
-#EXTINF:-1 group-title="🌍Worldwide" tvg-logo="https://i.ytimg.com/vi/Z8C6dto0Qjc/maxresdefault.jpg",Sony One | Action HITS
-https://89514e758f814907be6d14bbc0aa66b7.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-800-UK-SONYONEACTIONHITS-LG_UK/playlist.m3u8
-
-#EXTINF:-1 group-title="🌍Worldwide" tvg-logo="https://i.ytimg.com/vi/RlgBes0LMXo/sddefault.jpg",Sony One | Comedy HITS
-https://9f8e2ffcd87f4c469be7194e48f84874.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-802-UK-SONYONECOMEDYHITS-LG_UK/playlist.m3u8
-
-#EXTINF:-1 group-title="🌍Worldwide" tvg-logo="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/e9c044f2-3aa1-4fee-94ae-5445d49a988a/delgzci-8a48149c-b3d2-4384-92aa-e37c8f329316.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi9lOWMwNDRmMi0zYWExLTRmZWUtOTRhZS01NDQ1ZDQ5YTk4OGEvZGVsZ3pjaS04YTQ4MTQ5Yy1iM2QyLTQzODQtOTJhYS1lMzdjOGYzMjkzMTYucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.RUi6S8BWV0LLmlF3VfOzMUaJC1TBZEaWILW4ZoPvs4w",Sony One | Comedy TV
-https://ec613694ee5049d3b8f30913b619662e.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-804-UK-SONYONECOMEDYTV-LG_UK/playlist.m3u8
-
-#EXTINF:-1 group-title="🌍Worldwide" tvg-logo="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVdUeFz8yY_bPQGTiYZ4xReqeNIWjfihHBcqOpbe-3BkJXBj_X9kntPBs&s=10",Sony One | Dragons' Den
-https://5dae1f2dfec54d8f9992b7d2ac0bc627.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-810-UK-SONYONEDRAGONSDEN-LG_UK/playlist.m3u8
-
-#EXTINF:-1 group-title="🌍Worldwide" tvg-logo="https://www.notebookcheck.net/fileadmin/Notebooks/News/_nc4/Notebookcheck17.jpg",Sony One | FAVES
-https://8a4805800dac428ebbf1d3cde0cdcf87.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-806-UK-SONYONEFAVES-LG_UK/playlist.m3u8
-
-#EXTINF:-1 group-title="🌍Worldwide" tvg-logo="https://i.ytimg.com/vi/R_P0_UIGSsQ/maxresdefault.jpg",Sony One | Thriller TV
-https://52aad07d9d4f4d479d9b27e08ddf9e8b.mediatailor.us-west-2.amazonaws.com/v1/master/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-808-UK-SONYONETHRILLERTV-LG_UK/playlist.m3u8
-
-#EXTINF:-1 group-title="🌍Worldwide" tvg-chno="114" tvg-id="National.Geographic.HD.us2" tvg-name="Nat Geo" tvg-logo="https://downloadr2.apkmirror.com/wp-content/uploads/2018/04/5aca89bad1118.png",NAT GEO (US)
-http://23.237.104.106:8080/USA_NAT_GEO/index.m3u8
-
-#EXTINF:-1 group-title="🌍Worldwide" tvg-chno="115" tvg-id="National.Geographic.Wild.HD.us2" tvg-name="Nat Geo Wild" tvg-logo="https://yt3.googleusercontent.com/ytc/AIdro_nfdGvnXdpe3olxwYAXGzKLYZY-I-_wzbWDdAN8Na7r=s900-c-k-c0x00ffffff-no-rj",NAT GEO WILD (US)
-http://23.237.104.106:8080/USA_NAT_GEO_WILD/index.m3u8
-
 #EXTINF:-1 tvg-id="858986" group-title="🌎 Worldwide | Nl India Eu" tvg-logo="https://cdn.artstation.com/p/thumbnails/000/380/519/thumb.jpg", Star Plus HD 1080p
 https://ranapkx.site/RANAPK33k/TVD/play.php?id=858986&e=.m3u8
 
@@ -246,9 +248,7 @@ https://ranapkx.site/RANAPK33k/TVD/play.php?id=859005&e=.m3u8
 
 
 
-#EXTINF:-1 tvg-id="372697" group-title="🌎 Worldwide | Hindi India Eu" tvg-logo="http://picon.tivi-ott.net:25461/picon/INDIA/utsavbharat.png",┃IN┃ UTSAV BHARAT HD (UK)
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=372697&e=.m3u8
-#EXTINF:-1 tvg-id="728526" group-title="🌎 Worldwide | Hindi India Eu" tvg-logo="http://picon.tivi-ott.net:25461/picon/INDIA/utsavbharat.png",┃IN┃ UTSAV BHARAT (UK)  ⏺ʳᵉᶜ
+#EXTINF:-1 tvg-id="728526" group-title="🌎 Worldwide | Hindi India Eu" tvg-logo="https://yt3.googleusercontent.com/JfcP1XW02QYjf9sUDmYo0sygYsjoHu41MKSZSzTDxphpnlPczVa1kTyI821CePGIHHVDxOYH=s900-c-k-c0x00ffffff-no-rj",STAR BHARAT (UK)  ⏺ʳᵉᶜ
 https://ranapkx.site/RANAPK33k/TVD/play.php?id=728526&e=.m3u8
 #EXTINF:-1 tvg-id="824003" group-title="🌎 Worldwide | Hindi India Eu" tvg-logo="http://picon.tivi-ott.net:25461/picon/INDIA/zeetv.png",┃IN┃ ZEE TV 4K HEVC (UK)
 https://ranapkx.site/RANAPK33k/TVD/play.php?id=824003&e=.m3u8
@@ -834,118 +834,7 @@ https://ranapkx.site/RANAPK33k/TVD/play.php?id=1433163&e=.m3u8
 https://ranapkx.site/RANAPK33k/TVD/play.php?id=1433170&e=.m3u8
 #EXTINF:-1 tvg-id="1433161" group-title="🌎 Worldwide | Hindi India" tvg-logo="http://picon.tivi-ott.net:25461/picon/INDIA/HINDI INDIA/ZEE ZEST.png",┃HINDI┃ ZEE ZEST HD
 https://ranapkx.site/RANAPK33k/TVD/play.php?id=1433161&e=.m3u8
-#EXTINF:-1 tvg-id="865000" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/PUTHIYA THALAIMURAI.png",┃TM┃ PUTHIYA THALAIMURAI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=865000&e=.m3u8
-#EXTINF:-1 tvg-id="908551" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/ADHTIYA TV.png",┃TM┃ ADHTIYA TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908551&e=.m3u8
-#EXTINF:-1 tvg-id="908552" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/ANGEL TV HD.png",┃TM┃ ANGEL TV HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908552&e=.m3u8
-#EXTINF:-1 tvg-id="908583" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/CHUTTI TV.png",┃TM┃ CHUTTI TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908583&e=.m3u8
-#EXTINF:-1 tvg-id="908553" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/COLORS TAMIL HD.png",┃TM┃ COLORS TAMIL HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908553&e=.m3u8
-#EXTINF:-1 tvg-id="908554" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/DD PODHIGAI.png",┃TM┃ DD PODHIGAI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908554&e=.m3u8
-#EXTINF:-1 tvg-id="908582" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/DD SAPTAGIRI.png",┃TM┃ DD SAPTAGIRI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908582&e=.m3u8
-#EXTINF:-1 tvg-id="908584" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/DISCOVERY KIDS TAMIL.png",┃TM┃ DISCOVERY KIDS TAMIL
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908584&e=.m3u8
-#EXTINF:-1 tvg-id="908555" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/DISCOVERY WORLD.png",┃TM┃ DISCOVERY WORLD HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908555&e=.m3u8
-#EXTINF:-1 tvg-id="908579" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/FLOWERS TV.png",┃TM┃ FLOWERS TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908579&e=.m3u8
-#EXTINF:-1 tvg-id="908556" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/FOX LIFE HD.png",┃TM┃ FOX LIFE HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908556&e=.m3u8
-#EXTINF:-1 tvg-id="908557" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/HISTORY TV18 HD.png",┃TM┃ HISTORY TV18 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908557&e=.m3u8
-#EXTINF:-1 tvg-id="908575" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/IBC BAKTHI.png",┃TM┃ IBC BAKTHI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908575&e=.m3u8
-#EXTINF:-1 tvg-id="908577" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/IBC COMEDY.png",┃TM┃ IBC COMEDY
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908577&e=.m3u8
-#EXTINF:-1 tvg-id="908576" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/IBC TAMIL.png",┃TM┃ IBC TAMIL
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908576&e=.m3u8
-#EXTINF:-1 tvg-id="908603" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/IMAYAM TV.png",┃TM┃ IMAYAM TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908603&e=.m3u8
-#EXTINF:-1 tvg-id="908581" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/JAYA MAX.png",┃TM┃ JAYA MAX
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908581&e=.m3u8
-#EXTINF:-1 tvg-id="908596" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/JAYA MAX.png",┃TM┃ JAYA MAX
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908596&e=.m3u8
-#EXTINF:-1 tvg-id="908580" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/JAYA PLUS.png",┃TM┃ JAYA PLUS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908580&e=.m3u8
-#EXTINF:-1 tvg-id="908558" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/JAYA TV HD.png",┃TM┃ JAYA TV HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908558&e=.m3u8
-#EXTINF:-1 tvg-id="908605" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/J MOVIES.png",┃TM┃ J MOVIES
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908605&e=.m3u8
-#EXTINF:-1 tvg-id="908559" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/KTV HD.png",┃TM┃ KTV HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908559&e=.m3u8
-#EXTINF:-1 tvg-id="908602" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/MADHA TV.png",┃TM┃ MADHA TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908602&e=.m3u8
-#EXTINF:-1 tvg-id="908592" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/MAKKAL TV.png",┃TM┃ MAKKAL TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908592&e=.m3u8
-#EXTINF:-1 tvg-id="908599" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/MK TV.png",┃TM┃ MK TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908599&e=.m3u8
-#EXTINF:-1 tvg-id="908601" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/MOON TV.png",┃TM┃ MOON TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908601&e=.m3u8
-#EXTINF:-1 tvg-id="908560" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/NAT GEO WILD HD.png",┃TM┃ NAT GEO WILD HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908560&e=.m3u8
-#EXTINF:-1 tvg-id="908561" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/NATIONAL GEOGRAPHIC HD.png",┃TM┃ NATIONAL GEOGRAPHIC HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908561&e=.m3u8
-#EXTINF:-1 tvg-id="908562" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/NEWS 18 TAMIL NADU.png",┃TM┃ NEWS 18 TAMIL NADU
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908562&e=.m3u8
-#EXTINF:-1 tvg-id="908589" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/POLIMER NEWS.png",┃TM┃ POLIMER NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908589&e=.m3u8
-#EXTINF:-1 tvg-id="908594" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/POLIMER TV.png",┃TM┃ POLIMER TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908594&e=.m3u8
-#EXTINF:-1 tvg-id="908585" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/PUTHUYUGAM.png",┃TM┃ PUTHUYUGAM
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908585&e=.m3u8
-#EXTINF:-1 tvg-id="908593" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/RAJ DIGITAL PLUS.png",┃TM┃ RAJ DIGITAL PLUS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908593&e=.m3u8
-#EXTINF:-1 tvg-id="908563" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/RAJ MUSIX.png",┃TM┃ RAJ MUSIX
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908563&e=.m3u8
-#EXTINF:-1 tvg-id="908590" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/RAJ NEWS.png",┃TM┃ RAJ NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908590&e=.m3u8
-#EXTINF:-1 tvg-id="908564" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/RAJ TV.png",┃TM┃ RAJ TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908564&e=.m3u8
-#EXTINF:-1 tvg-id="908597" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/SAHANA TV.png",┃TM┃ SAHANA TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908597&e=.m3u8
-#EXTINF:-1 tvg-id="908598" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/SALVATION TV.png",┃TM┃ SALVATION TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908598&e=.m3u8
-#EXTINF:-1 tvg-id="908591" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/SATHIYAM TV.png",┃TM┃ SATHIYAM TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908591&e=.m3u8
-#EXTINF:-1 tvg-id="908565" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/SONY BBC EARTH HD.png",┃TM┃ SONY BBC EARTH HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908565&e=.m3u8
-#EXTINF:-1 tvg-id="908587" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/SONY YAY.png",┃TM┃ SONY YAY
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908587&e=.m3u8
-#EXTINF:-1 tvg-id="908566" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/STAR VIJAY HD.png",┃TM┃ STAR VIJAY HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908566&e=.m3u8
-#EXTINF:-1 tvg-id="908567" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/SUN LIFE.png",┃TM┃ SUN LIFE
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908567&e=.m3u8
-#EXTINF:-1 tvg-id="908568" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/SUN MUSIC HD.png",┃TM┃ SUN MUSIC HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908568&e=.m3u8
-#EXTINF:-1 tvg-id="908569" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/SUN NEWS.png",┃TM┃ SUN NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908569&e=.m3u8
-#EXTINF:-1 tvg-id="908570" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/SUN TV HD.png",┃TM┃ SUN TV HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908570&e=.m3u8
-#EXTINF:-1 tvg-id="908600" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/TAMILAN TV.png",┃TM┃ TAMILAN TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908600&e=.m3u8
-#EXTINF:-1 tvg-id="908571" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/TATA SKY TAMIL CINEMA.png",┃TM┃ TATA SKY TAMIL CINEMA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908571&e=.m3u8
-#EXTINF:-1 tvg-id="908586" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/THANTHI TV.png",┃TM┃ THANTHI TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908586&e=.m3u8
-#EXTINF:-1 tvg-id="908578" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/TVI HD.png",┃TM┃ TVI HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908578&e=.m3u8
-#EXTINF:-1 tvg-id="908604" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/VALICHAM PLUS.png",┃TM┃ VALICHAM PLUS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908604&e=.m3u8
-#EXTINF:-1 tvg-id="908572" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/VASANTH TV.png",┃TM┃ VASANTH TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908572&e=.m3u8
-#EXTINF:-1 tvg-id="908573" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/VIJAY SUPER HD.png",┃TM┃ VIJAY SUPER HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908573&e=.m3u8
-#EXTINF:-1 tvg-id="908588" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/ZEE TAMIL FHD.png",┃TM┃ ZEE TAMIL FHD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908588&e=.m3u8
-#EXTINF:-1 tvg-id="908574" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/ZEE TAMIL HD.png",┃TM┃ ZEE TAMIL HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908574&e=.m3u8
-#EXTINF:-1 tvg-id="908595" group-title="🌎 Worldwide | Asia Tamil" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL/ZEE THIRAI.png",┃TM┃ ZEE THIRAI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908595&e=.m3u8
+
 #EXTINF:-1 tvg-id="373207" group-title="🌎 Worldwide | Asia Sports" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/SPORTS/Star_Sports_First.png",┃SPORTS┃ STAR SPORTS FIRST
 https://ranapkx.site/RANAPK33k/TVD/play.php?id=373207&e=.m3u8
 #EXTINF:-1 tvg-id="373206" group-title="🌎 Worldwide | Asia Sports" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/SPORTS/starsports1.png",┃SPORTS┃ STAR SPORTS 1 HD ENGLISH
@@ -1012,339 +901,10 @@ https://ranapkx.site/RANAPK33k/TVD/play.php?id=373312&e=.m3u8
 https://ranapkx.site/RANAPK33k/TVD/play.php?id=373307&e=.m3u8
 #EXTINF:-1 tvg-id="373304" group-title="🌎 Worldwide | Asia English" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/ENGLISH/Star_Movies.png",┃ENGLISH┃ STAR MOVIES HD
 https://ranapkx.site/RANAPK33k/TVD/play.php?id=373304&e=.m3u8
-#EXTINF:-1 tvg-id="373373" group-title="🌎 Worldwide | Asia Gujarati" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/GUJARATI/COLORSGUJARATI.png",┃GUJARATI┃ COLORS GUJARATI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373373&e=.m3u8
-#EXTINF:-1 tvg-id="373372" group-title="🌎 Worldwide | Asia Gujarati" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/GUJARATI/COLORS GUJARATI CINEMA.png",┃GUJARATI┃ COLORS GUJARATI CINEMA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373372&e=.m3u8
-#EXTINF:-1 tvg-id="373371" group-title="🌎 Worldwide | Asia Gujarati" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/GUJARATI/Gstv_00.png",┃GUJARATI┃ GSTV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373371&e=.m3u8
-#EXTINF:-1 tvg-id="373370" group-title="🌎 Worldwide | Asia Gujarati" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/GUJARATI/India-News-Gujrat_5.png",┃GUJARATI┃ INDIA NEWS GUJARAT
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373370&e=.m3u8
-#EXTINF:-1 tvg-id="373369" group-title="🌎 Worldwide | Asia Gujarati" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/GUJARATI/Lakshya_TV.png",┃GUJARATI┃ LAKSHYA TV HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373369&e=.m3u8
-#EXTINF:-1 tvg-id="373368" group-title="🌎 Worldwide | Asia Gujarati" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/GUJARATI/Mantavya_News.png",┃GUJARATI┃ MANTAVYA NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373368&e=.m3u8
-#EXTINF:-1 tvg-id="373367" group-title="🌎 Worldwide | Asia Gujarati" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/GUJARATI/Sandesh_News.png",┃GUJARATI┃ SANDESH NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373367&e=.m3u8
-#EXTINF:-1 tvg-id="373366" group-title="🌎 Worldwide | Asia Gujarati" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/GUJARATI/NDTV_247.png",┃GUJARATI┃ VTV NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373366&e=.m3u8
-#EXTINF:-1 tvg-id="373365" group-title="🌎 Worldwide | Asia Gujarati" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/GUJARATI/CNBC_Bajar.png",┃GUJARATI┃ CNBC BAZAR
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373365&e=.m3u8
-#EXTINF:-1 tvg-id="373364" group-title="🌎 Worldwide | Asia Gujarati" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/GUJARATI/Kartavya_TV.png",┃GUJARATI┃ KARTAVYA TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373364&e=.m3u8
-#EXTINF:-1 tvg-id="373363" group-title="🌎 Worldwide | Asia Gujarati" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/GUJARATI/tv9news.png",┃GUJARATI┃ TV9 NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373363&e=.m3u8
-#EXTINF:-1 tvg-id="373362" group-title="🌎 Worldwide | Asia Gujarati" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/GUJARATI/ABP_Asmita_logo.svg.png",┃GUJARATI┃ ABP ASMITA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373362&e=.m3u8
-#EXTINF:-1 tvg-id="373361" group-title="🌎 Worldwide | Asia Gujarati" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/GUJARATI/CNBC_Awaaz.png",┃GUJARATI┃ CNBC AAWAZ
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373361&e=.m3u8
-#EXTINF:-1 tvg-id="373405" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Amrita_TV.svg.png",┃MALAYALAM┃ AMRITHA TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373405&e=.m3u8
-#EXTINF:-1 tvg-id="373404" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/1200px-Asianet_Logo.svg.png",┃MALAYALAM┃ ASIANET HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373404&e=.m3u8
-#EXTINF:-1 tvg-id="373403" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Flowers_TV_2023_logo.png",┃MALAYALAM┃ FLOWERS TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373403&e=.m3u8
-#EXTINF:-1 tvg-id="373402" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Kairali_TV.svg.png",┃MALAYALAM┃ KAIRALI PEOPLE TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373402&e=.m3u8
-#EXTINF:-1 tvg-id="373401" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Kochu_TV.png",┃MALAYALAM┃ KOCHU TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373401&e=.m3u8
-#EXTINF:-1 tvg-id="373400" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/92907-MazhavilManorama.png",┃MALAYALAM┃ MAZAVIL MANORAMA HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373400&e=.m3u8
-#EXTINF:-1 tvg-id="373399" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/News18_Kerala.png",┃MALAYALAM┃ NEWS 18 KERALA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373399&e=.m3u8
-#EXTINF:-1 tvg-id="373398" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Raj_msx_tamil.png",┃MALAYALAM┃ RAJ MUSIC
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373398&e=.m3u8
-#EXTINF:-1 tvg-id="373397" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Asianet_Movies.png",┃MALAYALAM┃ ASIANET MOVIE
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373397&e=.m3u8
-#EXTINF:-1 tvg-id="373396" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Asianet_Plus.png",┃MALAYALAM┃ ASIANET PLUS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373396&e=.m3u8
-#EXTINF:-1 tvg-id="373395" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Surya_Movies_TV_Logo.png",┃MALAYALAM┃ SURYA MOVIES
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373395&e=.m3u8
-#EXTINF:-1 tvg-id="373394" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Surya_TV.png",┃MALAYALAM┃ SURYA TV HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373394&e=.m3u8
-#EXTINF:-1 tvg-id="373393" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/we-tv.png",┃MALAYALAM┃ WE TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373393&e=.m3u8
-#EXTINF:-1 tvg-id="373392" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Asianet_News_Logo.png",┃MALAYALAM┃ ASIANET NEWS HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373392&e=.m3u8
-#EXTINF:-1 tvg-id="373391" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Manorama_News_3D.png",┃MALAYALAM┃ MANORAMA NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373391&e=.m3u8
-#EXTINF:-1 tvg-id="373390" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/suryamusic.png",┃MALAYALAM┃ SURYA MUSIC
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373390&e=.m3u8
-#EXTINF:-1 tvg-id="373389" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Janam_TV_logo.png",┃MALAYALAM┃ JANAM TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373389&e=.m3u8
-#EXTINF:-1 tvg-id="373388" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Zee_Keralam-HD.png",┃MALAYALAM┃ ZEE KERALAM HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373388&e=.m3u8
-#EXTINF:-1 tvg-id="373387" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/DD_Malayalam_2023_logo%20(1).png",┃MALAYALAM┃ DD MALAYALAM
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373387&e=.m3u8
-#EXTINF:-1 tvg-id="373386" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Jaihind_TV_Logo.png",┃MALAYALAM┃ JAIHIND TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373386&e=.m3u8
-#EXTINF:-1 tvg-id="373385" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/mathrumbhubi.png",┃MALAYALAM┃ MATHRUBHUMI NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373385&e=.m3u8
-#EXTINF:-1 tvg-id="373384" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/2560px-YuppTV_logo.svg.png",┃MALAYALAM┃ REPORTER TV YUPP
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373384&e=.m3u8
-#EXTINF:-1 tvg-id="373383" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Kappa_tv_Channel_Logo.png",┃MALAYALAM┃ KAPPA TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373383&e=.m3u8
-#EXTINF:-1 tvg-id="373382" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/rai-news-24-new1127.png",┃MALAYALAM┃ RAJ NEWS MALAYALAM
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373382&e=.m3u8
-#EXTINF:-1 tvg-id="373381" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Safari-Television-Added-on-Sun-Direct.png",┃MALAYALAM┃ SAFARI TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373381&e=.m3u8
-#EXTINF:-1 tvg-id="373380" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Kairali_TV.svg.png",┃MALAYALAM┃ KAIRALI ARABIA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373380&e=.m3u8
-#EXTINF:-1 tvg-id="373379" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/Kairali_TV.svg.png",┃MALAYALAM┃ KAIRALI NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373379&e=.m3u8
-#EXTINF:-1 tvg-id="373378" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/kaumudy.png",┃MALAYALAM┃ KAUMUDY
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373378&e=.m3u8
-#EXTINF:-1 tvg-id="373377" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/ShalomTVlogo.png",┃MALAYALAM┃ SHOLAM TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373377&e=.m3u8
-#EXTINF:-1 tvg-id="373376" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/24 NEWS MALAYALAM.png",┃MALAYALAM┃ 24 NEWS MALAYALAM
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373376&e=.m3u8
-#EXTINF:-1 tvg-id="373375" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/powervisiontv-1.png",┃MALAYALAM┃ POWER VISION
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373375&e=.m3u8
-#EXTINF:-1 tvg-id="373374" group-title="🌎 Worldwide | Asia Malayalam" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MALAYALAM/bigboss.png",┃MALAYALAM┃ BIGG BOSS 24X7 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373374&e=.m3u8
-#EXTINF:-1 tvg-id="373426" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/Colors_Kannada.png",┃ KANNADA ┃ COLORS KANNADA HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373426&e=.m3u8
-#EXTINF:-1 tvg-id="373425" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/Colors_Kannada.png",┃ KANNADA ┃ COLORS KANNADA MOVIES
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373425&e=.m3u8
-#EXTINF:-1 tvg-id="373424" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/Colors_Super.png",┃ KANNADA ┃ COLORS SUPER
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373424&e=.m3u8
-#EXTINF:-1 tvg-id="373423" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/sakkath.png",┃ KANNADA ┃ SAKKAT HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373423&e=.m3u8
-#EXTINF:-1 tvg-id="373422" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/kasturi.png",┃ KANNADA ┃ REBULIC KANNADA TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373422&e=.m3u8
-#EXTINF:-1 tvg-id="373421" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/NDTV_640px-News18_Kannada_logo247.png",┃ KANNADA ┃ NEWS 18
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373421&e=.m3u8
-#EXTINF:-1 tvg-id="373420" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/Kannada_Raj_musix.png",┃ KANNADA ┃ RAJ MUSIC
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373420&e=.m3u8
-#EXTINF:-1 tvg-id="373419" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/Kannada_Raj_News.png",┃ KANNADA ┃ RAJ NEWS KANNADA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373419&e=.m3u8
-#EXTINF:-1 tvg-id="373418" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/Star_Suvarna.png",┃ KANNADA ┃ STAR SUVARNA HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373418&e=.m3u8
-#EXTINF:-1 tvg-id="373417" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/Star_Suvarna.png",┃ KANNADA ┃ STAR SUVARNA NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373417&e=.m3u8
-#EXTINF:-1 tvg-id="373416" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/tv9kannada.png",┃ KANNADA ┃ TV9 KANNADA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373416&e=.m3u8
-#EXTINF:-1 tvg-id="373415" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/udayahd.png",┃ KANNADA ┃ UDAYA HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373415&e=.m3u8
-#EXTINF:-1 tvg-id="373414" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/Udaya_Comedy.png",┃ KANNADA ┃ UDAYA COMEDY
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373414&e=.m3u8
-#EXTINF:-1 tvg-id="373413" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/Udaya_Movies.png",┃ KANNADA ┃ UDAYA MOVIES
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373413&e=.m3u8
-#EXTINF:-1 tvg-id="373412" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/Suvarna_News_New_Logo.png",┃ KANNADA ┃ SUVARNA NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373412&e=.m3u8
-#EXTINF:-1 tvg-id="373411" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/Zee_Kannada.png",┃ KANNADA ┃ ZEE HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373411&e=.m3u8
-#EXTINF:-1 tvg-id="373410" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/DD_Chandana_Logo.png",┃ KANNADA ┃ DD CHANDANA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373410&e=.m3u8
-#EXTINF:-1 tvg-id="373409" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/udayamusic.png",┃ KANNADA ┃ UDAYA MUSIC
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373409&e=.m3u8
-#EXTINF:-1 tvg-id="373408" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/dighvijaynews.png",┃ KANNADA ┃ DD KANNADA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373408&e=.m3u8
-#EXTINF:-1 tvg-id="373407" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/Public_TV.png",┃ KANNADA ┃ PUBLIC TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373407&e=.m3u8
-#EXTINF:-1 tvg-id="373406" group-title="🌎 Worldwide | Asia Kannada" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/KANADA/Zee_Kannada%20(1).png",┃ KANNADA ┃ ZEE KANNADA HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373406&e=.m3u8
-#EXTINF:-1 tvg-id="373438" group-title="🌎 Worldwide | Asia Marathi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MARATHI/Colors_Marathi.png",┃ MARATHI ┃ COLORS MARATHI HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373438&e=.m3u8
-#EXTINF:-1 tvg-id="373437" group-title="🌎 Worldwide | Asia Marathi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MARATHI/Sangeet_Marathi.png",┃ MARATHI ┃ SANGEET MARATHI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373437&e=.m3u8
-#EXTINF:-1 tvg-id="373436" group-title="🌎 Worldwide | Asia Marathi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MARATHI/sonymarathi.png",┃ MARATHI ┃ SONY MARATHI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373436&e=.m3u8
-#EXTINF:-1 tvg-id="373435" group-title="🌎 Worldwide | Asia Marathi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MARATHI/sonyaath.png",┃ MARATHI ┃ SONY AATH
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373435&e=.m3u8
-#EXTINF:-1 tvg-id="373434" group-title="🌎 Worldwide | Asia Marathi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MARATHI/Star_Pravah_2019_slogan.png",┃ MARATHI ┃ SAAM MARATHI HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373434&e=.m3u8
-#EXTINF:-1 tvg-id="373433" group-title="🌎 Worldwide | Asia Marathi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MARATHI/Zee_Marathi_2017_logo.png",┃ MARATHI ┃ ZEE MARATHI HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373433&e=.m3u8
-#EXTINF:-1 tvg-id="373432" group-title="🌎 Worldwide | Asia Marathi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MARATHI/Zee_talkies_hd.png",┃ MARATHI ┃ ZEE TALKIES HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373432&e=.m3u8
-#EXTINF:-1 tvg-id="373431" group-title="🌎 Worldwide | Asia Marathi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MARATHI/ddsahyadri.png",┃ MARATHI ┃ DD SAHAYADRI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373431&e=.m3u8
-#EXTINF:-1 tvg-id="373430" group-title="🌎 Worldwide | Asia Marathi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MARATHI/jhakaas9x.png",┃ MARATHI ┃ 9X JHAKAAS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373430&e=.m3u8
-#EXTINF:-1 tvg-id="373429" group-title="🌎 Worldwide | Asia Marathi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MARATHI/Zee-24-taas.png",┃ MARATHI ┃ ZEE 24 TAAS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373429&e=.m3u8
-#EXTINF:-1 tvg-id="373428" group-title="🌎 Worldwide | Asia Marathi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MARATHI/TV9_Marathi.png",┃ MARATHI ┃ TV9 MARATHI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373428&e=.m3u8
-#EXTINF:-1 tvg-id="373427" group-title="🌎 Worldwide | Asia Marathi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/MARATHI/tuljabhavani.png",┃ MARATHI ┃ FAKT MARATHI HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373427&e=.m3u8
-#EXTINF:-1 tvg-id="908617" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/ATN Punjabi 5 HD.png",┃PB┃ ABP SANJHA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908617&e=.m3u8
-#EXTINF:-1 tvg-id="908644" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/BRIT ASIA.png",┃PB┃ BRIT ASIA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908644&e=.m3u8
-#EXTINF:-1 tvg-id="908645" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/CHARDIKALAH TIMES TV.png",┃PB┃ CHARDIKALAH TIMES TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908645&e=.m3u8
-#EXTINF:-1 tvg-id="908622" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/CHARDIKLA TIMES TV.png",┃PB┃ CHARDIKLA TIMES TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908622&e=.m3u8
-#EXTINF:-1 tvg-id="908623" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/DD PUNJABI.png",┃PB┃ DD PUNJABI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908623&e=.m3u8
-#EXTINF:-1 tvg-id="908646" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/DESI CHANNEL.png",┃PB┃ DESI CHANNEL
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908646&e=.m3u8
-#EXTINF:-1 tvg-id="908642" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/FATEH TV.png",┃PB┃ FATEH TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908642&e=.m3u8
-#EXTINF:-1 tvg-id="908614" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/GLOBAL FHD.png",┃PB┃ GLOBAL FHD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908614&e=.m3u8
-#EXTINF:-1 tvg-id="908624" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/INDIA NEWS PUNJAB.png",┃PB┃ INDIA NEWS PUNJAB
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908624&e=.m3u8
-#EXTINF:-1 tvg-id="908643" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/JUS ONE.png",┃PB┃ JUS ONE
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908643&e=.m3u8
-#EXTINF:-1 tvg-id="908621" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/KTV INDIA.png",┃PB┃ KTV INDIA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908621&e=.m3u8
-#EXTINF:-1 tvg-id="908615" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/LIVE PUNJABI HD.png",┃PB┃ LIVE PUNJABI HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908615&e=.m3u8
-#EXTINF:-1 tvg-id="908648" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/LIVING INDIA NEWS.png",┃PB┃ LIVING INDIA NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908648&e=.m3u8
-#EXTINF:-1 tvg-id="908640" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/MAHA.png",┃PB┃ MAHA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908640&e=.m3u8
-#EXTINF:-1 tvg-id="908625" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/MANORANJAN MOVIES.png",┃PB┃ MANORANJAN MOVIES
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908625&e=.m3u8
-#EXTINF:-1 tvg-id="908626" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/MANORANJAN TV.png",┃PB┃ MANORANJAN TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908626&e=.m3u8
-#EXTINF:-1 tvg-id="908627" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/MH1 MUSIC.png",┃PB┃ MH1 MUSIC
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908627&e=.m3u8
-#EXTINF:-1 tvg-id="908628" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/MH1 NEWS.png",┃PB┃ MH1 NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908628&e=.m3u8
-#EXTINF:-1 tvg-id="908629" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/MH1 SHRADDHA.png",┃PB┃ MH1 SHRADDHA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908629&e=.m3u8
-#EXTINF:-1 tvg-id="908630" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/NEWS 18 PUNJAB HARYANA.png",┃PB┃ NEWS 18 PUNJAB HARYANA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908630&e=.m3u8
-#EXTINF:-1 tvg-id="908647" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/PCHS TV HD.png",┃PB┃ PCHS TV HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908647&e=.m3u8
-#EXTINF:-1 tvg-id="908631" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/PITAARA TV.png",┃PB┃ PITAARA TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908631&e=.m3u8
-#EXTINF:-1 tvg-id="908632" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/PRIME ASIA HD.png",┃PB┃ PRIME ASIA HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908632&e=.m3u8
-#EXTINF:-1 tvg-id="908633" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/PTC CHAKDE.png",┃PB┃ PTC CHAKDE
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908633&e=.m3u8
-#EXTINF:-1 tvg-id="908613" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/PTC GOLD TV.png",┃PB┃ PTC GOLD TV
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908613&e=.m3u8
-#EXTINF:-1 tvg-id="908634" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/PTC NEWS.png",┃PB┃ PTC NEWS
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908634&e=.m3u8
-#EXTINF:-1 tvg-id="908616" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/PTC PUNJABI.png",┃PB┃ PTC PUNJABI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908616&e=.m3u8
-#EXTINF:-1 tvg-id="908635" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/PTC PUNJABI.png",┃PB┃ PTC PUNJABI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908635&e=.m3u8
-#EXTINF:-1 tvg-id="908612" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/PTC SIMRAN.png",┃PB┃ PTC SIMRAN
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908612&e=.m3u8
-#EXTINF:-1 tvg-id="908618" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/PUNJABI TV HD.png",┃PB┃ PUNJABI TV HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908618&e=.m3u8
-#EXTINF:-1 tvg-id="908636" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/SANJHA TV HD.png",┃PB┃ SANJHA TV HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908636&e=.m3u8
-#EXTINF:-1 tvg-id="908637" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/SSTV HD.png",┃PB┃ SSTV HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908637&e=.m3u8
-#EXTINF:-1 tvg-id="908641" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/TATA SKY PUNJAB DE RANG.png",┃PB┃ TATA SKY PUNJAB DE RANG
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908641&e=.m3u8
-#EXTINF:-1 tvg-id="908619" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/TV PUNJAB HD.png",┃PB┃ TV PUNJAB HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908619&e=.m3u8
-#EXTINF:-1 tvg-id="908620" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/VISION PUNJAB GURBANI  HD.png",┃PB┃ VISION PUNJAB GURBANI HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908620&e=.m3u8
-#EXTINF:-1 tvg-id="908638" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/ZEE PUNJAB HARYANA   HD.png",┃PB┃ ZEE PUNJAB HARYANA HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908638&e=.m3u8
-#EXTINF:-1 tvg-id="908639" group-title="🌎 Worldwide | Asia Punjabi" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI/ZEE PUNJABI.png",┃PB┃ ZEE PUNJABI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=908639&e=.m3u8
-#EXTINF:-1 tvg-id="734303" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ GURBANI CHANNEL 1
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734303&e=.m3u8
-#EXTINF:-1 tvg-id="734302" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ GURBANI CHANNEL 2
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734302&e=.m3u8
-#EXTINF:-1 tvg-id="734301" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ PUNJABI BOX OFFICE COLLECTION HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734301&e=.m3u8
-#EXTINF:-1 tvg-id="734300" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ PUNJABI COMEDY CLIP
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734300&e=.m3u8
-#EXTINF:-1 tvg-id="734299" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ PUNJABI CINEMA 1 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734299&e=.m3u8
-#EXTINF:-1 tvg-id="734298" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ PUNJABI CINEMA LATEST HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734298&e=.m3u8
-#EXTINF:-1 tvg-id="734297" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ PUNJABI CLASSIC 1 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734297&e=.m3u8
-#EXTINF:-1 tvg-id="734296" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ PUNJABI CLASSIC MOVIES HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734296&e=.m3u8
-#EXTINF:-1 tvg-id="734295" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ PUNJABI ACTION THRILLER CINEMA HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734295&e=.m3u8
-#EXTINF:-1 tvg-id="734294" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ PUNJABI BIOGRAPHY CINEMA HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734294&e=.m3u8
-#EXTINF:-1 tvg-id="734293" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ PUNJABI COMEDY 1 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734293&e=.m3u8
-#EXTINF:-1 tvg-id="734292" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ PUNJABI CRIME HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734292&e=.m3u8
-#EXTINF:-1 tvg-id="734290" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ PUNJABI HISTORY DOCUMENTRY CINEMA HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734290&e=.m3u8
-#EXTINF:-1 tvg-id="734289" group-title="🌎 Worldwide | Asia Punjabi Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/PUNJABI PREMIUM/PUNJABI CINEMA.png",┃PUNJABI┃ PUNJABI MIX HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734289&e=.m3u8
-#EXTINF:-1 tvg-id="373497" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/History_TV18_29.png",┃TELEGU┃ HISTORY 18 TELUGU HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373497&e=.m3u8
-#EXTINF:-1 tvg-id="373496" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/Star_Maa_Movies.png",┃TELEGU┃ STAR MAA MOVIES HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373496&e=.m3u8
-#EXTINF:-1 tvg-id="373495" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/Nat_Geo_Telugu.png",┃TELEGU┃ NATIONAL GEOGRAPHIC HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373495&e=.m3u8
-#EXTINF:-1 tvg-id="373494" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/raj_telugu_msx.png",┃TELEGU┃ RAJ MUSIC TELUGU
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373494&e=.m3u8
-#EXTINF:-1 tvg-id="373493" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/Raj_news.png",┃TELEGU┃ RAJ NEWS TELUGU
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373493&e=.m3u8
-#EXTINF:-1 tvg-id="373492" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/BBC_Earth.png",┃TELEGU┃ SONY BBC EARTH HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373492&e=.m3u8
-#EXTINF:-1 tvg-id="373491" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/Star_Maa_Gold_2019.png",┃TELEGU┃ STAR MAA GOLD HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373491&e=.m3u8
-#EXTINF:-1 tvg-id="373490" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/Star_maa.png",┃TELEGU┃ STAR MAA HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373490&e=.m3u8
-#EXTINF:-1 tvg-id="373489" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/tatasky.png",┃TELEGU┃ TATA SKY TELUGU CINEMA HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373489&e=.m3u8
-#EXTINF:-1 tvg-id="373485" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/Zee_Telugu_logo.png",┃TELEGU┃ ZEE CINEMALU HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373485&e=.m3u8
-#EXTINF:-1 tvg-id="373484" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/Zee_Telugu_logo.png",┃TELEGU┃ ZEE TELUGU HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373484&e=.m3u8
-#EXTINF:-1 tvg-id="373479" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/Sony_Yay_new.png",┃TELEGU┃ SONIC
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373479&e=.m3u8
-#EXTINF:-1 tvg-id="373477" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/DD_Saptagiri_New_logo.png",┃TELEGU┃ DD SAPTAGIRI
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373477&e=.m3u8
-#EXTINF:-1 tvg-id="373474" group-title="🌎 Worldwide | Asia Telegu" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TELEGU/96040-KushiTV.png",┃TELEGU┃  STAR MAA
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=373474&e=.m3u8
 
-#EXTINF:-1 tvg-id="734186" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/TOP 250 MOVIES.png",┃INDIAN ┃TAMIL┃ TOP 250 MOVIES HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734186&e=.m3u8
-#EXTINF:-1 tvg-id="734185" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/POPULAR MOVIES.png",┃INDIAN ┃TAMIL┃ POPULAR MOVIES HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734185&e=.m3u8
-#EXTINF:-1 tvg-id="734184" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/EROSNOW CINEMA.png",┃INDIAN ┃TAMIL┃ EROSNOW CINEMA HD 1
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734184&e=.m3u8
-#EXTINF:-1 tvg-id="734183" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/COMEDY CLIP.png",┃INDIAN ┃TAMIL┃ COMEDY CLIP
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734183&e=.m3u8
-#EXTINF:-1 tvg-id="734182" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/CLASSIC CINEMA.png",┃INDIAN ┃TAMIL┃ CLASSIC CINEMA 1 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734182&e=.m3u8
-#EXTINF:-1 tvg-id="734181" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/CLASSIC CINEMA.png",┃INDIAN ┃TAMIL┃ CLASSIC CINEMA 2 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734181&e=.m3u8
-#EXTINF:-1 tvg-id="734180" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/CLASSIC CINEMA.png",┃INDIAN ┃TAMIL┃ CLASSIC CINEMA 3 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734180&e=.m3u8
-#EXTINF:-1 tvg-id="734179" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/CLASSIC CINEMA.png",┃INDIAN ┃TAMIL┃ CLASSIC CINEMA 4 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734179&e=.m3u8
-#EXTINF:-1 tvg-id="734178" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/CLASSIC CINEMA.png",┃INDIAN ┃TAMIL┃ CLASSIC CINEMA 5 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734178&e=.m3u8
-#EXTINF:-1 tvg-id="734177" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/CLASSIC CINEMA.png",┃INDIAN ┃TAMIL┃ CLASSIC CINEMA 6 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734177&e=.m3u8
-#EXTINF:-1 tvg-id="734176" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/CLASSIC CINEMA.png",┃INDIAN ┃TAMIL┃ CLASSIC CINEMA 7 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734176&e=.m3u8
-#EXTINF:-1 tvg-id="734175" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/CINEMA 1.png",┃INDIAN ┃TAMIL┃ CINEMA 1 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734175&e=.m3u8
-#EXTINF:-1 tvg-id="734174" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/CINEMA 9 HD.png",┃INDIAN ┃TAMIL┃ CINEMA 9 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734174&e=.m3u8
-#EXTINF:-1 tvg-id="734173" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/MIX CINEMA 1.png",┃INDIAN ┃TAMIL┃ MIX CINEMA 1 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734173&e=.m3u8
-#EXTINF:-1 tvg-id="734172" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/FANTASY CINEMA 1.png",┃INDIAN ┃TAMIL┃ FANTASY CINEMA 1 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734172&e=.m3u8
-#EXTINF:-1 tvg-id="734171" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/HORROR CINEMA.png",┃INDIAN ┃TAMIL┃ HORROR CINEMA 1 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734171&e=.m3u8
-#EXTINF:-1 tvg-id="734170" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/MUSICAL CINEMA.png",┃INDIAN ┃TAMIL┃ MUSICAL CINEMA 1 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734170&e=.m3u8
-#EXTINF:-1 tvg-id="734169" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/ROMANCE CINEMA 1.png",┃INDIAN ┃TAMIL┃ ROMANCE CINEMA 1 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734169&e=.m3u8
-#EXTINF:-1 tvg-id="734168" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/ACTION COMEDY 3.png",┃INDIAN ┃TAMIL┃ ACTION COMEDY  3 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734168&e=.m3u8
-#EXTINF:-1 tvg-id="734167" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/COMEDY CINEMA 3.png",┃INDIAN ┃TAMIL┃ COMEDY CINEMA 3 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734167&e=.m3u8
-#EXTINF:-1 tvg-id="734162" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/COMEDY CINEMA 1.png",┃INDIAN ┃TAMIL┃ COMEDY CINEMA 1 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734162&e=.m3u8
-#EXTINF:-1 tvg-id="734161" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/ACTION ADVENTURE.png",┃INDIAN ┃TAMIL┃ ACTION ADVENTURE HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734161&e=.m3u8
-#EXTINF:-1 tvg-id="734160" group-title="🌎 Worldwide | Asia Tamil Premium" tvg-logo="http://picon.tivi-ott.net:25461/picon/ASIA/TAMIL PREMIUM/ACTION CINEMA 1.png",┃INDIAN ┃TAMIL┃ ACTION CINEMA 1 HD
-https://ranapkx.site/RANAPK33k/TVD/play.php?id=734160&e=.m3u8
+
+
+
 
 
 #EXTINF:-1 tvg-id="1315" group-title="🌎 Worldwide | Others" tvg-logo="http://picon.tivi-ott.net:25461/picon/NEDERLAND/FOXHD.png",┃NL┃ STAR CHANNEL HD ⏺ʳᵉᶜ
