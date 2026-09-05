@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     const url3 = "https://old-shape-1bd3.poonamchouhan076.workers.dev/";
     const url4 = "https://raw.githubusercontent.com/Prtstream820894/Adult/refs/heads/main/merged_playlist.m3u"; // Nayi playlist add ki gayi hai
     const url5 = "https://divine-moon-058f.poonamchouhan076.workers.dev/";
-    const url6 = "https://raw.githubusercontent.com/Prtstream820894/Api/refs/heads/main/world.txt";
+    const url6 = "https://raw.githubusercontent.com/Prtstream820894/Api/refs/heads/main/worl.txt";
     const url7 = "https://hdhub4u-lake-f103.poonamchouhan076.workers.dev/";// Nayi NCC playlist add ki gayi hai
   
     
