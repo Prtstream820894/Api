@@ -10,12 +10,9 @@ export default async function handler(req, res) {
   try {
     const url1 = "https://lucky-hat-6f1c.poonamchouhan076.workers.dev/";
     const url2 = "https://raw.githubusercontent.com/Prtstream820894/Allmovies-playlist/refs/heads/main/playlist.m3u";
-    
-    const url4 = "https://raw.githubusercontent.com/Prtstream820894/Adult/refs/heads/main/merged_playlist.m3u"; // Nayi playlist add ki gayi hai
-    
-    const url6 = "https://raw.githubusercontent.com/Prtstream820894/Api/refs/heads/main/worl.txt";
-    
-    const url8 = "https://raw.githubusercontent.com/Prtstream820894/iptv-checker/refs/heads/main/working.m3u";// Nayi NCC playlist add ki gayi hai
+    const url3 = "https://raw.githubusercontent.com/Prtstream820894/Adult/refs/heads/main/merged_playlist.m3u"; // Nayi playlist add ki gayi hai 
+    const url4 = "https://raw.githubusercontent.com/Prtstream820894/Api/refs/heads/main/worl.txt";
+    const url5 = "https://raw.githubusercontent.com/Prtstream820894/iptv-checker/refs/heads/main/working.m3u";// Nayi NCC playlist add ki gayi hai
   
     
 
@@ -60,12 +57,9 @@ export default async function handler(req, res) {
     const responses = await Promise.all([
       fetchWithTimeout(url1, 20000),
       fetchWithTimeout(url2, 30000),
-      
+      fetchWithTimeout(url3, 20000),
       fetchWithTimeout(url4, 20000),
-      
-      fetchWithTimeout(url6, 20000),
-      
-      fetchWithTimeout(url8, 30000),// Nayi URL ke liye timeout add kiya gaya hai
+      fetchWithTimeout(url5, 30000),// Nayi URL ke liye timeout add kiya gaya hai
     ]);
 
     if (!responses[0]) {
