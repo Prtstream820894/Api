@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   try {
     const url1 = "https://lucky-hat-6f1c.poonamchouhan076.workers.dev/";
     const url2 = "https://raw.githubusercontent.com/Prtstream820894/Allmovies-playlist/refs/heads/main/playlist.m3u";
-    const url3 = "https://raw.githubusercontent.com/Prtstream820894/Prmovies/refs/heads/main/playlist.m3u"; // Nayi playlist add ki gayi hai 
+    const url3 = "https://raw.githubusercontent.com/Prtstream820894/Prtlive_stream/refs/heads/main/playlist.m3u"; // Nayi playlist add ki gayi hai 
     const url4 = "https://raw.githubusercontent.com/Prtstream820894/Mymovies/refs/heads/main/toffy.m3u";
     const url5 = "https://raw.githubusercontent.com/Prtstream820894/Api/refs/heads/main/worl.txt";
     const url6 = "https://raw.githubusercontent.com/Prtstream820894/iptv-checker/refs/heads/main/working.m3u";
