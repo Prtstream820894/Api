@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  let current_cookie = "hdntl=exp=1791032018~acl=%2f*~id=a9e407ec0862848f9d79c9fe197be629~data=hdntl~hmac=6f63427b53603dadfc728f7e70fe9cec540330b35eb888d60261c9c162ef1644"; // Jab bhi pre-configured rakhni ho yahan daal dena
+  let current_cookie = ""; // Jab bhi pre-configured rakhni ho yahan daal dena
 
   if (current_cookie && current_cookie.trim() !== "") {
     return res.status(200).send(`
@@ -14,47 +14,20 @@ export default async function handler(req, res) {
   let extracted_cookie = null;
   let source_label = "Live Extracted Cookie";
 
-  // Step 1 & Step 2: Seedha Firebase REST se cookie ya link uthao (Direct Denver URL hit hata diya hai)
+  // Step 1: Seedha naye Firebase /cookie.json se hdntl cookie uthao
   try {
-    const fbRes = await fetch("https://ipl2020-46d2f.firebaseio.com/Denver.json");
-    const denverData = await fbRes.json();
+    const fbRes = await fetch("https://ipl2020-46d2f.firebaseio.com/cookie.json");
+    const cookieData = await fbRes.json();
 
-    if (denverData) {
-      // Agar direct stored cookie milti hai jo 'xyz' nahi hai
-      if (denverData.cookie && denverData.cookie !== "xyz") {
-        extracted_cookie = denverData.cookie;
-        source_label = "Firebase Stored Cookie";
-      } 
-      // Nahi toh Firebase me diye gaye 'Link' se fetch karo (Ye sirf tabhi hoga jab tera background app code ya koi ek authorized process karega)
-      else if (denverData.Link) {
-        const fbResponse = await fetch(denverData.Link, {
-          headers: {
-            "User-Agent": "Mozilla/5.0",
-            "Accept": "*/*"
-          }
-        });
-        const fbText = await fbResponse.text();
-        const fbLines = fbText.split("\n");
-        for (let line of fbLines) {
-          if (line.includes("jcevent") || line.includes("Cookie=")) {
-            let match = line.match(/Cookie=([^&]+)/);
-            if (match) {
-              extracted_cookie = match[1].trim();
-              break;
-            } else if (line.includes("?")) {
-              extracted_cookie = line.substring(line.indexOf("?") + 1).trim();
-              break;
-            }
-          }
-        }
-        if (extracted_cookie) source_label = "Firebase Link Extracted Cookie";
-      }
+    if (cookieData && cookieData.hdntl) {
+      extracted_cookie = cookieData.hdntl;
+      source_label = "Firebase Stored Cookie";
     }
   } catch (fbErr) {
     console.log("Firebase REST fetch failed:", fbErr.message);
   }
 
-  // Step 3: Purana worker fallback agar Firebase me na mile
+  // Step 2: Purana worker fallback agar Firebase me na mile
   if (!extracted_cookie) {
     try {
       const response = await fetch(fallback_url, {
